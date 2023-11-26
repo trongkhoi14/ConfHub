@@ -26,7 +26,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
 // middleware serve static files
-// chưa cần :>>
+// chưa cần :>>>
 
 // connect to database
 dbConnect()

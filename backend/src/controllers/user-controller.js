@@ -1,22 +1,15 @@
 const {status} = require('./../constants');
+const { userModel } = require('./../models')
 
 class UserController {
     // [GET] /api/v1/user/all
-    getAll = async(req, res, next) => {
-        const user = [
-            {
-                id: 1,
-                username: 'khoi'
-            },
-            {
-                id: 2,
-                username: 'khoi2'
-            }
-        ]
+    getAll = async (req, res, next) => {
+        const users = await userModel.getAll();
+        console.log(users)
         try {
             res.status(status.OK).json({
                 message: 'get all user successfully',
-                data: user
+                data: users
             })
         } catch(err) {
             next(err);
