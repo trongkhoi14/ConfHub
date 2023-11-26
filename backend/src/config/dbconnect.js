@@ -1,6 +1,5 @@
 const connection = require('./database')
 
-
 const dbConnect = async () => {
     try {
         await connection.connect();
