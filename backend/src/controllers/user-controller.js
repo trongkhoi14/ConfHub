@@ -4,8 +4,9 @@ const { userModel } = require('./../models')
 class UserController {
     // [GET] /api/v1/user/all
     getAll = async (req, res, next) => {
+        // Trỏ xuống model lấy dữ liệu 
         const users = await userModel.getAll();
-        console.log(users)
+                             
         try {
             res.status(status.OK).json({
                 message: 'get all user successfully',

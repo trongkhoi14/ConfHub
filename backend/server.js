@@ -41,5 +41,5 @@ app.use(errorHandlingMDW.handleErrorOccurAfterRequest)
 
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`server was running on port ${port}`)
 })
