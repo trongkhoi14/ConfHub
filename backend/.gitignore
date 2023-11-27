@@ -8,11 +8,6 @@ pnpm-debug.log*
 lerna-debug.log*
 Dockerfile
 
-
-.env.production
-docker-compose.yml
-docker-compose.production.yml
-
 node_modules
 dist
 dist-ssr
