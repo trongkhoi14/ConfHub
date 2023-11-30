@@ -7,7 +7,7 @@ const dbConnect = async () => {
         //console.log(result)
         console.log("DB is connecting!")
     } catch (e) {
-        console.log('Error at connecting to MongoDB')
+        console.log('Error at connecting to MSSQL')
         throw new Error('Cannot connect to the Database:\n' + e)
     }
 }
