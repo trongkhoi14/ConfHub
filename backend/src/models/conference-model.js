@@ -1,7 +1,17 @@
 const connection = require('./../config/database')
 
 module.exports = {
-    getAll: async (skip, size) => {
+    getQuantity: async () => {
+        try {
+            await connection.connect();
+            const result = await connection.request().query(`SELECT COUNT(*) AS value FROM dbo.CONFERENCE`)
+            return result.recordset;
+        } catch (error) {
+            console.log(error) 
+        }
+    },
+
+    getPage: async (skip, size) => {
         try {
             await connection.connect();
             let sql = `SELECT CONF_ID AS conf_id `

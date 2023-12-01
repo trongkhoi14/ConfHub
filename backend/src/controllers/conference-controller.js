@@ -3,19 +3,21 @@ const {status} = require('./../constants');
 const model = require('./../models')
 
 class ConferenceController {
-    // [GET] /api/v1/conference/all
-    getAll = async (req, res, next) => {
-        const page = req.query.page
+    // [GET] /api/v1/conference/
+    getPage = async (req, res, next) => {
+        const page = req.query.page || 1
         const size = req.query.size || 5
         var skip = page * size - size
         let result = []
         let msg = ``
-        // Trỏ xuống model lấy dữ liệu 
-        const conferences = await model.conferenceModel.getAll(skip, size);
-        let psize = conferences.length
-        if (psize == 0) {
+        // Trỏ xuống model lấy dữ liệu
+        let quantity = await model.conferenceModel.getQuantity()
+        var max_page = Math.ceil(quantity[0].value * 1.0 / size)
+        if (page > max_page || page < 1) {
             msg = `Page is not existed.`
         } else {
+            const conferences = await model.conferenceModel.getPage(skip, size);
+            let psize = conferences.length
             for (let i = 0; i < psize; i++) {
                 const id = conferences[i].conf_id
                 const info = await model.conferenceModel.getDetail(id)
@@ -59,11 +61,7 @@ class ConferenceController {
                 }
                 result.push(conference)
             }
-            if (psize <= size) {
-                msg = `Get all ${psize} conferences at page ${page} successfully`
-            } else {
-                msg = `Get all ${size} conferences at page ${page} successfully`
-            }
+            msg = `Get all ${psize} conferences at page ${page} successfully`
         }    
         try {
             res.status(status.OK).json({

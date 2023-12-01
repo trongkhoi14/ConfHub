@@ -4,7 +4,7 @@ const { ConferenceController } = require('../controllers');
 const router = express.Router();
 const conferenceController = new ConferenceController();
 
-router.get('/', conferenceController.getAll);
+router.get('/', conferenceController.getPage);
 router.get('/:id/detail', conferenceController.getDetail);
 
 module.exports = router;
