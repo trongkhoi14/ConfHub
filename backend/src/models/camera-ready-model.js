@@ -1,7 +1,7 @@
 const connection = require('../config/database')
 
 module.exports = {
-    getDetail: async (id) => {
+    getCameraReady: async (id) => {
         try {
             await connection.connect();
             const result = await connection.request().query(`SELECT CAMERA_READY_ID AS cr_id, `

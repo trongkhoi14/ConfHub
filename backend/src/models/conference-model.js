@@ -11,7 +11,7 @@ module.exports = {
         }
     },
 
-    getPage: async (skip, size) => {
+    getAllConference: async (skip, size) => {
         try {
             await connection.connect();
             let sql = `SELECT CONF_ID AS conf_id `
@@ -25,7 +25,7 @@ module.exports = {
         }
     },
 
-    getDetail: async (id) => {
+    getConference: async (id) => {
         try {
             await connection.connect();
             const result = await connection.request().query(`SELECT CONF_ID AS conf_id, `

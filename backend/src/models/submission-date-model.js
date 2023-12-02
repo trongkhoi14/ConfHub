@@ -1,7 +1,7 @@
 const connection = require('../config/database')
 
 module.exports = {
-    getDetail: async (id) => {
+    getSubmissionDate: async (id) => {
         try {
             await connection.connect();
             const result = await connection.request().query(`SELECT SUB_ID AS sub_id, `

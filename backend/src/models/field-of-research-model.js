@@ -1,7 +1,7 @@
 const connection = require('../config/database')
 
 module.exports = {
-    getAll: async () => {
+    getAllFOR: async () => {
         try {
             await connection.connect();
             const result = await connection.request().query(`SELECT * FROM dbo.FIELD_OF_RESEARCH`)
@@ -11,7 +11,7 @@ module.exports = {
         }
     },
 
-    getDetail: async (id) => {
+    getConferenceFOR: async (id) => {
         try {
             await connection.connect();
             const sql = `SELECT TB2.FOR_NAME AS for_name ` 

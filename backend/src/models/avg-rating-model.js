@@ -1,7 +1,7 @@
 const connection = require('../config/database')
 
 module.exports = {
-    getDetail: async (id) => {
+    getConferenceRating: async (id) => {
         try {
             await connection.connect();
             const sql = `SELECT RATE_ID as rate_id, `

@@ -1,7 +1,7 @@
 const connection = require('../config/database')
 
 module.exports = {
-    getDetail: async (id) => {
+    getImportantDate: async (id) => {
         try {
             await connection.connect();
             const result = await connection.request().query(`SELECT TB1.DATE_ID AS date_id, TB2.DOC_TYPE AS doc_type `
