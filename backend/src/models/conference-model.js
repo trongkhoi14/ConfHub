@@ -33,6 +33,7 @@ module.exports = {
                                                             + `CONF_SOURCE AS source, `
                                                             + `CONF_ACRONYM AS acronym, `
                                                             + `CONF_RANK AS rank, `
+                                                            + `CONF_DATE AS date, `
                                                             + `CONF_LOCATION AS location, `
                                                             + `CONF_TYPE AS type, `
                                                             + `CONF_IMPACT_FACTOR AS impact_factor, `
