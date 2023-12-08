@@ -4,7 +4,7 @@ require('dotenv').config();
 const router = require('./src/routes')
 const dbConnect = require('./src/config/dbconnect')
 const cookieParser = require('cookie-parser')
-const { errorHandlingMDW } = require('./src/middlewares');
+const { notFound, errorHandler } = require('./src/middlewares/errorHandling')
 const { rateLimiter } = require('./src/utils/rate-limiter');
 const { infoLogger } = require('./src/utils/logger');
 
@@ -35,11 +35,12 @@ dbConnect()
 router(app)
 
 // middleware handle error
-app.use(errorHandlingMDW.handleErrorOccurAfterRequest)
+app.use(notFound)
+app.use(errorHandler)
 
 // schedule crawl data
 
 
 app.listen(port, () => {
-  console.log(`server was running on port ${port}`)
+  console.log(`Server was running on port ${port}`)
 })
