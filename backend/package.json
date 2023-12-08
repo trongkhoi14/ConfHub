@@ -20,6 +20,7 @@
     "express-winston": "^2.6.0",
     "jsonwebtoken": "^9.0.2",
     "mssql": "^10.0.1",
+    "nvm": "^0.0.4",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1"
   },
