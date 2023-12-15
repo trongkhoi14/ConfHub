@@ -1,10 +1,8 @@
-const { status } = require('./../constants');
-const { userModel } = require('./../models')
+const User = require('../models/user-model')
 const asyncHandler = require('express-async-handler')
 const jwt = require('jsonwebtoken')
 const { generateAccessToken, generateRefreshToken} = require('../middlewares/jwt')
-const CryptoJS = require('crypto-js');
-const hashLength = 64;
+
 
 class UserController {
     // [POST] /api/v1/user/register
@@ -13,39 +11,19 @@ class UserController {
         const { name, phone, email, address, nationality, password } = req.body
         if (!name || !phone || !email || !address || !nationality || !password) {
             return res.status(400).json({
-                message: "Missing registration information",
-                data: []
+                status: false,
+                data: "Missing registration information"
             })
         }
         // check if the user with email are already existed
-        const user = await userModel.getUserByEmail(email);
-        if (user.length > 0) {
-            throw new Error('Email already exists');
+        const user = await User.findOne({email})
+        if (user) {
+            throw new Error('Email already exists')
         } else {
-            // hash password
-            const salt = Date.now().toString(16);
-            const pwSalt = password + salt;
-            const pwHashed = CryptoJS.SHA3(pwSalt, { outputLength: hashLength*4 })
-                .toString(CryptoJS.enc.Hex);
-
-            // get list all account
-            const allAccount = await userModel.getAllUser();
-
-            const acc = {
-                id: `A0${allAccount.length+1}`,
-                name: name,
-                phone: phone,
-                email: email,
-                address: address,
-                nationality: nationality,
-                password: pwHashed + salt
-            }
-
-            // add new user (new account)
-            const newUser = await userModel.createUser(acc);
+            const newUser = await User.create(req.body);
             return res.status(201).json({
                 message: "Registration was successfully, please login",
-                data: []
+                data: newUser
             })
         }
     })
@@ -61,42 +39,34 @@ class UserController {
                 data: []
             })
         }
-
-        // Kiểm tra email
-        const users = await userModel.getUserByEmail(email);
-        if (users.length == 0) {
+        const response = await User.findOne({email});
+        if (!response) {
             return res.status(400).json({
                 message: "Email not found.",
                 data: []
             })
         }
-        
-        // Kiểm tra mật khẩu 
-        const passwordDB = users[0].ACC_PASSWORD;
-        const salt = passwordDB.slice(hashLength);
-        const pwSalt = password + salt;
-        const pwHashed = CryptoJS.SHA3(pwSalt, { outputLength: hashLength*4 })
-            .toString(CryptoJS.enc.Hex);
-
-        if (passwordDB === (pwHashed + salt)) {
-            const userData = users[0]
+        const passwordCorrect = await response.isCorrectPassword(password);
+        //console.log(passwordCorrect);
+        if (passwordCorrect) {
+            const userData = response.toObject()
             // generate access token
-            const accessToken = generateAccessToken(userData.ACC_ID)
+            const accessToken = generateAccessToken(response._id, userData.role)
             // generate refresh token
-            const newRefreshToken = generateRefreshToken(userData.ACC_ID)
+            const newRefreshToken = generateRefreshToken(response._id)
             // save refresh token to the database
-            await userModel.updateUserTokenById(userData.ACC_ID, newRefreshToken)
+            await User.findByIdAndUpdate(response._id, {refreshToken: newRefreshToken}, {new: true})
             // save refresh token to cookie
             res.cookie('refreshToken', newRefreshToken, {httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000})
             return res.status(200).json({
-                message: "Login successfully",
+                status: true,
                 data: {
-                    id: userData.ACC_ID,
-                    name: userData.ACC_NAME,
-                    phone:userData.ACC_PHONE,
-                    email:userData.ACC_EMAIL,
-                    address:userData.ACC_ADDRESS,
-                    nationality:userData.ACC_NATIONALITY,
+                    name: userData.name,
+                    phone: userData.phone,
+                    email: userData.email,
+                    address: userData.address,
+                    nationality: userData.nationality,
+                    role: userData.role,
                     accessToken
                 }
             })
@@ -108,12 +78,74 @@ class UserController {
         }
     })
 
+    // 
+    getCurrentUser = asyncHandler( async (req, res) => {
+        const { _id } = req.user
+        const user = await User.findById(_id).select('-refreshToken -password -role -passwordChangedAt -passwordResetToken -passwordResetExpires')
+        return res.status(200).json({
+            status: user ? true:false,
+            data: user ? user: 'User not found'
+        })
+    })
+
+    //
+    changePassword = asyncHandler( async (req, res) => {
+        const { _id } = req.user
+        if (!_id || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                status: false,
+                message: "Nothing was updated."
+            })
+        }
+        const {currentPassword, newPassword } = req.body
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                status: false,
+                message: "Missing inputs"
+            })
+        }
+        // find the user
+        const user = await User.findById(_id);
+        const isCorrectPassword = await user.isCorrectPassword(currentPassword);
+        if (!isCorrectPassword) {
+            return res.status(400).json({
+                status: false,
+                message: "Current password did not match."
+            })
+        }
+        //const hashedPassword = generatePassword(newPassword);
+        user.password = newPassword
+        await user.save();
+    
+        return res.status(200).json({
+            status: true,
+            message: "Password was changed successfully."
+        })
+    })
+
+    //
+    refreshAccessToken = asyncHandler(async (req, res) => {
+        // get token from cookies
+        const cookie = req.cookies
+        // check if the refresh token is existed
+        if (!cookie && !cookie.refreshToken) throw new Error('No refresh token')
+        const rs = await jwt.verify(cookie.refreshToken, process.env.JWT_SECRET)
+        const response = await User.findOne({_id: rs._id, refreshToken: cookie.refreshToken})
+        return res.status(200).json({
+            status: response ? true:false,
+            data: {
+                newAccessToken: response ? generateAccessToken(response._id, response.role):'Refresh token not matched'
+            }
+        })
+    })
+
+
     // [GET] /api/v1/user/logout
     logout = asyncHandler(async (req, res) => {
         const cookie = req.cookies
         if (!cookie || !cookie.refreshToken) throw new Error('No refresh token in cookies')
         // empty refreshToken in the database
-        await userModel.updateUserTokenByToken(cookie.refreshToken, '')
+        await User.findOneAndUpdate({refreshToken: cookie.refreshToken}, {refreshToken: ''}, {new: true})
         // delete refreshToken in the browser's cookie
         res.clearCookie('refreshToken', {
             httpOnly: true,
