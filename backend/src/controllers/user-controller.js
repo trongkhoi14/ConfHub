@@ -59,7 +59,7 @@ class UserController {
             // save refresh token to cookie
             res.cookie('refreshToken', newRefreshToken, {httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000})
             return res.status(200).json({
-                status: true,
+                message: "Login successfully",
                 data: {
                     name: userData.name,
                     phone: userData.phone,
