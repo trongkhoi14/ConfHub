@@ -13,7 +13,10 @@ var conferenceSchema = new mongoose.Schema({
         type: String,
     },
     source: {
-        typre: String,
+        type: String,
+    },
+    category: {
+        type: String
     },
     rank: {
         type: String,
@@ -28,19 +31,19 @@ var conferenceSchema = new mongoose.Schema({
         type: String,
     },
     impactFactor: {
-        type: String,
+        type: Number,
     },
     link: {
         type: String,
     },
     rating: {
-        welcoming: String,
-        feedback: String,
-        networking: String,
-        interaction: String,
-        topPeople: String,
-        worthwhile: String,
-        avgRating: String,
+        welcoming: Number,
+        feedback: Number,
+        networking: Number,
+        interaction: Number,
+        topPeople: Number,
+        worthwhile: Number,
+        avgRating: Number,
     },
     callForPapers: [{
         content: String,
