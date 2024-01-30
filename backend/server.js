@@ -13,9 +13,7 @@ const { infoLogger } = require('./src/utils/logger');
 const app = express()
 const port = process.env.PORT || 8081
 
-app.use(cors({
-  origin: '*'
-}))
+app.use(cors())
 
 // middleware parse cookie
 app.use(cookieParser())
