@@ -41,7 +41,9 @@ app.use(errorHandler)
 
 // schedule crawl data
 
-app.use(cors())
+app.use(cors({
+  origin: '*'
+}))
 app.listen(port, () => {
   console.log(`Server was running on port ${port}`)
 })
