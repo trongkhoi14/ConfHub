@@ -93,7 +93,7 @@ class ConferenceController {
             arr.unshift(req.query.category)
             category = arr
         }
-        
+
         // acronym
         let acronym = req.query.acronym || ["all"];
         if (acronym[0] === "all") {
@@ -102,10 +102,10 @@ class ConferenceController {
 
         // rating
         let rating = parseFloat(req.query.rating) || 0;
-        
+
         // impact factor
         let impactFactor = parseFloat(req.query.impactFactor) || 0;
-        
+
         // holding type
         let type = req.query.type || "all";
         if (type === "all") {
@@ -183,6 +183,7 @@ class ConferenceController {
         try {
             res.status(status.OK).json({
                 amount: count,
+                maxPage: Math.ceil(count / size),
                 locations,
                 ranks,
                 fors,
@@ -192,6 +193,19 @@ class ConferenceController {
                 conferences
             })
         } catch (err) {
+            next(err);
+        }
+    }
+
+    // [GET] /api/v1/conference?id
+    getConference = async (req, res, next) => {
+        const id = req.params?.id;
+        const conference = await conferenceModel.find({ _id: id });
+        try {
+            res.status(status.OK).json({
+                conference,
+            })
+        } catch(err) {
             next(err);
         }
     }
