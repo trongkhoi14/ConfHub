@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 
 const router = require('./src/routes')
@@ -40,7 +41,7 @@ app.use(errorHandler)
 
 // schedule crawl data
 
-
+app.use(cors())
 app.listen(port, () => {
   console.log(`Server was running on port ${port}`)
 })
