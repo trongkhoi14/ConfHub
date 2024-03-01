@@ -17,13 +17,15 @@ import { AuthLayout } from '../layout/AuthLayout'
 import InformationPage from '../pages/public/InformationPage'
 import ImportantDatePage from '../pages/public/ImportantDatePage'
 import CallforpaperPage from '../pages/public/CallforpaperPage'
+import Setting from '../pages/auth/Setting'
 
 const authPage = [
   {path: 'account', element: <Account/>},
   {path: 'followed', element: <Followed/>},
   {path: 'yourconferences', element: <YourConf/>},
-  {path: 'timestamp', element: <Timestamp/>},
+  {path: 'schedule', element: <Timestamp/>},
   {path: 'notifications', element: <Notifications/>},
+  {path: 'setting', element: <Setting/>},
 ]
 const RoutesApp = () => {
   return (
@@ -33,10 +35,9 @@ const RoutesApp = () => {
           <Route path="home" element={<Homepage />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path="detail/:id/information" element={<InformationPage />} />
-          <Route path="detail/:id/importantdates" element={<ImportantDatePage />} />
-          <Route path="detail/:id/callforpaper" element={<CallforpaperPage />} />
-
+          <Route path="/detail/:id/information" element={<InformationPage />} />
+          <Route path="/detail/:id/importantdates" element={<ImportantDatePage />} />
+          <Route path="/detail/:id/callforpaper" element={<CallforpaperPage />} />
 
           <Route element={<AuthLayout/>}>
             {

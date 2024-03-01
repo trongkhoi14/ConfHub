@@ -6,6 +6,9 @@ h1,h2,h3,h4,h5{
     color: #434343;
     font-weight: bold;
 }
+.f6{
+    font-size: 10px;
+}
 
 /*pramy green*/
 .bg-primary-normal{
@@ -19,6 +22,12 @@ h1,h2,h3,h4,h5{
 }
 .bg-primary-dark{
     background-color: #419489;
+}
+button.bg-primary-dark:hover{
+    background-color: rgb(71, 163, 151);
+}
+button.bg-primary-dark:active{
+    background-color: rgb(52, 118, 110);
 }
 .bg-primary-light{
     background-color: #C2F1EB;
@@ -51,7 +60,7 @@ button.text-primary-normal:hover {
 .bg-red-normal{
     background-color: #E95D54;
 }
-.bg-red-normal:hover{
+button.bg-red-normal:hover{
     background-color: #D2544C;
 }
 
@@ -83,6 +92,9 @@ button.bg-blue-normal:hover{
 .bg-blue-light{
     background-color: #E8F1F3;
 }
+.bg-blue-dark{
+    background-color: #1A7482;
+}
 .text-blue-normal{
     color: #1A7482;
 }
@@ -95,15 +107,15 @@ button.bg-blue-normal:hover{
 .bg-brown-normal{
     background-color: #F9C9A0;
 }
-.bg-brown-normal:hover{
+button.bg-brown-normal:hover{
     background-color: #E0B590;
 }
-.bg-brown-normal:hover{
+button.bg-brown-normal:hover{
     background-color: #C7A180;
 }
 
 /*yellow*/
-.bg-yellow{
+.bg-yellow-normal{
     background-color: #FFB13B;
 }
 .text-yellow{
@@ -198,7 +210,7 @@ a{
 .my-header-bg-icon{
     width: 40px;
     height: 40px;
-    background-color: #DBF0ED;
+    background-color: white;
     display: flex;
     justify-content: center;
 }
@@ -208,7 +220,6 @@ a{
     height: 25px;
 }
 
-
 .noti.dropdown-toggle::after{
     content:none;
 }
@@ -216,8 +227,9 @@ a{
     background-color: #E6F6F4;
 }
 .btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active{
-    background-color: #CBEDE8;
+    background-color: white;
 }
+
 
 /*Slider*/
 
@@ -287,7 +299,7 @@ a{
     text-align: center;
     cursor: pointer;
 }
-.icon-sslider-follow{
+.icon-slider-follow{
     position: absolute;
     width: 30px;
     height: 30px;
@@ -372,9 +384,17 @@ a{
 
 
 /*Sidebar*/
-
+.my-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 300px; /* Điều chỉnh chiều rộng của sidebar tùy thuộc vào yêu cầu */
+    background-color: #419489; /* Màu nền của sidebar */
+    border-right: 1px solid #dee2e6; /* Viền phải của sidebar */
+  }
 .my-sidebar-navlink{
-    color: #4EB1A4;
+    color: white;
     font-size: 20px;
 }
 
@@ -382,3 +402,4 @@ a{
     background-color: #469E92;
     color: white;
 }
+

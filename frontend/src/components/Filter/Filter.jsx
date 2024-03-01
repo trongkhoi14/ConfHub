@@ -1,5 +1,5 @@
 import { Stack, Form, InputGroup, Button, Image, Container, Row, Col } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import DateRangePicker from "./DateRangePicker";
 import AdvancedFilter from "./AdvancedFilter";
@@ -11,25 +11,17 @@ import FilterSelected from "./FilterSelected";
 import useFilter from "../../hooks/useFilter";
 import Options from "./Options";
 
-const Filter = ({ showResult, setShowResult, setSelectedFilters }) => {
-  const {keywordFilter, addFilter} = useFilter()
-  const [selectedValues, setSelectedValues] = useState([])
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
+const Filter = () => {
+  const {optionsSelected, sendFilter, addKeywords} = useFilter()
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
-  
-
-  useEffect(()=>{
-
-  }, [selectedValues])
-  
-  const handleKeywordsChange = () => {
-    addFilter(keyword)
-  }
-  const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+  const [searchInput, setSearchInput] = useState("")
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
   };
-
+  const handleApplySearch = () => {
+    addKeywords("search", [searchInput])
+    sendFilter("search", searchInput)
+  }
   return (
     <Container className="bg-white shadow rounded-4 px-5 py-4 my-4">
       <div className="d-flex align-items-center mb-2">
@@ -45,11 +37,15 @@ const Filter = ({ showResult, setShowResult, setSelectedFilters }) => {
           <Form.Control
             placeholder="Search for location, conference name, acronym, etc"
             className="border-0 bg-blue-light"
+            type="text"
+            value={searchInput}
+            name="searchInput"
+            onChange={handleSearchChange}
           />
           {/*Button Search */}
           <InputGroup.Text className='bg-primary-light m-0 border-0 bg-primary-light p-0'>
             <Button 
-              onClick={()=>setShowResult(!showResult)}
+              onClick={handleApplySearch}
               className="bg-primary-light text-primary-normal fw-bold border-0">Search</Button>
           </InputGroup.Text>
         </InputGroup>
@@ -64,7 +60,7 @@ const Filter = ({ showResult, setShowResult, setSelectedFilters }) => {
         </Col>
         <Col >
           <span className="fw-bold text-color-black">Location</span>
-          <Options label={"location"}/>
+          <Options label={"locations"}/>
         </Col>
         <Col>
           <span className="fw-bold text-color-black">Submission date</span>
@@ -84,7 +80,7 @@ const Filter = ({ showResult, setShowResult, setSelectedFilters }) => {
         className={showAdvancedFilter ? "ms-2 rotate-180" : 'ms-2'}/>
       </Button>
       {showAdvancedFilter && <AdvancedFilter/>}
-      {keywordFilter && <FilterSelected/>}  
+      {optionsSelected && <FilterSelected/>}  
     </Container>
   );
 };

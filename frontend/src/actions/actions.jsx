@@ -1,7 +1,5 @@
 import * as actionTypes from './actionTypes';
 
-//base URL 
-const baseURL = ""
 
 export const loginRequest = () => {
   return {
@@ -29,33 +27,16 @@ export const logoutUser = () => {
   };
 };
 
+export const registrationRequest = () => ({
+  type: actionTypes.REGISTRATION_REQUEST,
+});
 
-export const getAllNotifications = () => {
+export const registrationSuccess = (userData) => ({
+  type: actionTypes.REGISTRATION_SUCCESS,
+  payload: userData,
+});
 
-}
-
-export const addFilter = (keyword) => ({
-    type: actionTypes.ADD_FILTER,
-    payload: keyword,
-})
-
-export const addFilterSubmission = (keyword) => ({
-  type: actionTypes.ADD_FILTER_SUBMISSION_DATE,
-  payload: keyword,
-})
-export const addFilterConference = (keyword) => ({
-  type: actionTypes.ADD_FILTER_CONFERENCE_DATE,
-  payload: keyword,
-})
-
-export const removeFilter = (keyword) => {
-  return {
-    type: actionTypes.REMOVE_FILTER,
-    payload: keyword
-  }
-}
-export const clearFilters = () => {
-  return {
-    type: actionTypes.CLEAR_FILTERS
-  }
-}
+export const registrationFailure = (error) => ({
+  type: actionTypes.REGISTRATION_FAILURE,
+  payload: error,
+});

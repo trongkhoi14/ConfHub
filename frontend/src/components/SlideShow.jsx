@@ -60,7 +60,7 @@ const test = [
 
 const properties = {
     prevArrow: <Button className='bg-transparent border-0'>
-        <Image src={PrevIcon} style={{ width: "15px" }} fluid />
+        <Image src={PrevIcon} style={{ width: "15zpx" }} fluid />
     </Button>,
 
     nextArrow: <Button className='bg-transparent border-0 ms-2'>

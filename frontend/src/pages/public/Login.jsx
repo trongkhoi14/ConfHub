@@ -71,13 +71,17 @@ const Login = () => {
                         <ButtonGroup className="d-flex justify-content-around mb-3">
                             <Button className='bg-transparent border-0 p-0' style={{color: "#434343"}}>Forgot your password?</Button>
                         </ButtonGroup>
-                        <Button 
-                            type='submit' 
-                            className='border-0 fw-bold rounded-4 p-2' 
-                            style={{width: "140px", fontSize: "20px", backgroundColor: "#419489"}}>
-                                
-                                LOG IN 
-                            </Button>
+                        <div className='d-flex flex-column justify-content-center align-items-center'>
+                            {error && <span className='text-danger'>{error}</span>}
+                            {loading && <p>Loading...</p>}
+                                <Button
+                                    type='submit'
+                                    className='border-0 fw-bold rounded-4 p-2'
+                                    style={{width: "140px", fontSize: "20px", backgroundColor: "#419489"}}>
+                            
+                                    LOG IN
+                                </Button>
+                        </div>
                         <div className="my-3 mx-3 d-flex align-items-center justify-content-center">
                             <span htmlFor="#signup">Don't have an account?</span>
                             <Button
@@ -98,8 +102,7 @@ const Login = () => {
                     </div>
                 </Col>
             </Row>
-            {loading && <p>Loading...</p>}
-            {error && <p>Error: {error}</p>}
+            
         </Container>
     )
 }

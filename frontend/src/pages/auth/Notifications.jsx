@@ -3,10 +3,12 @@ import { Container } from 'react-bootstrap'
 const Notifications = () => {
   return (
     <Container
-    className='pt-5 ps-5'
-    style={{ }}>
-    <h1>Coming soon</h1>
-  </Container>
+      fluid
+      className='pt-5 overflow-hidden' style={{marginLeft: "350px"}}>
+      <h4 className='mb-4'>Notification</h4>
+      <h6>All notifications here</h6>
+
+    </Container>
   )
 }
 

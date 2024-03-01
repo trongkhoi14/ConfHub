@@ -1,123 +1,70 @@
-import React, { useState } from 'react'
-import { Container, Row, Card, Button, Image, Stack } from 'react-bootstrap'
+import { useEffect, useState } from 'react'
+import { Container, Card, Button, Image, Stack } from 'react-bootstrap'
 import ReactPaginate from 'react-paginate'
+import { formatDate } from '../utils/formatDate'
 
 import UnfollowIcon from './../assets/imgs/unfollow.png'
 import FollowIcon from './../assets/imgs/follow.png'
 import TimeIcon from './../assets/imgs/time.png'
 import LocationIcon from './../assets/imgs/location.png'
 import { useLocation, useNavigate } from 'react-router-dom'
+import useConference from '../hooks/useConferences'
+import useFollow from '../hooks/useFollow'
+import { isObjectInList } from '../utils/checkExistInList'
 
-const test = [
-    {
-        con_id: 1,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-        isUpcoming: true,
-
-    }, {
-        con_id: 2,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: true,
-        isUpcoming: true,
-    },
-    {
-        con_id: 3,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-        isUpcoming: false,
-    },
-    {
-        con_id: 4,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: true,
-        isUpcoming: false,
-    },
-    {
-        con_id: 5,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-        isUpcoming: true,
-    },
-    {
-        con_id: 6,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-        isUpcoming: true,
-    },
-    {
-        con_id: 6,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-        isUpcoming: true,
-    },
-
-]
 const Conference = () => {
-    const [listConf, setListConf] = useState(test)
+    const {filterOptions, conferences, maxpage,amount, handleGetList} = useConference()
+    const {listFollowed, followConference, unfollowConference} = useFollow()
     const navigate = useNavigate()
     const location = useLocation()
+    const [page, setPage] = useState(1)  
+    const [fetchCount, setFetchCount] = useState(0);
 
+    // Tạo ref cho handleGetList
+    useEffect(()=>{
+        if (fetchCount < 3) {            
+            handleGetList(page)
+            // Tăng giá trị fetchCount sau khi fetch
+            setFetchCount(fetchCount + 1);
+            console.log(conferences)
+        }
+    }, [fetchCount, conferences, page, maxpage, amount, filterOptions]);
 
-
-    const [itemOffset, setItemOffset] = useState(0);
-    const endOffset = itemOffset + 5;
-    const currentItems = listConf.slice(itemOffset, endOffset);
-    const pageCount = Math.ceil(listConf.length / 5);
     const handlePageClick = (event) => {
-        const newOffset = (event.selected * 5) % listConf.length;
-        setItemOffset(newOffset);
+        handleGetList(event.selected + 1)
     };
 
-    const onClickFollow = (con_id, isFollow) => {
-
-    }
-
     const chooseConf = (id) => {
+        console.log(id)
         navigate(`/detail/${id}/information`)
     }
+
+
 
     return (
         <Container className='d-flex flex-column align-items-center p-0'>
             <div className="my-3 align-self-start">
-                <span className="h5 fw-bold">Conferences</span> ({listConf.length})
+                <span className="h5 fw-bold">Conferences</span> ({amount})
             </div>
-            {
-                currentItems.map(conf => (
-                    <Card
-                        onClick={() => chooseConf(conf.con_id)}
-                        className={location.pathname === "/followed" ? 'my-conf-card-followed' : 'my-conf-card-home'}
-                        id={conf.con_id} key={conf.con_id}>
-                        <Stack className=' p-0' direction='horizontal'>
-                            <div md={4} className='bg-white rounded-4 h1 fw-bolder d-flex align-items-center justify-content-center ' style={{ width: '120px', height: "120px" }}>
 
-                                <span className='fw-bold fs-1'>{conf.acronym}</span>
+           {
+            conferences && conferences.length > 0 
+            ?
+             
+                (conferences.map(conf => (
+                    <Card
+                        
+                        className={location.pathname === "/followed" ? 'my-conf-card-followed' : 'my-conf-card-home'}
+                        id={conf._id} key={conf._id}>
+                        <Stack className=' p-0' direction='horizontal'>
+                            <div  className='bg-white rounded-4 h1 fw-bolder d-flex align-items-center justify-content-center ' style={{ width: '120px', height: "120px" }}>
+
+                                <span className='fw-bold fs-5'>{conf.acronym}</span>
 
                             </div>
-                            <div md={7} className=''>
+                            <div className=''>
 
-                                <Card.Body className=''>
+                                <Card.Body className='' onClick={() => chooseConf(conf._id)}>
                                     <Card.Title className='text-color-black'>
                                         <Stack direction='horizontal'>
                                             {conf.isUpcoming
@@ -126,7 +73,7 @@ const Conference = () => {
                                                     Upcoming
                                                 </div>
                                             }
-                                            <span className='fw-bold'>{conf.con_name}</span>
+                                            <span className='fw-bold'>{conf.name}</span>
                                         </Stack>
 
                                     </Card.Title>
@@ -134,12 +81,13 @@ const Conference = () => {
                                         <Card.Text className='d-flex align-items-center mb-1'>
                                             <Image src={TimeIcon} className='me-2' width={20}/>
                                             <label className='conf-data-label'>Submission Date: </label>
-                                            <span className='conf-data'>{conf.update_time}</span>
+                                            <span className='conf-data'>{formatDate(conf.document[0].submissionDate)}</span>
                                         </Card.Text>
+                                        
                                         <Card.Text className='d-flex align-items-center mb-1'>
                                             <Image src={TimeIcon} className='me-2' width={20}/>
                                             <label className='conf-data-label'>Conference Date: </label>
-                                            <span className='conf-data'>{conf.update_time}</span>
+                                            <span className='conf-data'>{formatDate(conf.date)}</span>
                                         </Card.Text>
                                     </Stack>
                                     <Card.Text className='d-flex align-items-center'>
@@ -147,35 +95,37 @@ const Conference = () => {
                                         {conf.location}
                                     </Card.Text>
                                 </Card.Body>
-                                <Button className='icon-follow' onClick={onClickFollow()}>
-                                    {
-                                        conf.follow === true
-                                            ?
-                                            <>
-                                                <Image src={FollowIcon} className='me-2 ' style={{ width: '18px' }} />
-                                                <span>Unfollow</span>
-                                            </>
-                                            :
-                                            <>
-                                                <Image src={UnfollowIcon} className='me-2 ' style={{ width: '18px' }} />
-                                                <span>Follow</span>
-                                            </>
-                                    }
+                                
+                                {
+                                    isObjectInList(conf._id, listFollowed)
+                                        ?
+                                        <Button className='icon-follow' onClick={()=>unfollowConference(conf._id)}>
+                                            <Image src={FollowIcon} className='me-2 ' style={{ width: '18px' }} />
+                                            <span>Unfollow</span>
+                                        </Button>
+                                        :
+                                        <Button className='icon-follow' onClick={()=>followConference(conf)}>
+                                        <Image src={UnfollowIcon} className='me-2 ' style={{ width: '18px' }} />
+                                        <span>Follow</span>
+                                        </Button>
+                                }
 
-                                </Button>
                             </div>
 
                         </Stack>
                     </Card>
                 ))
-            }
+            )
+            :
+            <p>No conferences available.</p>
+           }
             <ReactPaginate
                 breakLabel="..."
                 nextLabel=">"
                 onPageChange={handlePageClick}
                 pageRangeDisplayed={3}
                 marginPagesDisplayed={1}
-                pageCount={pageCount}
+                pageCount={maxpage}
                 previousLabel="<"
                 renderOnZeroPageCount={null}
                 containerClassName="justify-content-center pagination"

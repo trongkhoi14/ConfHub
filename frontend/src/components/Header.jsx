@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navbar, Container, NavDropdown, Nav, Image, Button, Dropdown, Tooltip } from 'react-bootstrap'
 import { Link, useLocation } from 'react-router-dom'
 import './../assets/styles/custom.css'
@@ -8,13 +8,18 @@ import { useAppContext } from '../context/authContext'
 
 import NotiIcon from './../assets/imgs/noti.png'
 import avatarIcon from '../assets/imgs/avatar.png'
+import AvatarDropdown from './AvatarDropdown'
+import useAuth from '../hooks/useAuth'
 
 const Header = () => {
   const {state} = useAppContext()
+  const {user, storedUser} = useAuth()
   const {notifications, handleGetList} = getNotifications()
   const navigate = useNavigate()
 
-
+  if (user === null){
+    storedUser()
+  }
   return (
     <Navbar expand="md" 
     className="bg-body-tertiary d-flex justify-content-between my-header  w-100 sticky-top"
@@ -30,37 +35,37 @@ const Header = () => {
             </Link>
             <Dropdown>
               <Dropdown.Toggle className='bg-transparent text-color-black border-0 fs-6'>
-                Dropdown Button
+                Conferences
               </Dropdown.Toggle>
         
               <Dropdown.Menu>
-                <Dropdown.Item className='fs-6'>Followed Conferences</Dropdown.Item>
-                <Dropdown.Item className='fs-6'>Your Conferences</Dropdown.Item>
+                <Dropdown.Item className='fs-6' onClick={()=>navigate('/followed')}>Followed Conferences</Dropdown.Item>
+                <Dropdown.Item className='fs-6' onClick={()=>navigate('/yourconferences')}>Your Conferences</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             
 
-            <Link to='/timestamp' className='mx-4 text-body-emphasis text-color-black fs-6' title='Timestamp'>
-              Timestamp
+            <Link to='/schedule' className='mx-4 text-body-emphasis text-color-black fs-6' title='Timestamp'>
+              Schedule
             </Link>
 
             <Dropdown>
 
               <Dropdown.Toggle
-                className='noti rounded-pill p-1 my-header-bg-icon mx-4 border-0'
-                style={{}}
+                className='noti rounded-pill p-1 my-header-bg-icon mx-2 border-0'
                 title='Notification'
               >
                 <Image src={NotiIcon} width={20} height={24} className=' text-center m-auto' />
               </Dropdown.Toggle>
 
 
-              <Dropdown.Menu className='shadow'
-              >
+              <Dropdown.Menu className='shadow' style={{ right: 0, left: 'auto' }}>
                 <div style={{ width: "200px", maxHeight: "200px" }} className='overflow-auto'>
                   {
                     notifications.map(noti =>
-                      <Dropdown.Item className='text-wrap fs-6 px-4 mx-0 d-inline-block text-truncate text-overflow-elli[sis' >
+                      <Dropdown.Item 
+                        key={noti.id}
+                        className='text-wrap fs-6 px-4 mx-0 d-inline-block text-truncate text-overflow-elli[sis' >
                         <Link to='/detail/1' className='fs-6 text-color-black'>
                           <strong>{noti.noti_message}</strong>
                           {noti.content}
@@ -77,10 +82,8 @@ const Header = () => {
 
 
             {
-              state.user ?
-                <Link to='/account' className='rounded-pill p-1 ' title='Login / Signup'>
-                  <Image src={avatarIcon} width={40}/>
-                </Link>
+              state.user || localStorage.getItem('user-info')?
+                <AvatarDropdown/>
                 :
                 <Button className='bg-red-normal border-0 px-4 rounded-5 fw-bold' onClick={() => navigate('/login')}>LOG IN</Button>
             }

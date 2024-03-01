@@ -1,39 +1,37 @@
 import React, { useState } from 'react'
-import { Container, Stack, Image, Row } from 'react-bootstrap'
+import { Container, Stack, Image, Row, Col } from 'react-bootstrap'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import test from './../assets/imgs/location.png'
 
 import avatarIcon from '../assets/imgs/avatar_lg.png'
+import useAuth from '../hooks/useAuth'
 
 const sidebar = [
   { path: `/account`, title: 'Account', icon: test },
   { path: '/followed', title: 'Followed Conferences', icon: test },
   { path: '/yourconferences/', title: 'Your conferences', icon: test },
-  { path: '/timestamp/', title: 'Timestamp', icon: test },
+  { path: '/schedule/', title: 'Schedule', icon: test },
   { path: '/notifications/', title: 'Notifications', icon: test },
+  { path: '/setting/', title: 'Setting', icon: test },
 ]
 
 const Sidebar = () => {
+  const {user} = useAuth()
   const [isActive, setActive] = useState(false)
   const location=useLocation()
-  console.log(location.pathname)
   return (
-      
-        <Row
-        id="sticky-sidebar"
-          className='bg-primary-dark h-100 mh-100 mx-100 mh-100 flex-column ms-5 me-2 ps-2'
-        
-          style={{ height: '100vh', width: "310px" }}
-          >
-            <Row className='pe-0'>
-              <div className='text-center mt-5'>
-                <Image roundedCircle width={100} height={100} className='mx-auto' src={avatarIcon}/>
+    <Container fluid className="my-sidebar">
+      <Stack>
+        {/* Sidebar */}
+        <div className='text-center mt-5 pt-5'>
+                <Image roundedCircle width={80} height={80} className='mx-auto' src={avatarIcon}/>
               </div>
               <div className='text-center mt-2 text-light'>
-                <h3 className='text-light'>Username</h3>
+                <h3 className='text-light'>{user.name}</h3>
               </div>
-              {
+        <Stack md={3} className="fixed-left">
+        {
                 sidebar.map(link => (
         
                     <NavLink
@@ -42,7 +40,7 @@ const Sidebar = () => {
                     activeClassName="active"
                     className={
                       location.pathname === link.path
-                      ? 'my-sidebar-navlink ps-2 py-3 fs-6 bg-primary-normal text-light rounded-2'
+                      ? 'my-sidebar-navlink ps-2 py-3 fs-6 bg-primary-normal text-color-darker rounded-2'
                       : 'my-sidebar-navlink px-2 py-3 fs-6 '}
                     >
         
@@ -51,8 +49,10 @@ const Sidebar = () => {
         
                 ))
               }
-            </Row>
-        </Row>
+        </Stack>
+
+      </Stack>
+    </Container>
   )
 }
 

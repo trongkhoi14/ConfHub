@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
-import { Dropdown, Stack, Image, ButtonGroup, Button } from 'react-bootstrap';
+import { Dropdown, Image, ButtonGroup, Button } from 'react-bootstrap';
 import { format } from 'date-fns';
 
 import useFilter from '../../hooks/useFilter';
 
 import dateIcon from '../../assets/imgs/conf_date_light.png'
 import arrowIcon from '../../assets/imgs/arrow.png'
-
+import { formatDate } from '../../utils/formatDate';
 const DateRangePicker = ({ label }) => {
   const { addKeywords, addFilterDate } = useFilter()
   const [dateRange, setDateRange] = useState([
@@ -30,12 +30,13 @@ const DateRangePicker = ({ label }) => {
     setDateRange([ranges.selection]);
   };
   const handleApplyFilter = () => {
-    console.log(dateRange[0])
-    const keywordFormat = `${label}: from ${format(dateRange[0].startDate, 'mm/dd/yyyy')} to ${format(dateRange[0].endDate, 'mm/dd/yyyy')}`
+    const keywordFormat = `${label}: from ${formatDate(dateRange[0].startDate)} to ${formatDate(dateRange[0].endDate)}`
     const keyword = { from: dateRange[0].startDate, to: dateRange[0].endDate }
     console.log(keyword)
-    addFilterDate(keyword)
-    addKeywords(keywordFormat)
+    addFilterDate(startDate, endDate, label)
+    addKeywords('submissionDate', [keywordFormat])    
+    //sendFilter(label, {startDate, endDate})
+
   };
   return (
     <Dropdown className="w-100">
@@ -57,10 +58,9 @@ const DateRangePicker = ({ label }) => {
       <Dropdown.Menu className='px-2'>
         <div className="w-100 px-2">
         <DateRange
-        color='#4EB1A4'
+          color='#4EB1A4'
           ranges={dateRange}
           onChange={handleSelect}
-          months={1}
           direction="horizontal" // Hướng sắp xếp tháng
           
         />

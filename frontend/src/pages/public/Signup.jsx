@@ -3,8 +3,10 @@ import { Container, Form, Button, ButtonGroup, Image, Row, Col } from 'react-boo
 import { useNavigate, Link } from 'react-router-dom'
 
 import googleIcon from './../../assets/imgs/google.png'
+import useAuth from '../../hooks/useAuth'
 
 const Signup = () => {
+    const {handleRegister} = useAuth()
     const [account, setAccount] = useState({
         email: "",
         password: "",
@@ -19,8 +21,7 @@ const Signup = () => {
     }
     const handleSignup = (e) => {
         e.preventDefault()
-        navigate('/home')
-        console.log(account)
+        handleRegister(account.email, account.password)
     }
     const chooseLogin = () => {
         navigate('/login')

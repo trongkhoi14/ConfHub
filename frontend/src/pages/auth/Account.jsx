@@ -24,7 +24,6 @@ const Account = () => {
   })
   //profile 
   const [profile, setProfile] = useState([
-    { title: "Username", value: user.name, placeholder: 'your name'},
   { title: "Phone", value: user.phone, placeholder: 'phone number'},
   { title: "Address", value: user.address, placeholder: 'your address'},
   { title: "Nationality", value: user.nationality, placeholder: 'your nationality' },
@@ -38,16 +37,16 @@ const Account = () => {
   const handleUpdateProfile = () => {
     updateProfile(updateData)
   }
-  console.log(profile)
+  console.log(user)
   return (
     <Container
-      className='pt-5 ps-5 h-100'
-      style={{ }}>
-      <h4 className='mb-5'>Account</h4>
+      fluid
+      className='pt-5 overflow-hidden' style={{marginLeft: "350px"}}>
+      <h4 className='mb-4'>Account</h4>
       <InputGroup className="mb-3 ms-4">
         <div className='me-5 pe-5 border-0 bg-transparent'>Email</div>
         {
-        user.email === null 
+        user === null 
         ? <Form.Control className='border-1 w-100'/>
         : <div id="basic-addon1" className='ms-5'>{user.email}</div>
          }
@@ -67,11 +66,22 @@ const Account = () => {
         <Image width={18} height={20} className='me-2' src={lockIcon}/>
           Change password
         </Button>
-        <h4 className='my-5'>Personal Data</h4>
+        <h4 className='mt-5 mb-4'>Personal Data</h4>
+        <Row className="mb-3 d-flex">
+        
+          <Col xs={2}>
+          <label>Username</label>
+          
+          </Col>
+          <Col xs={5} className='ms-3'>
+          <p  className='h6'>{user.name}</p>
+           
+          </Col>
+      </Row>
 
         {
           profile.map(data=>(
-        <Row className="mb-3 d-flex">
+        <Row key={data.title} className="mb-3 d-flex">
         
           <Col xs={2}>
           <label>{data.title}</label>

@@ -5,9 +5,9 @@ import useFilter from '../../hooks/useFilter'
 
 import starIcon from '../../assets/imgs/star.png'
 import unstarIcon from '../../assets/imgs/unstar.png'
-
+const rating = [1,2,3,4,5]
 const StarDropdown = ({label}) => {
-    const { filterOptions, addKeywords } = useFilter()
+    const { filterOptions, addKeywords, sendFilter } = useFilter()
     const [selectedOptions, setSelectedOptions] = useState([]);
     
     const [isOpenDropdown, setOpenDropdown] = useState(false)
@@ -33,8 +33,9 @@ const StarDropdown = ({label}) => {
         }
     };
     const handleApplyFilter = () => {
-        addKeywords(selectedOptions)
+        addKeywords(label, selectedOptions)
         setOpenDropdown(!isOpenDropdown)
+        sendFilter(label,selectedOptions )
     }
     return (
         <Dropdown className="w-100" show={isOpenDropdown} onToggle={handleDropdownToggle} onHide={handleDropdownHide} 
@@ -48,7 +49,7 @@ const StarDropdown = ({label}) => {
             <Dropdown.Menu className='shadow-sm py-0'>
                 <Form className=' overflow-y-auto' style={{ maxHeight: "180px" }}>
                     {
-                        filterOptions['rating'].map((star) => (
+                        rating.map((star) => (
                             <div className='w-100 p-2' key={star}>
                                 <Form.Check
                                     key={star}
