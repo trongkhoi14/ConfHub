@@ -24,7 +24,6 @@ const Setting = () => {
       setting.id === id ? { ...setting, value: !setting.value } : setting
     );
     setNotificationSettings(updatedSettings);
-    console.log(notificationSettings  )
   };
 
   const updateCircleOptions = [

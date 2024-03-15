@@ -23,7 +23,7 @@ export const initialState = {
     sources: [], //['Score2023', 'Score2024']
     acronyms: [], //['ACM', 'KDD']
     types: [],
-    holdingDate: [],
+    date: [],
     submissionDate: [],
     search: [],
     impactfactor: [],
@@ -38,7 +38,7 @@ export const initialState = {
     sources: [], //['Score2023', 'Score2024']
     acronyms: [], //['ACM', 'KDD']
     types: [],
-    holdingDate: [],
+    date: [],
     submissionDate: [],
     search: [],
     impactfactor: [],
@@ -48,11 +48,24 @@ export const initialState = {
 
   keywordFilter: [],//filter
 
-  submissionDate: { from: "", to: "" }, //{from: "04/22/2023", to: "03/12/2024"}
-  confDate: { from: "", to: "" }, //{from: "04/22/2023", to: "03/12/2024"}
-
   
   //follow
   listFollowed: [],
+  filteFollow: [],
+  filterOptionsFollowed:  {
+    locations: [],
+    ranks: [],
+    fors: [],
+    sources: [],
+    acronyms: [],
+    types: [],
+    date: [],
+    submissionDate: [],
+    search: [],
+    impactfactor: [],
+    rating: [],
+    categories: [],
+  },
+
 };
 

@@ -12,44 +12,66 @@ import LocationIcon from './../../assets/imgs/location.png'
 import { formatDate } from '../../utils/formatDate'
 import { isObjectInList } from '../../utils/checkExistInList'
 import ReactPaginate from 'react-paginate'
+import Filter from '../../components/FilterFollowed/Filter'
+import useFilter from '../../hooks/useFilter'
+import { mergeAndCountUniqueValues } from '../../utils/checkFetchedResults'
+import { filterListbyCondition } from '../../utils/filterFollowed'
 
 const Followed = () => {
-  const {filterOptions, conferences, maxpage,amount, handleGetList} = useConference()
+  const { maxpage, handleGetList} = useConference()
     const {listFollowed, followConference, unfollowConference} = useFollow()
+    const {filterOptionsFollowed} = useFilter()
     const navigate = useNavigate()
     const location = useLocation()
-    const [page, setPage] = useState(1)  
-
-    console.log(listFollowed)
-
-
+    const [listConfFollowed, setListConfFollowed] = useState(listFollowed)
     const handlePageClick = (event) => {
         handleGetList(event.selected + 1)
     };
 
     const chooseConf = (id) => {
-        console.log(id)
         navigate(`/detail/${id}/information`)
     }
+
+    useEffect(()=>{
+        if(mergeAndCountUniqueValues(filterOptionsFollowed).totalCount > 0) {         
+            const filterResults = filterListbyCondition(listFollowed, filterOptionsFollowed)
+            setListConfFollowed(filterResults)
+        }
+        else {
+            setListConfFollowed(listFollowed)
+        }
+        
+    },[filterOptionsFollowed])
+    
   return (
     <Container
       fluid
-      className='pt-5 overflow-hidden' style={{marginLeft: "350px"}}>
+      className='py-5 ' style={{marginLeft: "350px"}}>
       <h4 className=''>Followed Conference</h4>
       <h6>Review the list of events you previously saved. Pay attention to the time so you don't miss it.</h6>
+      
+      {        
+      listFollowed && listFollowed.length > 0 &&
+      
+      <div style={{width: "970px"}}>
+        <Filter/>
+      </div>
+      }
      {
       listFollowed.length > 0 && 
       <Container className='d-flex flex-column ps-2 p-0'>
       <div className="my-3 align-self-start">
-          <span className="h5 fw-bold">Conferences</span> ({listFollowed.length})
+          <span className="h5 fw-bold">Conferences</span> ({listConfFollowed.length})
       </div>
 
      {
       listFollowed && listFollowed.length > 0 
       ?
        
-          (listFollowed.map(conf => (
-              <Card                        
+          <>
+          {
+           listConfFollowed.map((conf)=>(
+            <Card                        
                   className={location.pathname === "/followed" ? 'my-conf-card-followed' : 'my-conf-card-home'}
                   id={conf._id} key={conf._id}>
                   <Stack className=' p-0' direction='horizontal'>
@@ -110,8 +132,9 @@ const Followed = () => {
 
                   </Stack>
               </Card>
-          ))
-      )
+        ))
+          }
+          </>
       :
       <p>No conferences available.</p>
      }

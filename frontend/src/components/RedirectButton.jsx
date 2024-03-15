@@ -2,13 +2,35 @@
 import { Button, OverlayTrigger, Tooltip, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import ViewMoreIcon from './../assets/imgs/view_page.png'
-const RedirectButton = (path) => {
+const RedirectButton = (conference) => {
     const navigate = useNavigate();
+    const aFunc = () => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve("resolved");
+          }, 500);
+        });
+      }
+    
+      const bFunc = (externalUrl) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(externalUrl);
+          }, 500);
+        });
+      }
 
-    const handleRedirect = () => {
+    const handleRedirect = async () => {
+        
+        const externalUrl = conference.conference['link']
         // Thay thế URL bằng địa chỉ của trang web mà bạn muốn chuyển hướng đến
-        const redirectURL = path;
-        navigate(redirectURL);
+        await aFunc().then(async () => {
+            await bFunc(externalUrl).then((externalUrl) => {
+                if(externalUrl) {
+                    window.open(externalUrl, '_blank');
+                }
+            });
+        });
     };
 
     return (
@@ -21,7 +43,7 @@ const RedirectButton = (path) => {
             }
         >
             <Button
-                className='bg-transparent border d-flex align-items-center justify-content-between'
+                className='bg-transparent border border-2 d-flex align-items-center justify-content-between text-color-black'
                 onClick={handleRedirect}
             >
                 View More 

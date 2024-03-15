@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Container, Row, Card, Button, Image, Stack } from 'react-bootstrap'
+import { useEffect, useState } from 'react'
+import { Container, Card, Button, Image, Stack } from 'react-bootstrap'
 import ReactPaginate from 'react-paginate'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -18,7 +18,6 @@ import useFollow from '../../hooks/useFollow'
 import { isObjectInList } from '../../utils/checkExistInList'
 
 const FetchedResults = () => {
-  const { handleGetList } = useConference()
   const { fetchedResults } = useFilter()
   const {listFollowed, followConference, unfollowConference, } = useFollow()
   const navigate = useNavigate()
@@ -29,8 +28,6 @@ const FetchedResults = () => {
   const [displayedConferences, setDisplayedConferences] = useState([]);
 
 
-  // Tạo ref cho handleGetList
-  const handleGetListRef = useRef(handleGetList);
   useEffect(() => {
 
   }, [fetchedResults]);
@@ -68,13 +65,12 @@ const FetchedResults = () => {
   return (
     <Container className='d-flex flex-column align-items-center p-0'>
       <div className="my-3 align-self-start">
-        <span className="h5 fw-bold">Conferences</span> ({displayedConferences.length})
+        <span className="h5 fw-bold">Conferences</span> ({results.totalCount})
       </div>
       {results.uniqueValues && results.uniqueValues.length > 0 ? (
         <>
           {displayedConferences.map((conf) => (
             <Card
-              onClick={() => chooseConf(conf._id)}
               className={location.pathname === "/followed" ? 'my-conf-card-followed' : 'my-conf-card-home'}
               id={conf._id} key={conf._id}
             >
@@ -83,7 +79,7 @@ const FetchedResults = () => {
                   <span className='fw-bold fs-5'>{conf.acronym}</span>
                 </div>
                 <div className=''>
-                  <Card.Body className=''>
+                  <Card.Body onClick={() => chooseConf(conf._id)}>
                     <Card.Title className='text-color-black'>
                       <Stack direction='horizontal'>
                         {conf.isUpcoming &&

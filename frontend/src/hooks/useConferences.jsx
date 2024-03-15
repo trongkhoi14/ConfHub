@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useAppContext } from "../context/authContext"
 
 import { baseURL } from "./api/baseApi"
-import { getAllConf, getOneConf } from "../actions/ConfAction"
+import { getAllConf, getOneConf, requestConference } from "../actions/ConfAction"
 import { getoptionsSelected } from "../actions/filterActions"
 
 const useConference = () => {
@@ -17,6 +17,7 @@ const useConference = () => {
 
       const response = await fetch(`${baseURL}/conference?page=${page}&size=5`);
       const data = await response.json();
+      dispatch(requestConference())
       //cập nhật các filter
       if (data !== null) {
         const allKeys = Object.keys(data);
@@ -44,7 +45,6 @@ const useConference = () => {
   }
 
   const handleGetOne = async (id) => {
-    console.log(id)
     try {
       //size = 5
       const response = await fetch(`${baseURL}/conference/${id}`);
@@ -52,7 +52,7 @@ const useConference = () => {
       
       //Gửi action để cập nhật state
       dispatch(getOneConf(data.conference[0]));
-      console.log(state.conference)
+      
     } catch (error) {
       console.error('Error fetching data:', error);
     }

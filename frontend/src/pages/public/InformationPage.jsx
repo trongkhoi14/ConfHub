@@ -25,14 +25,14 @@ const InformationPage = () => {
     <div className='px-5 mx-5 pt-4'>
       <div className='fs-4 fw-bold d-flex justify-content-between '>
         <span>Conference information</span>
-        <RedirectButton/>
+        <RedirectButton conference={conference}/>
       </div>
       {conference ? 
       <>
       
       <div className='fs-5 fw-bold mt-2 ps-3'>{conference.name}</div>
       <div className='mt-2'>
-        <Row className='bg-light py-3 ps-5'>
+        <Row className='bg-blue-light py-3 ps-5'>
 
           <Col xs={4}>Location:</Col>
           <Col className='fw-bold'>{conference.location}</Col>
@@ -41,7 +41,7 @@ const InformationPage = () => {
           <Col xs={4}>Conference date:</Col>
           <Col className='fw-bold'>{formatDate(conference.date)}</Col>         
         </Row>
-        <Row className='bg-light py-3 ps-5'>
+        <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Category:</Col>
           <Col className='fw-bold'>{capitalizeFirstLetter(conference.category)}</Col>
         </Row>
@@ -49,7 +49,7 @@ const InformationPage = () => {
           <Col xs={4}>Acronym:</Col>
           <Col  className='fw-bold'>{conference.acronym}</Col>
         </Row>
-        <Row className='bg-light py-3 ps-5'>
+        <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Source:</Col>
           <Col className='fw-bold'>{conference.source}</Col>
         </Row>
@@ -58,7 +58,7 @@ const InformationPage = () => {
           <Col className='fw-bold'>{conference.rank}
           </Col>         
         </Row>
-        <Row className='bg-light py-3 ps-5'>
+        <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Type:</Col>
           <Col className='fw-bold'>{capitalizeFirstLetter(conference.type)}</Col>
         </Row>
@@ -66,7 +66,7 @@ const InformationPage = () => {
           <Col xs={4}>Impact factor:</Col>
           <Col  className='fw-bold'>{conference.impactFactor}</Col>
         </Row>
-        <Row className='bg-light py-3 ps-5'>
+        <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4} className='d-flex align-items-center'>Average rating:</Col>
           <Col className='fw-bold'>
           {Object.entries(conference.rating).map(([key, value]) => (

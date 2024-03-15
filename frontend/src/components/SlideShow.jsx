@@ -73,7 +73,6 @@ const SlideShow = ({showSlideShow, setShowSlideShow}) => {
     const onClickFollow = () => {
 
     }
-    // console.log(listEvents)
     return (
         <Container className='mt-4 border-0 rounded-4 p-4 bg-blue-light mx'  >
 

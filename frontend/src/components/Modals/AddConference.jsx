@@ -21,14 +21,13 @@ const AddConference = ({ show, handleClose }) => {
 
     const handleFieldOfResearchChange = (selectedOptions) => {
         setSelectedFieldOfResearch(selectedOptions);
-        const selectedValues = selectedFieldOfResearch.map(option => option.value);
+        //const selectedValues = selectedFieldOfResearch.map(option => option.value);
 
         // Cập nhật formData với giá trị mới
         setFormData({
         ...formData,
         fieldOfResearch: selectedOptions,
         });
-        console.log(selectedFieldOfResearch)
     };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -38,8 +37,6 @@ const AddConference = ({ show, handleClose }) => {
         });
     };
     const handleFormSubmit = () => {
-        // Thực hiện các hành động cần thiết với formData
-        console.log(formData);
 
         // Sau khi xử lý xong, có thể reset giá trị trong state
         setFormData({

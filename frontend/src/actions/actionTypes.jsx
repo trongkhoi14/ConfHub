@@ -13,6 +13,7 @@ export const SEARCH_KEYWORD_FAILURE = 'SEARCH_KEYWORD_FAILURE'; //get FAILED
 
 export const GET_ALL_CONFERENCES = 'GET_ALL_CONFERENCES';   //get all conferences from server
 export const GET_ONE_CONFERENCE = 'GET_ONE_CONFERENCE'  //get data of one conference by id
+export const REQUEST_CONFERENCE = 'REQUEST_CONFERENCE'
 
 export const FOLLOW = "FOLLOW";
 export const UNFOLLOW = "UNFOLLOW"
@@ -20,7 +21,7 @@ export const UNFOLLOW = "UNFOLLOW"
 export const GET_NOTIFICATIONS = 'GET_NOTIFICATIONS'
 
 export const GET_OPTIONS_FILTER = 'GET_OPTIONS_FILTER'
-export const ADD_FILTER_SUBMISSION_DATE = 'ADD_FILTER_SUBMISSION_DATE';
+export const ADD_FILTER_DATE = 'ADD_FILTER_DATE';
 export const ADD_FILTER_CONFERENCE_DATE= 'ADD_FILTER_CONFERENCE_DATE';
 export const ADD_FILTER = 'ADD_FILTER';
 export const REMOVE_FILTER = 'REMOVE_FILTER';

@@ -34,7 +34,6 @@ const useAuth = () => {
           dispatch(loginFailure(errorData.message));
         }
       } catch (error) {
-        console.log(error)
         dispatch(loginFailure('An error occurred during login.'));
       }
       
@@ -53,8 +52,6 @@ const useAuth = () => {
       // Dispatch registration request action
       dispatch(registrationRequest());
   
-      // Prepare user data
-      console.log('User:', user);
       // Make API request to register
       const response = await fetch(`${baseURL}/user/register`, {
         method: 'POST',
@@ -103,7 +100,6 @@ const useAuth = () => {
     if (storedUser) {
       // Nếu có giá trị, thực hiện đăng nhập lại
       const parsedUser = JSON.parse(storedUser);
-      console.log(parsedUser)
       dispatch(loginSuccess(parsedUser));
       // Gọi hàm đăng nhập lại hoặc thực hiện các bước cần thiết
     }

@@ -26,7 +26,6 @@ const Conference = () => {
             handleGetList(page)
             // Tăng giá trị fetchCount sau khi fetch
             setFetchCount(fetchCount + 1);
-            console.log(conferences)
         }
     }, [fetchCount, conferences, page, maxpage, amount, filterOptions]);
 
@@ -35,7 +34,6 @@ const Conference = () => {
     };
 
     const chooseConf = (id) => {
-        console.log(id)
         navigate(`/detail/${id}/information`)
     }
 
@@ -52,8 +50,7 @@ const Conference = () => {
             ?
              
                 (conferences.map(conf => (
-                    <Card
-                        
+                    <Card                        
                         className={location.pathname === "/followed" ? 'my-conf-card-followed' : 'my-conf-card-home'}
                         id={conf._id} key={conf._id}>
                         <Stack className=' p-0' direction='horizontal'>

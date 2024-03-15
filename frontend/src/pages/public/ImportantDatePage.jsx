@@ -28,7 +28,7 @@ const ImportantDatePage = () => {
         {conference ?
         <>
         {conference.document.map((item, index)=>(
-          <Row className={index % 2 === 0 ? 'bg-light p-2 ps-5' : 'p-2 ps-5'} key={index}>
+          <Row className={index % 2 === 0 ? 'bg-blue-light p-2 ps-5' : 'p-2 ps-5'} key={index}>
             <Col xs={4} className='d-flex align-items-center'>{item.documentName}</Col>
             <Col>
               {displayFields.map((field)=>(

@@ -30,7 +30,6 @@ const Calendar = () => {
   
 
   const filterEventsByDate = (date) => {
-    console.log(date)
     const dateStr = formatDate(date);   
     return events.filter((event) => formatDate(event.date) === dateStr);
   };
@@ -39,7 +38,6 @@ const Calendar = () => {
     setSelectedDate(date)
     const eventsForDate = filterEventsByDate(selectedDate);
     setExistEvents(eventsForDate)
-    console.log(eventsForDate, existEvents)
     setShow(!show);
     setTarget(event.target);
   };
@@ -48,7 +46,6 @@ const Calendar = () => {
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const startingDay = firstDayOfMonth.getDay(); // Ngày trong tuần của ngày đầu tiên (0-6)
     const daysInMonth = [];
-    console.log(startingDay)
 
   
     // Nếu ngày đầu tiên không phải là thứ 2 (Monday), thêm các ngày của tháng trước vào mảng daysInMonth

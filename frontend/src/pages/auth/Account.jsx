@@ -37,7 +37,6 @@ const Account = () => {
   const handleUpdateProfile = () => {
     updateProfile(updateData)
   }
-  console.log(user)
   return (
     <Container
       fluid

@@ -1,13 +1,11 @@
 //lấy dữ liệu từ danh sách để đưa vào dropdown
 import React, { useEffect, useState } from 'react'
 import useFilter from '../../hooks/useFilter'
-import { Dropdown, Form, InputGroup, Image, ButtonGroup, Button } from 'react-bootstrap'
 
-import searchIcon from '../../assets/imgs/search.png'
 import useConference from '../../hooks/useConferences'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import Select from 'react-select'
-import { useLocation } from 'react-router-dom'
+import useFollow from '../../hooks/useFollow'
 const category = ["Conference", "Journal"]
 const customStyles = {
    
@@ -27,7 +25,7 @@ const CustomOption = ({ innerProps, label, isSelected }) => (
         <input
             type="checkbox"
             checked={isSelected}
-            onChange={() => { }}
+            onChange={() => {}}
             className='m-2'
         />
         <label style={{ fontWeight: isSelected ? 'bold' : 'normal' }} className='fs-6'>{label}</label>
@@ -36,20 +34,12 @@ const CustomOption = ({ innerProps, label, isSelected }) => (
 const Options = ({ label }) => {
     const { filterOptions } = useConference()
     const [tranformOptions, setTranformOptions] = useState([])
-    const { addKeywords, sendFilter } = useFilter()
-    const [statename, setStateName] = useState('')
-    const location = useLocation();
-    const pathname = location.pathname;
-    useEffect(()=>{
-      if(pathname === '/' || pathname === '/home'){
-        setStateName('optionsSelected')
-      }
-      else setStateName('filterOptionsFollowed')
-    }, [pathname])
+    const { addKeywords } = useFilter()
+    const { handleFilter} = useFollow()
+
     const handleOptionChange = (item) => {
         const selectedValues = item.map(option => option.label);
-        addKeywords(statename, label, selectedValues)
-        sendFilter(label, selectedValues)
+        addKeywords('filterOptionsFollowed', label, selectedValues)
     };
     useEffect(() => {
         let transformedState = []

@@ -17,16 +17,18 @@ const Header = () => {
   const {notifications, handleGetList} = getNotifications()
   const navigate = useNavigate()
 
-  if (user === null){
-    storedUser()
-  }
+  useEffect(()=>{
+    if (user === null){
+      storedUser()
+    }
+  },[])
   return (
     <Navbar expand="md" 
     className="bg-body-tertiary d-flex justify-content-between my-header  w-100 sticky-top"
     
     >
       <Container fluid className='d-flex justify-content-between shadow-sm px-5'>
-        <Navbar.Brand href="/home" className='my-header-brand'>DOANTOTNGHIEP</Navbar.Brand>
+        <Navbar.Brand href="/home" className='my-header-brand'>DATN</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto d-flex align-items-center">

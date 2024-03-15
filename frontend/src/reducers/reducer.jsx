@@ -55,43 +55,40 @@ const appReducer = (state, action) => {
             return { ...state, filterOptions: action.payload }
 
         case actionTypes.ADD_FILTER:
-            console.log(action.payload)
             return {
                 ...state,
-                keywordFilter: [...state.keywordFilter, action.payload],
-
-                optionsSelected: {
-                    ...state.optionsSelected,
-                    [action.payload.label]: action.payload.keywords,
+                [action.payload.statename]: {
+                  ...state[action.payload.statename],
+                  [action.payload.label]: [
+                    ...(state[action.payload.statename][action.payload.label] || []), // Nếu mảng không tồn tại, tạo một mảng mới
+                    ...action.payload.keywords, // Thêm giá trị mới vào mảng
+                  ],
                 },
-            }
-        case actionTypes.ADD_FILTER_SUBMISSION_DATE:
+              };
+        case actionTypes.ADD_FILTER_DATE:
             return {
                 ...state,
-                submissionDate: { ...state.submissionDate, ...action.payload }
-            }
-        case actionTypes.ADD_FILTER_CONFERENCE_DATE:
-            return {
-                ...state,
-                confDate: { ...state.confDate, ...action.payload },
+                [action.payload.statename]: {
+                    ...state[action.payload.statename],
+                    [action.payload.label]: [...action.payload.keyword],
+                  },
+                fetchedResults: {
+                    ...state.fetchedResults,
+                    [action.payload.label]: action.payload.conferences,
+                }
             }
         case actionTypes.REMOVE_FILTER:
-            console.log(action.payload)
-
             return {
                 ...state,
-                optionsSelected: {
-                    ...state.optionsSelected,
-                    [action.payload.label]: action.payload.updateOptions,
-                },
-                fetchedResults: action.payload.updateResults,
+                fetchedResults: action.payload.updatedResults,
+                [action.payload.statename]: action.payload.updateOptionsSelected
             }
         case actionTypes.CLEAR_FILTERS:
             // Cập nhật state với fetchedResults đã xóa hết giá trị
             return {
                 ...state,
                 fetchedResults: action.payload.clearedFetchedResults,
-                optionsSelected: action.payload.clearedOptionsSelected
+                [action.payload.statename]: action.payload.clearedOptionsSelected
             };
 
 
@@ -99,12 +96,20 @@ const appReducer = (state, action) => {
             return {
                 ...state,
                 fetchedResults: {
-                    ...state.fetchedResults,
-                    [action.payload.option]: [...action.payload.results]
-
+                  ...state.fetchedResults,
+                  [action.payload.option]: [
+                    ...state.fetchedResults[action.payload.option],
+                    ...action.payload.results.map(item => item)
+                  ]
                 },
             };
-
+        case actionTypes.REQUEST_CONFERENCE: 
+            return {
+                ...state,
+                loading: true,
+                conferences: null,
+                error: null,
+            };
         case actionTypes.GET_ALL_CONFERENCES:
             return {
                 ...state,
@@ -122,8 +127,8 @@ const appReducer = (state, action) => {
             };
         case actionTypes.UNFOLLOW:
             return {
-            ...state,
-            listFollowed: state.listFollowed.filter(item => item.id !== action.payload.id),
+                ...state,
+                listFollowed: state.listFollowed.filter(item => item.id !== action.payload.id),
             };
         default:
             return state;

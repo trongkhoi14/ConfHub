@@ -24,7 +24,7 @@ const AdvancedFilter = () => {
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Rating</span>
-                <StarDropdown label={'Rating'}  />
+                <StarDropdown label={'rating'}  />
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Type</span>

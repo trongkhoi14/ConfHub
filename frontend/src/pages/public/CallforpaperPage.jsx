@@ -3,7 +3,6 @@ import useConference from '../../hooks/useConferences'
 
 const CallforpaperPage = () => {
   const {conference} = useConference()
-  console.log(conference.callForPapers)
   return (
     <div className='px-5 mx-5 pt-4'>
       <span className='fs-4 fw-bold'>Call for paper</span>

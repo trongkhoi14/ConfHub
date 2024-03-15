@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 
 const EventOverlay = ({ show, target, container, setShow, selectedDate, eventDescription, setEventDescription, handleSaveEvent, existEvents }) => {
-  console.log(existEvents)
+  
   return (
     <Overlay
       show={show}

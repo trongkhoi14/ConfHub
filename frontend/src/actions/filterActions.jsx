@@ -5,30 +5,27 @@ export const getoptionsSelected = (options) => {
     type: actionTypes.GET_OPTIONS_FILTER,
     payload: options
 }}
-export const addFilter = (label, keywords) => ({
+export const addFilter = (statename, label, keywords) => ({
     type: actionTypes.ADD_FILTER,
-    payload: {label, keywords},
+    payload: {statename, label, keywords},
 })
 
-export const addFilterSubmission = (keyword) => ({
-  type: actionTypes.ADD_FILTER_SUBMISSION_DATE,
-  payload: keyword,
-})
-export const addFilterConference = (keyword) => ({
-  type: actionTypes.ADD_FILTER_CONFERENCE_DATE,
-  payload: keyword,
-})
+export const addFilterDateResults = (statename, label, keyword, conferences) => {
+  return {
+  type: actionTypes.ADD_FILTER_DATE,
+  payload: {statename, label, keyword, conferences},
+}}
 
-export const removeFilter = (label, updateOptions, updateResults) => {
+export const removeFilter = (statename, updatedResults, updateOptionsSelected) => {
   return {
     type: actionTypes.REMOVE_FILTER,
-    payload: {label, updateOptions, updateResults},
+    payload: {statename, updatedResults, updateOptionsSelected},
   }
 }
-export const clearFilters = (clearedFetchedResults, clearedOptionsSelected) => {
+export const clearFilters = (statename, clearedFetchedResults, clearedOptionsSelected) => {
   return {
     type: actionTypes.CLEAR_FILTERS,
-    payload: {clearedFetchedResults, clearedOptionsSelected}
+    payload: {statename, clearedFetchedResults, clearedOptionsSelected}
   }
 }
 
