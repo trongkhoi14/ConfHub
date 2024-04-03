@@ -1,23 +1,19 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/database')
 
-var Conference = sequelize.define('Conference', {
-    conf_id: {
+var Source = sequelize.define('Source', {
+    src_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    conf_name: {
-        type: DataTypes.STRING(256),
-        allowNull: false,
-    },
-    acronym: {
-        type: DataTypes.STRING(16),
+    src_name: {
+        type: DataTypes.STRING(64),
         allowNull: false,
     }
 }, {
     timestamps: false,
-    tableName: 'conferences',
+    tableName: 'sources',
 })
 
-module.exports = Conference
+module.exports = Source

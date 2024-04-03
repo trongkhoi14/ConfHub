@@ -10,7 +10,10 @@ const userController = new UserController();
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/current', verifyAccessToken, userController.getCurrentUser)
-router.get('/logout', userController.logout)
-router.get('/all', userController.getAll);
+router.get('/logout', userController.logout);
+router.get('/', userController.getAll);
+router.get('/refreshToken', userController.refreshAccessToken);
+router.put('/changePassword', verifyAccessToken, userController.changePassword);
+router.put('/:id', verifyAccessToken, userController.updateUser);
 
 module.exports = router;
