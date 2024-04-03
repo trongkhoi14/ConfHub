@@ -14,6 +14,7 @@ const app = express()
 const port = process.env.PORT || 8081
 
 app.use(cors())
+app.set('trust proxy', true);
 
 // middleware parse cookie
 app.use(cookieParser())
