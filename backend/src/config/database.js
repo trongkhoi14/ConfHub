@@ -8,6 +8,9 @@ require('dotenv').config();
 //     logging: false,
 // });
 
-const sequelize = new Sequelize(process.env.DB_CONN_STR)
+const sequelize = new Sequelize(process.env.DB_CONN_STR, {
+    dialect: 'postgres',
+    logging: false,
+})
 
 module.exports = sequelize;
