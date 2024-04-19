@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter} from 'react-router-dom'
 import RoutesApp from './routes/RouteApp.jsx'
 
 import MainLayout from './layout/MainLayout.jsx'

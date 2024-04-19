@@ -1,13 +1,13 @@
 import * as actionTypes from './actionTypes'
 
-export const getoptionsSelected = (options) => {
+export const getoptionsSelected = (option) => {
   return {
     type: actionTypes.GET_OPTIONS_FILTER,
-    payload: options
+    payload: option
 }}
 export const addFilter = (statename, label, keywords) => ({
     type: actionTypes.ADD_FILTER,
-    payload: {statename, label, keywords},
+    payload: {statename, label, keywords, loading: false},
 })
 
 export const addFilterDateResults = (statename, label, keyword, conferences) => {

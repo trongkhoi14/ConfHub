@@ -79,7 +79,7 @@ const StarDropdown = ({label}) => {
           sendFilter( label, [selectedValues])
       }
       else {
-        addKeywords('filterOptionsFollowed', label, [formatOption])
+        addKeywords('filterOptionsAuth', label, [formatOption])
       }
         
     };

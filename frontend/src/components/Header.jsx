@@ -1,30 +1,28 @@
-import React, { useEffect, useState } from 'react'
-import { Navbar, Container, NavDropdown, Nav, Image, Button, Dropdown, Tooltip } from 'react-bootstrap'
-import { Link, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Navbar, Container, Nav, Image, Button, Dropdown,  } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import './../assets/styles/custom.css'
 import { useNavigate } from 'react-router-dom'
 import getNotifications from '../hooks/getNotifications'
 import { useAppContext } from '../context/authContext'
 
 import NotiIcon from './../assets/imgs/noti.png'
-import avatarIcon from '../assets/imgs/avatar.png'
 import AvatarDropdown from './AvatarDropdown'
-import useAuth from '../hooks/useAuth'
+import useLocalStorage from '../hooks/useLocalStorage'
 
 const Header = () => {
-  const {state} = useAppContext()
-  const {user, storedUser} = useAuth()
-  const {notifications, handleGetList} = getNotifications()
+  const {user} = useLocalStorage();
+  const {notifications} = getNotifications()
   const navigate = useNavigate()
-
-  useEffect(()=>{
+  useEffect(()=>{ 
     if (user === null){
-      storedUser()
+      navigate('/home')
     }
-  },[])
+  },[user])
   return (
     <Navbar expand="md" 
-    className="bg-body-tertiary d-flex justify-content-between my-header  w-100 sticky-top"
+    id='header'
+    className="bg-body-tertiary d-flex justify-content-between my-header w-100 fixed-top"
     
     >
       <Container fluid className='d-flex justify-content-between shadow-sm px-5'>
@@ -84,7 +82,7 @@ const Header = () => {
 
 
             {
-              state.user || localStorage.getItem('user-info')?
+              user ?
                 <AvatarDropdown/>
                 :
                 <Button className='bg-red-normal border-0 px-4 rounded-5 fw-bold' onClick={() => navigate('/login')}>LOG IN</Button>

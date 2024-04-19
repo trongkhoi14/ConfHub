@@ -4,18 +4,15 @@ import { useAppContext } from "../context/authContext"
 
 import { baseURL } from "./api/baseApi"
 import { getAllConf, getOneConf, requestConference } from "../actions/ConfAction"
-import { getoptionsSelected } from "../actions/filterActions"
+
 
 const useConference = () => {
   const { state, dispatch } = useAppContext()
-  const [maxpage, setMaxPage] = useState(0)
-  const [amount, setAmount] = useState(0)  
+  const [quantity, setQuantity] = useState(0)
 
-  const handleGetList = async (page) => {
+  const handleGetList = async () => {
     try {
-      //size = 5
-
-      const response = await fetch(`${baseURL}/conference?page=${page}&size=5`);
+      const response = await fetch(`${baseURL}/conference`);
       const data = await response.json();
       dispatch(requestConference())
       //cập nhật các filter
@@ -29,16 +26,12 @@ const useConference = () => {
         arrayKeys.forEach(key => {
           updateLists[key] = data[key];
         });
-
-        dispatch(getoptionsSelected(updateLists))
       }
       // Gửi action để cập nhật all conferences
-      dispatch(getAllConf(data.conferences));
+      dispatch(getAllConf(data.data));
 
       //cập nhật state
-      setMaxPage(data.maxPage)
-      setAmount(data.amount)
-
+      setQuantity(data.quantity)
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -49,9 +42,9 @@ const useConference = () => {
       //size = 5
       const response = await fetch(`${baseURL}/conference/${id}`);
       const data = await response.json();
-      
+      console.log(data)
       //Gửi action để cập nhật state
-      dispatch(getOneConf(data.conference[0]));
+      dispatch(getOneConf(data.data));
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -61,8 +54,7 @@ const useConference = () => {
   return {
     conferences: state.conferences,
     conference: state.conference,
-    maxpage: maxpage,
-    amount: amount,
+    quantity: quantity,
     filterOptions: state.filterOptions,
     handleGetList,
     handleGetOne

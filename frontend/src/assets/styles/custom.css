@@ -56,6 +56,10 @@ button.text-primary-normal:hover {
 .border-primary-normal{
     border-color: #4EB1A4 !important;
 }
+
+.border-primary-light{
+    border-color: #C2F1EB;
+}
 /*red*/
 .bg-red-normal{
     background-color: #E95D54;
@@ -138,6 +142,10 @@ button.bg-brown-normal:hover{
 }
 .text-color-light{
     color: #B8BEBD !important;
+}
+
+.bg-light{
+    background-color: #B8BEBD;
 }
 
 a.dropdown-item{
@@ -280,19 +288,9 @@ a{
 
 
 /*****/
-.my-conf-card-home{
-    width: 1260px;
+.my-conf-card{
     border-radius: 15px;
     border: none;
-    background-color: #C2F1EB;
-    margin-bottom: 24px;
-    padding: 20px 40px;
-    text-align: center;
-    cursor: pointer;
-}
-.my-conf-card-followed{
-    width: 950px;
-    border: 10px;
     background-color: #C2F1EB;
     margin-bottom: 24px;
     padding: 20px 40px;
@@ -334,6 +332,7 @@ a{
 .icon-follow:active:focus{
     background-color: #CBEDE8;
 }
+
 .conf-data-title{
     font-size: 20px;
     font-weight: bold;
@@ -404,7 +403,47 @@ a{
 }
 
 
-
-.react-select__option{
-    background-color: red;
-}
+.main-container {
+    align-items: start;
+    min-height: 100vh; 
+    overflow: hidden;
+  }
+  
+  .content {
+    flex: 1; /* Content container sẽ mở rộng để điền vào phần còn lại của trình duyệt */
+  }
+  
+  .footer {
+    flex-shrink: 0; /* Footer sẽ không bị co lại khi container nhỏ hơn */
+    height: 80px;
+    background-color: #34766D;
+    position: fixed;
+    bottom: 0;
+    left: 300px;
+  }
+  
+/* Style the navbar */
+#navbar {
+    overflow: hidden;
+  }
+  
+  /* Navbar links */
+  #navbar a {
+    float: left;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  
+  /* The sticky class is added to the navbar with JS when it reaches its scroll position */
+  .sticky {
+    position: fixed !important;
+    top: 0;
+    width: 100%;
+  }
+  
+  /* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
+  .sticky + .information {
+    padding-top: 60px;
+  }

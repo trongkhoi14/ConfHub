@@ -33,7 +33,7 @@ const DateRangePicker = ({ label }) => {
     if(location.pathname === '/home' || location.pathname === '/') {
         addFilterDate('optionsSelected', startDate, endDate, label, [keywordFormat])
     }
-    else addFilterDate('filterOptionsFollowed', startDate, endDate, label, [keywordFormat])
+    else addFilterDate('filterOptionsAuth', startDate, endDate, label, [keywordFormat])
     
     handleToggleClick()
   };

@@ -1,16 +1,17 @@
 
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import useFollow from '../hooks/useFollow';
 import { isObjectInList } from '../utils/checkExistInList';
-const FollowButton = ({conference_id, conference}) => {
+import useConference from '../hooks/useConferences';
+
+import { useLocation } from 'react-router-dom'
+import { getIdFromPathname } from '../utils/getID';
+const FollowButton = () => {
     const { listFollowed, followConference, unfollowConference} = useFollow()
-
-    const handleClick = () => {
-        // Thay thế URL bằng địa chỉ của trang web mà bạn muốn chuyển hướng đến
-       
-    };
-
+    const {conference} = useConference()
+    
+  const {pathname} = useLocation()
+  const id = getIdFromPathname(pathname)
     return (
         <OverlayTrigger
             placement="bottom"
@@ -21,18 +22,18 @@ const FollowButton = ({conference_id, conference}) => {
             }
         >
             {
-                isObjectInList(conference_id, listFollowed)
+                isObjectInList(id, listFollowed)
                 ?
                 
                 <Button 
                 className='bg-red-normal border-0 rounded-2 px-4 fw-bold py-2'
-                onClick={()=>unfollowConference(conference_id)}
+                onClick={()=>unfollowConference(id)}
                 >
                 Unfollow</Button>
                 :
                 <Button 
                 className='bg-red-normal border-0 rounded-2 px-4 fw-bold py-2'
-                onClick={()=>followConference(conference)}
+                onClick={()=>followConference(id)}
                 >
                 Follow
                 </Button>

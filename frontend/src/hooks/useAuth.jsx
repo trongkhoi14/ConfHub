@@ -1,74 +1,78 @@
 // useAuth.js
 // handleLogin, handleRegister, Logout, updateProfile
 import { useAppContext } from '../context/authContext';
-import { loginRequest, loginSuccess, loginFailure, logoutUser, registrationRequest, registrationSuccess, registrationFailure } from '../actions/actions';
+import { loginRequest, loginSuccess, loginFailure, logoutUser, registrationRequest, registrationSuccess, registrationFailure, setError, requestApi } from '../actions/actions';
 import { useNavigate } from 'react-router-dom';
 import { baseURL } from './api/baseApi';
+import useLocalStorage from './useLocalStorage';
+import useToken from './useToken';
 
 const useAuth = () => {
   const { state, dispatch } = useAppContext();
+  const { token, savetokenToLocalStorage, deletetokenFromLocalStorage } = useToken()
+  const { user, saveUserToLocalStorage, deleteUserFromLocalStorage} = useLocalStorage()
   const navigate = useNavigate()
 
   const handleLogin = async (email, password) => {
     dispatch(loginRequest());
 
     //test account page
-    const user = {email: email, password: password}
     try {
-        const response = await fetch(`${baseURL}/user/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
-  
-        if (response.ok) {        
-          const responseData = await response.json()
-          const userData = responseData.data
-          dispatch(loginSuccess(userData));
-          localStorage.setItem("user-info", JSON.stringify(userData))
-          navigate('/home')
-        } else {
-          const errorData = await response.json();
-          dispatch(loginFailure(errorData.message));
-        }
-      } catch (error) {
-        dispatch(loginFailure('An error occurred during login.'));
+      const response = await fetch(`${baseURL}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json()
+        const userData = responseData.data
+        dispatch(loginSuccess(userData));
+        saveUserToLocalStorage(userData)
+        savetokenToLocalStorage(userData.accessToken)
+        navigate('/home')
+      } else {
+        const errorData = await response.json();
+        dispatch(loginFailure(errorData.message));
       }
-      
+    } catch (error) {
+      dispatch(loginFailure('An error occurred during login.'));
+    }
+
   };
 
   const handleRegister = async (email, password) => {
-    const user ={
+    const user = {
       email: email,
-      name: 'ThaoVy',
-      phone: '07949962',
-      address: 'Ho Chi Minh city',
-      nationality: 'Viet Nam',
+      name: '',
+      phone: '',
+      address: '',
+      nationality: '',
       password: password
     }
     try {
       // Dispatch registration request action
       dispatch(registrationRequest());
-  
+
       // Make API request to register
       const response = await fetch(`${baseURL}/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify( user ),
+        body: JSON.stringify(user),
       });
-  
+
       if (response.ok && response.status !== 400) {
         // Successful registration
-        const responseData = await response.json();          
+        const responseData = await response.json();
         const userData = responseData.data
         dispatch(registrationSuccess(userData));
-        localStorage.setItem("user-info", JSON.stringify(userData))
+        saveUserToLocalStorage(userData)
         navigate('/home')
-  
+
         // Optionally, you can perform additional actions like redirecting to a login page
       } else {
         // Handle registration failure
@@ -84,26 +88,79 @@ const useAuth = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    localStorage.removeItem('user-info');
+    deleteUserFromLocalStorage()
+    
+    console.log('user', user)
+    navigate('/home')
+    window.location.reload()
   };
 
-  const updateProfile = (updateData) => {
+  const getCurrentUser = async () => {
+    try {
+      const response = await fetch(`${baseURL}/user/current`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-  }
-  
-  const changePassword = (newPassword) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-  }
-
-  const storedUser = () => {
-    const storedUser = localStorage.getItem('user-info');
-    if (storedUser) {
-      // Nếu có giá trị, thực hiện đăng nhập lại
-      const parsedUser = JSON.parse(storedUser);
-      dispatch(loginSuccess(parsedUser));
-      // Gọi hàm đăng nhập lại hoặc thực hiện các bước cần thiết
+      const data = await response.json();
+      saveUserToLocalStorage(data.data)
+      console.log('after updated', user)
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
+
+  const updateProfile = (updateData) => {
+    fetch(`${baseURL}/user/current`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(updateData),
+    })
+      .then(response => {
+        if (response.ok) {
+          getCurrentUser()
+        }
+        return response.json();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
+  const changePassword = (currentPassword, newPassword) => {
+    console.log(state.user)
+    requestApi()
+    fetch(`${baseURL}/user/changePassword`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      })
+    })
+      .then(response => {
+        if (!response.ok) {
+          setError(response.message)
+        }
+        console.log('Đổi mật khẩu thành công');
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
 
   return {
     user: state.user,
@@ -114,7 +171,6 @@ const useAuth = () => {
     handleLogout,
     updateProfile,
     changePassword,
-    storedUser
   };
 };
 

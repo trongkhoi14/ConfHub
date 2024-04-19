@@ -3,7 +3,7 @@ import { Container, Card, Button, Image, Stack } from 'react-bootstrap'
 import ReactPaginate from 'react-paginate'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { formatDate } from '../../utils/formatDate'
+import { formatDate, getDateValue } from '../../utils/formatDate'
 
 import UnfollowIcon from './../../assets/imgs/unfollow.png'
 import FollowIcon from './../../assets/imgs/follow.png'
@@ -13,123 +13,148 @@ import LocationIcon from './../../assets/imgs/location.png'
 
 import useFilter from '../../hooks/useFilter'
 import useConference from '../../hooks/useConferences'
-import { mergeAndCountUniqueValues } from '../../utils/checkFetchedResults'
+import { getUniqueConferences } from '../../utils/checkFetchedResults'
 import useFollow from '../../hooks/useFollow'
 import { isObjectInList } from '../../utils/checkExistInList'
+import { DropdownSort } from '../DropdownSort'
+import { sortConferences } from '../../utils/sortConferences'
+import useAuth from '../../hooks/useAuth'
+import Loading from '../Loading'
 
 const FetchedResults = () => {
-  const { fetchedResults } = useFilter()
-  const {listFollowed, followConference, unfollowConference, } = useFollow()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const { loading } = useAuth()
+  const { fetchedResults, optionsSelected } = useFilter()
+  const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
 
+  const navigate = useNavigate()
+
+  const [page, setPage] = useState(0)
   const itemsPerPage = 5; // Số lượng mục hiển thị trên mỗi trang
   const [currentPage, setCurrentPage] = useState(0);
   const [displayedConferences, setDisplayedConferences] = useState([]);
-
-
-  useEffect(() => {
-
-  }, [fetchedResults]);
-
-  const results = mergeAndCountUniqueValues(fetchedResults)
+  const [copiedConferences, setcopiedConferences] = useState([])
+  const usersPerPage = 5;
+  const pagesVisited = page * usersPerPage;
 
   useEffect(() => {
-    // Tính toán vị trí bắt đầu và kết thúc của mục hiển thị trên trang hiện tại
-    const startIndex = currentPage * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage
-
-    if (results.uniqueValues) {
-      // Lấy danh sách hội nghị cho trang hiện tại
-      const conferencesForPage = results.uniqueValues.slice(startIndex, endIndex);
-
-      // Cập nhật danh sách hội nghị được hiển thị
-      setDisplayedConferences(conferencesForPage);
-    }
+    const sortedConferenecs = sortConferences('Random', fetchedResults)
+      setDisplayedConferences(sortedConferenecs);
+      setcopiedConferences([...sortedConferenecs])
 
   }, [fetchedResults, currentPage]);
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
+  const handleFollow = (id) => {
+    console.log(id)
+    followConference(id)
+    getListFollowedConferences()
+  }
 
-  const onClickFollow = (_id, isFollow) => {
-
+  const handleUnfollow = (id) => {
+    unfollowConference(id)
+    getListFollowedConferences()
   }
 
   const chooseConf = (id) => {
-    navigate(`/detail/${id}/information`)
+    navigate(`/detail/information/${id}`)
   }
+  const handleDropdownSelect = (value) => {
+    console.log(value)
+    if (value === "Random") {
+      sortConferences(value, displayedConferences)
+      setDisplayedConferences([...copiedConferences])
+    }
+    else {
+      sortConferences(value, displayedConferences)
+    }
 
-  const maxpage = Math.ceil(results.totalCount / 5);
+  };
   return (
     <Container className='d-flex flex-column align-items-center p-0'>
-      <div className="my-3 align-self-start">
-        <span className="h5 fw-bold">Conferences</span> ({results.totalCount})
+      <div className="my-3 px-4 d-flex align-items-center justify-content-between w-100">
+        <div className="h5 fw-bold">
+          Conferences
+          <span className='fw-normal'> ({displayedConferences.length}) </span>
+        </div>
+        <DropdownSort
+          options={["Random", "Upcoming", "Name A > Z", "Latest"]}
+          onSelect={handleDropdownSelect}
+        />
       </div>
-      {results.uniqueValues && results.uniqueValues.length > 0 ? (
+      {displayedConferences && displayedConferences.length > 0 ? (
         <>
-          {displayedConferences.map((conf) => (
-            <Card
-              className={location.pathname === "/followed" ? 'my-conf-card-followed' : 'my-conf-card-home'}
-              id={conf._id} key={conf._id}
-            >
-              <Stack className='p-0' direction='horizontal'>
-                <div className='bg-white rounded-4 h1 fw-bolder d-flex align-items-center justify-content-center' style={{ width: '120px', height: "120px" }}>
-                  <span className='fw-bold fs-5'>{conf.acronym}</span>
-                </div>
-                <div className=''>
-                  <Card.Body onClick={() => chooseConf(conf._id)}>
-                    <Card.Title className='text-color-black'>
-                      <Stack direction='horizontal'>
-                        {conf.isUpcoming &&
-                          <div className='bg-yellow text-light p-1 rounded-3 me-2 fs-6 fw-bold'>
-                            Upcoming
-                          </div>
-                        }
-                        <span className='fw-bold'>{conf.name}</span>
+          {displayedConferences
+            .slice(pagesVisited, pagesVisited + usersPerPage)
+            .map((conf) => (
+              <Card
+                className='my-conf-card'
+                style={{ width: "1260px" }}
+                id={conf.cfp_id} key={conf.cfp_id}>
+                <Stack className=' p-0' direction='horizontal'>
+                  <div className='bg-white rounded-4 h1 fw-bolder d-flex align-items-center justify-content-center ' style={{ width: '120px', height: "120px" }}>
+
+                    <span className='fw-bold fs-5'>{conf.acronym}</span>
+
+                  </div>
+                  <div className=''>
+
+                    <Card.Body className='' onClick={() => chooseConf(conf.cfp_id)}>
+                      <Card.Title className='text-color-black'>
+                        <Stack direction='horizontal'>
+                          {conf.isUpcoming
+                            &&
+                            <div className='bg-yellow text-light p-1 rounded-3 me-2 fs-6 fw-bold'>
+                              Upcoming
+                            </div>
+                          }
+                          <span className='fw-bold'>{conf.name}</span>
+                        </Stack>
+
+                      </Card.Title>
+                      <Stack direction="horizontal" gap={5}>
+                        <Card.Text className='d-flex align-items-center mb-1'>
+                          <Image src={TimeIcon} className='me-2' width={20} />
+                          <label className='conf-data-label'>Submission Date: </label>
+                          <span className='conf-data'>{getDateValue("sub", conf.importantDates)}</span>
+                        </Card.Text>
+
+                        <Card.Text className='d-flex align-items-center mb-1'>
+                          <Image src={TimeIcon} className='me-2' width={20} />
+                          <label className='conf-data-label'>Conference Date: </label>
+                          <span className='conf-data'>{conf.organizations[0].conf_date}</span>
+                        </Card.Text>
                       </Stack>
-                    </Card.Title>
-                    <Stack direction="horizontal" gap={5}>
-                      <Card.Text className='d-flex align-items-center mb-1'>
-                        <Image src={TimeIcon} className='me-2' width={20} />
-                        <label className='conf-data-label'>Submission Date: </label>
-                        <span className='conf-data'>{formatDate(conf.document[0].submissionDate)}</span>
+                      <Card.Text className='d-flex align-items-center'>
+                        <Image src={LocationIcon} className='me-2' style={{ width: '18px' }} />
+                        {conf.organizations[0].location}
                       </Card.Text>
-                      <Card.Text className='d-flex align-items-center mb-1'>
-                        <Image src={TimeIcon} className='me-2' width={20} />
-                        <label className='conf-data-label'>Conference Date: </label>
-                        <span className='conf-data'>{formatDate(conf.date)}</span>
-                      </Card.Text>
-                    </Stack>
-                    <Card.Text className='d-flex align-items-center'>
-                      <Image src={LocationIcon} className='me-2' style={{ width: '18px' }} />
-                      {conf.location}
-                    </Card.Text>
-                  </Card.Body>
-                  {
-                    isObjectInList(conf._id, listFollowed)
+                    </Card.Body>
+
+                    {
+                      isObjectInList(conf.cfp_id, listFollowed)
                         ?
-                        <Button className='icon-follow' onClick={()=>unfollowConference(conf._id)}>
-                            <Image src={FollowIcon} className='me-2 ' style={{ width: '18px' }} />
-                            <span>Unfollow</span>
+                        <Button className='icon-follow' onClick={() => handleUnfollow(conf.cfp_id)} title='Unfollow'>
+                          <Image src={FollowIcon} className='me-2' style={{ width: '18px' }} />
+                          <span>Follwed</span>
                         </Button>
                         :
-                        <Button className='icon-follow' onClick={()=>followConference(conf)}>
-                        <Image src={UnfollowIcon} className='me-2 ' style={{ width: '18px' }} />
-                        <span>Follow</span>
+                        <Button className='icon-follow' onClick={() => handleFollow(conf.cfp_id)} title='Follow'>
+                          <Image src={UnfollowIcon} className='me-2 ' style={{ width: '18px' }} />
+                          <span>Follow</span>
                         </Button>
-                }
-                </div>
-              </Stack>
-            </Card>
-          ))}
+                    }
+
+                  </div>
+
+                </Stack>
+              </Card>
+            ))}
         </>
       ) : (
         <p>No conferences available.</p>
       )}
-
-
 
 
       <ReactPaginate
@@ -138,7 +163,7 @@ const FetchedResults = () => {
         onPageChange={handlePageClick}
         pageRangeDisplayed={3}
         marginPagesDisplayed={1}
-        pageCount={maxpage}
+        pageCount={Math.ceil(displayedConferences.length / usersPerPage)}
         previousLabel="<"
         renderOnZeroPageCount={null}
         containerClassName="justify-content-center pagination"

@@ -6,7 +6,7 @@ const Timestamp = () => {
   return (
     <Container
       fluid
-      className='pt-5 overflow-hidden' style={{marginLeft: "350px"}}>
+      className='pt-5 overflow-hidden' style={{marginLeft: "350px", marginTop: "60px" }}>
       <div className='d-flex justify-content-between align-items-center'>
         <h4 className='mb-3'>Schedule</h4>
         <Form.Check // prettier-ignore

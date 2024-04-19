@@ -5,15 +5,14 @@ import useConference from '../../hooks/useConferences'
 import { formatDate } from '../../utils/formatDate'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import RedirectButton from '../../components/RedirectButton'
-
+import { useEffect } from 'react'
 const InformationPage = () => {
-  const {conference, handleGetOne} = useConference()
-  
+  const {conference} = useConference()
   const renderFieldOfResearch = (fieldOfResearch) => {
     if (Array.isArray(fieldOfResearch)) {
       // Trường là một danh sách
       return fieldOfResearch.map((item, index) => (
-        <div key={index}>{item}</div>
+        <div key={index} className='my-1'>{item}</div>
       ));
     } else {
       // Trường là một giá trị đơn
@@ -35,15 +34,15 @@ const InformationPage = () => {
         <Row className='bg-blue-light py-3 ps-5'>
 
           <Col xs={4}>Location:</Col>
-          <Col className='fw-bold'>{conference.location}</Col>
+          <Col className='fw-bold'>{conference.organizations[0].location}</Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Conference date:</Col>
-          <Col className='fw-bold'>{formatDate(conference.date)}</Col>         
+          <Col className='fw-bold'>{formatDate(conference.organizations[0].conf_date)}</Col>         
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Category:</Col>
-          <Col className='fw-bold'>{capitalizeFirstLetter(conference.category)}</Col>
+          <Col className='fw-bold'>Conference</Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Acronym:</Col>
@@ -60,23 +59,20 @@ const InformationPage = () => {
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Type:</Col>
-          <Col className='fw-bold'>{capitalizeFirstLetter(conference.type)}</Col>
+          <Col className='fw-bold'>{capitalizeFirstLetter(conference.organizations[0].type)}</Col>
         </Row>
-        <Row className='py-3 ps-5'>
-          <Col xs={4}>Impact factor:</Col>
-          <Col  className='fw-bold'>{conference.impactFactor}</Col>
-        </Row>
-        <Row className='bg-blue-light py-3 ps-5'>
+        <Row className=' py-3 ps-5'>
           <Col xs={4} className='d-flex align-items-center'>Average rating:</Col>
           <Col className='fw-bold'>
-          {Object.entries(conference.rating).map(([key, value]) => (
+            {conference.rating}
+          {/*{Object.entries(conference.rating).map(([key, value]) => (
           <div key={key}>
             <span>{capitalizeFirstLetter(key)}: </span>{value}
           </div>
-        ))}
+        ))}*/}
           </Col>
         </Row>
-        <Row className='py-3 ps-5'>
+        <Row className='py-3 ps-5 bg-blue-light'>
           <Col xs={4} className='d-flex align-items-center'>Field of research:</Col>
           <Col  className='fw-bold'>
             {renderFieldOfResearch(conference.fieldOfResearch)}

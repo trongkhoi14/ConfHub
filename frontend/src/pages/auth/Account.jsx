@@ -1,109 +1,136 @@
-import React, { useState } from 'react'
-import { Container, InputGroup, ButtonGroup, Button, Image, Form, Row, Col } from 'react-bootstrap'
-
+import { useEffect, useState } from 'react'
+import { Container, InputGroup, Button, Image, Form, Col } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 
 import lockIcon from '../../assets/imgs/lock.png'
 import editIcon from '../../assets/imgs/edit.png'
-const test = {
-  email: "example@gamil.com",
-  password: "********",
-  name: "testname",
-  phone: "123456789",
-  address: "KTX Khu B, Di An, Binh Duong",
-  nationality: "Vietnam"
-}
+import ChangePasswordModal from '../../components/Modals/ChangePasswordModal'
+import useLocalStorage from '../../hooks/useLocalStorage'
+import useToken from '../../hooks/useToken'
 const Account = () => {
-  const {user, updateProfile, changePassword} = useAuth()
-  const [updateData, setUpdateData] = useState({
-    password: '',
-    name: '',
-    phone: '',
-    address: '',
-    nation: ''
-  })
+  const { updateProfile } = useAuth()
+  const [profile, setProfile] = useState([])
+  const { user } = useLocalStorage()
+  const { token } = useToken()
+  useEffect(() => {
+    if(user){
+      setProfile([
+        { title: "Name", infor: user.name, val: 'name', placeholder: 'username' },
+        { title: "Phone", infor: user.phone, val: 'phone', placeholder: 'phone number' },
+        { title: "Address", infor: user.address, val: 'address', placeholder: 'your address' },
+        { title: "Nationality", infor: user.nationality, val: 'nationality', placeholder: 'your nationality' },
+        { infor: user.license, val: 'license' }
+      ])
+    }
+  }, [user, token])
   //profile 
-  const [profile, setProfile] = useState([
-  { title: "Phone", value: user.phone, placeholder: 'phone number'},
-  { title: "Address", value: user.address, placeholder: 'your address'},
-  { title: "Nationality", value: user.nationality, placeholder: 'your nationality' },
-  ])
-  const [isChangePassword, setChangePassord] = useState(false)
-  const [isUpdate, setIsUpdate] = useState(true)
+  const [isUpdated, setIsUpdated] = useState(false)
 
-  const handleChangePassword = () => {
-    changePassword(updateData.password)
-  }
-  const handleUpdateProfile = () => {
-    updateProfile(updateData)
-  }
+  //change password
+  const [showModalChangePassword, setShowModalChangePassword] = useState(false);
+
+  const handleOpenModal = () => setShowModalChangePassword(true);
+  const handleCloseModal = () => setShowModalChangePassword(false);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setProfile((prevState) =>
+      prevState.map((item) => (item.val === name ? { ...item, infor: value } : item))
+    );
+    setIsUpdated(true)
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = profile.reduce((acc, item) => {
+      acc[item.val] = item.infor ?? '';
+      return acc;
+    }, {});
+    // Gửi formData đến API tại đây
+    updateProfile(formData)
+    setIsUpdated(false)
+  };
   return (
     <Container
       fluid
-      className='pt-5 overflow-hidden' style={{marginLeft: "350px"}}>
-      <h4 className='mb-4'>Account</h4>
-      <InputGroup className="mb-3 ms-4">
-        <div className='me-5 pe-5 border-0 bg-transparent'>Email</div>
-        {
-        user === null 
-        ? <Form.Control className='border-1 w-100'/>
-        : <div id="basic-addon1" className='ms-5'>{user.email}</div>
-         }
-        
-      </InputGroup>
-      <InputGroup className="mx-3 mt-4">
-        <div className='me-5 pe-5 border-0 bg-transparent'>Password</div>
-        <input
+      className='pt-5' style={{ marginLeft: "350px", marginTop: "60px" }}>
+      {
+        user
+        &&
+        <>
+          <div>
+            <h4 className='mb-4'>Account</h4>
+            {
+              user.role === "admin" &&
+              <Link to="/admin/dashboard">
+                Go to Admin page
+              </Link>
+            }
+          </div>
+          <InputGroup className="mb-3 ms-4">
+            <div className='me-5 pe-5 border-0 bg-transparent'>Email</div>
+            {
+              user === null
+                ? <Form.Control className='border-1 w-100' />
+                : <div id="basic-addon1" className='ms-5'>{user.email}</div>
+            }
+
+          </InputGroup>
+          <InputGroup className="mx-3 mt-4">
+            <div className='me-5 pe-5 border-0 bg-transparent'>Password</div>
+            <input
               placeholder='*********'
               className='border-1 rounded-2 ms-4 p-1 text-center'
-              style={{width: '200px', border: "1px solid mediumseagreen"}}
+              style={{ width: '200px', border: "1px solid mediumseagreen" }}
             />
-      </InputGroup>
+          </InputGroup>
 
-        
-        <Button className='rounded-2 bg-red-normal border-0 d-flex align-items-center justify-content-between px-4 ms-3 mt-4'>
-        <Image width={18} height={20} className='me-2' src={lockIcon}/>
-          Change password
-        </Button>
-        <h4 className='mt-5 mb-4'>Personal Data</h4>
-        <Row className="mb-3 d-flex">
-        
-          <Col xs={2}>
-          <label>Username</label>
-          
-          </Col>
-          <Col xs={5} className='ms-3'>
-          <p  className='h6'>{user.name}</p>
-           
-          </Col>
-      </Row>
 
-        {
-          profile.map(data=>(
-        <Row key={data.title} className="mb-3 d-flex">
-        
-          <Col xs={2}>
-          <label>{data.title}</label>
-          
-          </Col>
-          <Col xs={5} className='ms-3'>
+          <Button
+            onClick={handleOpenModal}
+            className='rounded-2 bg-red-normal border-0 d-flex align-items-center justify-content-between px-4 ms-3 mt-4'>
+            <Image width={18} height={20} className='me-2' src={lockIcon} />
+            Change password
+          </Button>
+          {showModalChangePassword && <ChangePasswordModal show={showModalChangePassword} handleClose={handleCloseModal} />}
+          <h4 className='mt-5 mb-4'>Personal Data</h4>
+          <Form onSubmit={handleSubmit}>
             {
-              data === null || data === undefined
-              ?
-              <p  className='h6'>{data.value}</p>
-              :
-              <Form.Control className= 'border-1' type="text" placeholder={`Enter ${data.placeholder}`} autoFocus={true} />
-            }
-          </Col>
-      </Row>
-            ))
-            
-        }
-        <Button className='rounded-2 bg-blue-normal border-0 d-flex align-items-center justify-content-between px-4 ms-3 mt-4'>
-        <Image width={20} height={20} className='me-2' src={editIcon}/>
-          Update changes
-        </Button>
+              profile.map((item, index) => (
+                <div key={index}>
+                  {
+                    item.val !== 'license'
+                    &&
+                    <Form.Group as={Col} className="mb-3 mx-4 d-flex align-items-center">
+                      <Form.Label column sm="3">
+                        {item.title}:
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder={item.infor !== '' ? item.infor : item.placeholder}
+                        name={item.val}
+                        value={item.infor}
+                        onChange={handleChange}
 
+                      />
+                    </Form.Group>
+                  }
+                </div>
+              ))
+            }
+
+            <Button
+              type="submit"
+              disabled={!isUpdated}
+              className='rounded-2 bg-blue-normal border-0 d-flex align-items-center justify-content-between px-4 ms-3 mt-4'>
+              <Image width={20} height={20} className='me-2' src={editIcon} />
+              Update changes
+            </Button>
+          </Form>
+
+        </>
+      }
     </Container>
   )
 }

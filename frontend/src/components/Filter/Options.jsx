@@ -1,14 +1,16 @@
 //lấy dữ liệu từ danh sách để đưa vào dropdown
 import React, { useEffect, useState } from 'react'
 import useFilter from '../../hooks/useFilter'
-import { Dropdown, Form, InputGroup, Image, ButtonGroup, Button } from 'react-bootstrap'
+
 
 import searchIcon from '../../assets/imgs/search.png'
 import useConference from '../../hooks/useConferences'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import Select from 'react-select'
 import { useLocation } from 'react-router-dom'
-const category = ["Conference", "Journal"]
+
+import data from './options.json'
+
 const customStyles = {
    
     option: (provided, state) => ({
@@ -35,7 +37,8 @@ const CustomOption = ({ innerProps, label, isSelected }) => (
 );
 const Options = ({ label }) => {
     const { filterOptions } = useConference()
-    const [tranformOptions, setTranformOptions] = useState([])
+    const { getOptionsFilter } = useFilter()
+    const [options, setOptions] = useState([])
     const { addKeywords, sendFilter } = useFilter()
     const [statename, setStateName] = useState('')
     const location = useLocation();
@@ -44,38 +47,43 @@ const Options = ({ label }) => {
       if(pathname === '/' || pathname === '/home'){
         setStateName('optionsSelected')
       }
-      else setStateName('filterOptionsFollowed')
+      else setStateName('filterOptionsAuth')
     }, [pathname])
+    
     const handleOptionChange = (item) => {
         const selectedValues = item.map(option => option.label);
         addKeywords(statename, label, selectedValues)
-        sendFilter(label, selectedValues)
+        if(statename === 'optionsSelected'){
+            sendFilter(label, selectedValues)
+        }
     };
     useEffect(() => {
-        let transformedState = []
-        if (filterOptions !== null) {
-            if (label === 'categories') {
-                transformedState = category.map((item, index) => ({
-                    value: index + 1,
-                    label: item,
-                }));
-            } else if (filterOptions[label]) {
-                transformedState = filterOptions[label].map((item, index) => ({
+        const staticValue = ["location", "rank", "type", "category"]
+        
+        if(staticValue.includes(label)){
+        
+            setOptions(data[label])
+            getOptionsFilter(label, data[label])
+        }
+        else { 
+            let transformedOptions = [] 
+            if (filterOptions[label]) {
+                transformedOptions = filterOptions[label].map((item, index) => ({
                     value: index + 1,
                     label: capitalizeFirstLetter(item),
                 }));
             }
-
+            setOptions(transformedOptions)
         }
-        setTranformOptions(transformedState);
-    }, [filterOptions, label, category]);
+        
+    }, []);
 
 
     return (
         <div>
             <Select
                 isMulti={true}
-                options={tranformOptions}
+                options={options}
                 value
                 components={{ Option: CustomOption }}
                 onChange={handleOptionChange}

@@ -1,6 +1,15 @@
 import * as actionTypes from './actionTypes';
-
-
+export const requestApi = () => {
+  return {
+    type: actionTypes.LOADING
+  }
+}
+export const setError = (error) => {
+  return {
+    type: actionTypes.ERROR_MESSAGE,
+    payload: error,
+  }
+}
 export const loginRequest = () => {
   return {
     type: actionTypes.LOGIN_REQUEST,

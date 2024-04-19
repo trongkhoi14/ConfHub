@@ -10,20 +10,37 @@ import downIcon from '../../assets/imgs/down.png'
 import FilterSelected from "./FilterSelected";
 import useFilter from "../../hooks/useFilter";
 import Options from "./Options";
+import { checkExistValue } from "../../utils/checkFetchedResults";
+import { useLocation } from "react-router-dom";
 
-const Filter = () => {
-  const {optionsSelected, sendFilter, addKeywords} = useFilter()
+const Filter = ({optionsSelected, statenameOption}) => {
+  const {sendFilter, addKeywords, clearKeywords} = useFilter()
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
-  const [searchInput, setSearchInput] = useState("")
+  const [searchInput, setSearchInput] = useState("")  
+  
+  const location = useLocation();
+  const pathname = location.pathname;
+  useEffect(()=>{
+    clearKeywords()
+    
+  }, [pathname])
+
+
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
   const handleApplySearch = () => {
-    addKeywords("search", [searchInput])
+    addKeywords(statenameOption, "search", [searchInput])
     sendFilter("search", searchInput)
   }
+  const handleEnterSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleApplySearch();
+    }
+  }
+
   return (
-    <Container className="bg-white shadow rounded-4 px-5 py-4 my-4">
+    <Container className="bg-white shadow rounded-4 px-5 py-4 my-5">
       <div className="d-flex align-items-center mb-2">
         <Image src={filterIcon} width={22} height={22} className="me-2" />
         <h4 className="m-0">Filter</h4>
@@ -41,6 +58,7 @@ const Filter = () => {
             value={searchInput}
             name="searchInput"
             onChange={handleSearchChange}
+            onKeyDown={handleEnterSearch}
           />
           {/*Button Search */}
           <InputGroup.Text className='bg-primary-light m-0 border-0 bg-primary-light p-0'>
@@ -56,11 +74,11 @@ const Filter = () => {
       <Row direction="horizontal" gap={3} className="w-100  d-flex justify-content-center">
         <Col>
           <span className="fw-bold text-color-black">Category</span>
-          <Options label={"categories"}/>
+          <Options label={"category"}/>
         </Col>
         <Col >
           <span className="fw-bold text-color-black">Location</span>
-          <Options label={"locations"}/>
+          <Options label={"location"}/>
         </Col>
         <Col>
           <span className="fw-bold text-color-black">Submission date</span>
@@ -80,7 +98,7 @@ const Filter = () => {
         className={showAdvancedFilter ? "ms-2 rotate-180" : 'ms-2'}/>
       </Button>
       {showAdvancedFilter && <AdvancedFilter/>}
-      {optionsSelected && <FilterSelected/>}  
+      {optionsSelected && <FilterSelected optionsSelected={optionsSelected} statenameOption={statenameOption}/>}  
     </Container>
   );
 };

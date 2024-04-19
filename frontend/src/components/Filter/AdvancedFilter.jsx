@@ -8,19 +8,19 @@ const AdvancedFilter = () => {
         <Row direction="horizontal" gap={3} className="w-100">
             <Col>
                 <span className="fw-bold text-color-black">Rank</span>
-                <Options label={"ranks"}/>
+                <Options label={"rank"}/>
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Field of research</span>
-                <Options label={"fors"}  />
+                <Options label={"for"}  />
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Source</span>
-                <Options label={"sources"}  />
+                <Options label={"source"}  />
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Acronym</span>
-                <Options label={"acronyms"}  />
+                <Options label={"acronym"}  />
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Rating</span>
@@ -28,11 +28,7 @@ const AdvancedFilter = () => {
             </Col>
             <Col>
                 <span className="fw-bold text-color-black">Type</span>
-                <Options label={"types"}  />
-            </Col>
-            <Col>
-                <span className="fw-bold text-color-black">Impact factor</span>
-                <StarDropdown label={'impactfactor'}  />
+                <Options label={"type"}  />
             </Col>
 
         </Row>

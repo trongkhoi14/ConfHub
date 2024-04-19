@@ -1,9 +1,14 @@
-import React from 'react'
+
 import { useLocation, Outlet } from 'react-router-dom'
 import Header from '../components/Header'
 import NavBarDetailPage from '../components/NavBarDetailPage'
+import { useEffect } from 'react'
+
 const MainLayout = () => {
     const location = useLocation()
+    useEffect(()=>{
+console.log('main layout')
+    },[])
   return (
     <>
         {

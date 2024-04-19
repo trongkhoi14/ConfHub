@@ -2,6 +2,18 @@ import * as actionTypes from './../actions/actionTypes'
 
 const appReducer = (state, action) => {
     switch (action.type) {
+        case actionTypes.LOADING:
+            return {
+                ...state,
+                loading: true,
+                error: null,
+            };
+            case actionTypes.ERROR_MESSAGE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload,
+            };
         case actionTypes.LOGIN_REQUEST:
             return {
                 ...state,
@@ -52,30 +64,36 @@ const appReducer = (state, action) => {
                 error: action.payload,
             };
         case actionTypes.GET_OPTIONS_FILTER:
-            return { ...state, filterOptions: action.payload }
-
-        case actionTypes.ADD_FILTER:
             return {
                 ...state,
+                filterOptions: { ...state.filterOptions, ...action.payload }
+            };
+        case actionTypes.ADD_FILTER:    
+            console.log("reducer", action.payload)
+            return {
+                ...state,  
+                loading: false,
                 [action.payload.statename]: {
-                  ...state[action.payload.statename],
-                  [action.payload.label]: [
-                    ...(state[action.payload.statename][action.payload.label] || []), // Nếu mảng không tồn tại, tạo một mảng mới
-                    ...action.payload.keywords, // Thêm giá trị mới vào mảng
-                  ],
-                },
-              };
+                    ...state[action.payload.statename],
+                    [action.payload.label]: [
+                        ...(state[action.payload.statename][action.payload.label] || []), // Nếu mảng không tồn tại, tạo một mảng mới
+                        ...action.payload.keywords, // Thêm giá trị mới vào mảng
+                    ],
+                },              
+            };
         case actionTypes.ADD_FILTER_DATE:
             return {
                 ...state,
+                
+                loading: false,
                 [action.payload.statename]: {
                     ...state[action.payload.statename],
                     [action.payload.label]: [...action.payload.keyword],
-                  },
+                },
                 fetchedResults: {
                     ...state.fetchedResults,
                     [action.payload.label]: action.payload.conferences,
-                }
+                },
             }
         case actionTypes.REMOVE_FILTER:
             return {
@@ -96,14 +114,14 @@ const appReducer = (state, action) => {
             return {
                 ...state,
                 fetchedResults: {
-                  ...state.fetchedResults,
-                  [action.payload.option]: [
-                    ...state.fetchedResults[action.payload.option],
-                    ...action.payload.results.map(item => item)
-                  ]
+                    ...state.fetchedResults,
+                    [action.payload.option]: [
+                        ...state.fetchedResults[action.payload.option],
+                        ...action.payload.results.map(item => item)
+                    ]
                 },
             };
-        case actionTypes.REQUEST_CONFERENCE: 
+        case actionTypes.REQUEST_CONFERENCE:
             return {
                 ...state,
                 loading: true,
@@ -123,7 +141,7 @@ const appReducer = (state, action) => {
         case actionTypes.FOLLOW:
             return {
                 ...state,
-                listFollowed: [...state.listFollowed, action.payload],
+                listFollowed: action.payload,
             };
         case actionTypes.UNFOLLOW:
             return {

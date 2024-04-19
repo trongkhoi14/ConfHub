@@ -14,45 +14,45 @@ export const initialState = {
   //filter
   maxpage: 0,
   amount: 0,
-  filterOptions: null,
+  filterOptions: [],
   filterResults: [],
   fetchedResults: {
-    locations: [], //['Vietnam', 'Silicon Valley', 'San Francisco', 'Seattle', 'Austin']
-    ranks: [], //["A", "B"]
-    fors: [], //['4605 - Machine Learning', '']
-    sources: [], //['Score2023', 'Score2024']
-    acronyms: [], //['ACM', 'KDD']
-    types: [],
+    location: [], //['Vietnam', 'Silicon Valley', 'San Francisco', 'Seattle', 'Austin']
+    rank: [], //["A", "B"]
+    for: [], //['4605 - Machine Learning', '']
+    source: [], //['Score2023', 'Score2024']
+    acronym: [], //['ACM', 'KDD']
+    type: [],
     date: [],
     submissionDate: [],
     search: [],
     impactfactor: [],
     rating: [],
-    categories: [],
+    category: [],
   },
 
   optionsSelected: {
-    locations: [], //['Vietnam', 'Silicon Valley', 'San Francisco', 'Seattle', 'Austin']
-    ranks: [], //["A", "B"]
-    fors: [], //['4605 - Machine Learning', '']
-    sources: [], //['Score2023', 'Score2024']
-    acronyms: [], //['ACM', 'KDD']
-    types: [],
+    location: [], //['Vietnam', 'Silicon Valley', 'San Francisco', 'Seattle', 'Austin']
+    rank: [], //["A", "B"]
+    for: [], //['4605 - Machine Learning', '']
+    source: [], //['Score2023', 'Score2024']
+    acronym: [], //['ACM', 'KDD']
+    type: [],
     date: [],
     submissionDate: [],
     search: [],
     impactfactor: [],
     rating: [],
-    categories: [],
+    category: [],
   },
 
   keywordFilter: [],//filter
 
   
-  //follow
   listFollowed: [],
-  filteFollow: [],
-  filterOptionsFollowed:  {
+  //filter in auth page
+  filterAuth: [],
+  filterOptionsAuth:  {
     locations: [],
     ranks: [],
     fors: [],
@@ -64,7 +64,7 @@ export const initialState = {
     search: [],
     impactfactor: [],
     rating: [],
-    categories: [],
+    category: [],
   },
 
 };

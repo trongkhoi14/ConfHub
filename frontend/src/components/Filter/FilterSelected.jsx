@@ -6,22 +6,22 @@ import deleteIcon from "../../assets/imgs/del.png";
 import RedDeleteIcon from "../../assets/imgs/redDel.png";
 import useFilter from "../../hooks/useFilter";
 import useConference from "../../hooks/useConferences";
-import { findKeyByKeyword, mergeAndCountUniqueValues } from "../../utils/checkFetchedResults";
-import { useLocation } from 'react-router-dom';
+import { findKeyByKeyword, getUniqueConferences,  } from "../../utils/checkFetchedResults";
+
 import { useEffect, useState } from 'react';
 
-const FilterSelected = () => {
-  const { optionsSelected, deleteKeyword, clearKeywords } = useFilter()
+const FilterSelected = ({optionsSelected, statenameOption}) => {
+  const { deleteKeyword, clearKeywords } = useFilter()
   
   const {handleGetList} = useConference()
-  const [statename, setStateName] = useState('')
+  const [statename, setStateName] = useState(statenameOption)
   const [keywordsSelected, setKeywordsSelected] = useState(null)
-  const [totalCount, setCount] = useState(null)
+  const [total, setTotal] = useState(0)
+  
   useEffect(()=>{
-    setStateName('optionsSelected')
-    const tempList = mergeAndCountUniqueValues(optionsSelected)
-    setCount(tempList.totalCount)
+    const tempList = getUniqueConferences(optionsSelected)
     setKeywordsSelected(tempList)
+    setTotal(tempList.length)
   }, [optionsSelected])
   
   const handleClearKeyword = () => {
@@ -31,10 +31,10 @@ const FilterSelected = () => {
   return (
     <>
       {
-        totalCount > 0
+        keywordsSelected !== null && total > 0
           ?
-          <div className="d-flex flex-wrap border-1 border border-light-subtle p-3 my-3 rounded-3">
-            {keywordsSelected.uniqueValues.map((keyword, index) => (
+          <div className="d-flex flex-wrap border-1 border border-light-subtle p-3 my-3 me-4 rounded-3">
+            {keywordsSelected.map((keyword, index) => (
               <div
                 onClick={() => { deleteKeyword(statename, findKeyByKeyword(optionsSelected, keyword),keyword) }}
                 key={index}

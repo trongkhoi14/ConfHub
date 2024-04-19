@@ -1,9 +1,8 @@
 
 import { Button, OverlayTrigger, Tooltip, Image } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+
 import ViewMoreIcon from './../assets/imgs/view_page.png'
 const RedirectButton = (conference) => {
-    const navigate = useNavigate();
     const aFunc = () => {
         return new Promise((resolve) => {
           setTimeout(() => {

@@ -10,53 +10,6 @@ import TimeIcon from './../assets/imgs/time.png'
 import LocationIcon from './../assets/imgs/location.png'
 import PrevIcon from './../assets/imgs/control_prev.png'
 import NextIcon from './../assets/imgs/control_next.png'
-const test = [
-    {
-        con_id: 1,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-
-    }, {
-        con_id: 2,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: true,
-
-    },
-    {
-        con_id: 3,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-
-    },
-    {
-        con_id: 4,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: true,
-    },
-    {
-        con_id: 5,
-        acronym: "KDD",
-        con_name: "ACM International Conference on Knowledge Discovery and Data Mining",
-        location: "Vietnam",
-        update_time: "22/11/2023",
-        follow: false,
-
-    },
-
-]
-
 
 const properties = {
     prevArrow: <Button className='bg-transparent border-0'>

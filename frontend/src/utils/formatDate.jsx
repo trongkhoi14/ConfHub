@@ -21,5 +21,13 @@ const day = String(originalDateObject.getDate()).padStart(2, '0'); // Thêm '0' 
 const formattedDateString = `${year}-${month}-${day}`;
 return formattedDateString
 }
-  
-  
+
+export function getDateValue(date_type, list) {
+  const foundDate = list.find(date => date.date_type === date_type);
+
+  if (foundDate) {
+    return foundDate.date_value;
+  } else {
+    return "NaN";
+  }
+}

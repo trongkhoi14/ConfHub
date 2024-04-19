@@ -1,13 +1,51 @@
 import { useAppContext } from '../context/authContext'
-import { addFilter, addFilterDateResults, clearFilters, getResult, removeFilter } from '../actions/filterActions'
+import { addFilter, addFilterDateResults, clearFilters, getResult, getoptionsSelected, removeFilter } from '../actions/filterActions'
 
 import { baseURL } from './api/baseApi'
 import { formatDateFilter } from '../utils/formatDate'
 import { convertToLowerCaseFirstLetter } from '../utils/formatWord'
+import { requestApi } from '../actions/actions'
+import { useEffect } from 'react'
 
 const useFilter = () => {
   const { state, dispatch } = useAppContext()
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      // Xử lý trước khi chuyển trang
+      event.preventDefault();
+      clearFilters()
+      return event.returnValue = ''; // Hiển thị thông báo trên trình duyệt
+    };
 
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  const getOptionsFilter = async (label, data) => {
+    const params = ["source", "for"];
+    if (label === "") {
+      for (const param of params) {
+        try {
+          const response = await fetch(`${baseURL}/${param}`);
+          const data = await response.json();
+          // Gửi action để cập nhật dữ liệu cho label hiện tại
+          dispatch(getoptionsSelected({ [param]: data.data }));
+          
+        } catch (error) {
+          console.error(`Error fetching data for ${label}:`, error);
+        }
+      }
+    }
+    else {
+      const options = data.map(item => item.label);
+      dispatch(getoptionsSelected({ [label]: options }))
+      
+    }
+
+  }
   const addKeywords = (statename, label, keywords) => {
     dispatch(addFilter(statename, label, keywords))
   }
@@ -15,17 +53,17 @@ const useFilter = () => {
   const addFilterDate = async (statename, startDate, endDate, label, keywordFormat) => {
     const start = formatDateFilter(startDate)
     const end = formatDateFilter(endDate)
-    
+
     if (label === 'submissionDate') {
       const response = await fetch(`${baseURL}/conference?startSubDate=${start}&endSubDate=${end}`);
       const data = await response.json();
       //dispatch(addFilterSubmission(label, data.conferences));
-      dispatch(addFilterDateResults(statename, label, keywordFormat, data.conferences))
+      dispatch(addFilterDateResults(statename, label, keywordFormat, data.data))
     }
     else {
       const response = await fetch(`${baseURL}/conference?startDate=${start}&endDate=${end}`);
       const data = await response.json();
-      dispatch(addFilterDateResults(statename, label, keywordFormat, data.conferences))
+      dispatch(addFilterDateResults(statename, label, keywordFormat, data.data))
     }
   }
 
@@ -33,24 +71,21 @@ const useFilter = () => {
   const deleteKeyword = (statename, label, keyword) => {
     let formatKeyword = keyword
     let modifiedLabel = label
-    if (label === 'types') {
+    if (label === 'type') {
       formatKeyword = convertToLowerCaseFirstLetter(keyword)
     }
     else formatKeyword = keyword
 
-    if(label === 'fors') {
+    if (label === 'for') {
       modifiedLabel = 'fieldOfResearch'
     }
     else if (label === 'search') {
       modifiedLabel = 'name'
       formatKeyword = keyword.toUpperCase()
     }
-    else if (label === 'categories') {
-      modifiedLabel = 'category'
-    }
     else if (label.endsWith("s")) {
       modifiedLabel = label.slice(0, -1)
-    }    
+    }
 
 
     let updatedResultsFilter = {}
@@ -91,7 +126,7 @@ const useFilter = () => {
       };
     }
     // Xóa 1 filter trong danh sách
-    dispatch( removeFilter(statename,updatedResultsFilter, updateOptionsSelected));
+    dispatch(removeFilter(statename, updatedResultsFilter, updateOptionsSelected));
 
 
   }
@@ -100,69 +135,23 @@ const useFilter = () => {
     const clearedOptionsSelected = Object.fromEntries(Object.keys(state.optionsSelected).map((key) => [key, []]));
     //reset all
     dispatch(clearFilters(statename, clearedFetchedResults, clearedOptionsSelected))
-    
+
   }
 
   const sendFilter = async (label, selectedOptions) => {
-    if (label === 'locations') {
-      const response = await fetch(`${baseURL}/conference?size=15&location=${selectedOptions[0]}`);
+    const listLabel = ['location', 'search', 'category', 'rank', 'for', 'source', 'acronym', 'rating']
+    requestApi()
+    if(listLabel.includes(label)){
+      const response = await fetch(`${baseURL}/conference?size=15&${label}=${selectedOptions[0]}`);
       const data = await response.json();
-      dispatch(getResult(label, data.conferences));
-    } else if (label === 'search') {
-      const response = await fetch(`${baseURL}/conference?size=15&search=${selectedOptions}`);
-      const data = await response.json();
-      dispatch(getResult(label, data.conferences));
+      dispatch(getResult(label, data.data));
     }
-    else if (label === 'categories') {
-      const response = await fetch(`${baseURL}/conference?size=15&category=${selectedOptions[0]}`);
-        const data = await response.json();
-        dispatch(getResult(label, data.conferences));
-    }
-    else if (label === 'types') {
+    else if (label === 'type') {
       for (const option of selectedOptions) {
         const formatOption = option.toLowerCase()
         const response = await fetch(`${baseURL}/conference?size=15&type=${formatOption}`);
         const data = await response.json();
-        dispatch(getResult(label, data.conferences));
-      }
-    }
-    else if (label === 'ranks') {
-      for (const option of selectedOptions) {
-
-        const response = await fetch(`${baseURL}/conference?size=15&rank=${option}`);
-        const data = await response.json();
-        dispatch(getResult(label, data.conferences));
-      }
-    }
-    else if (label === 'fors') {
-      for (const option of selectedOptions) {
-
-        const response = await fetch(`${baseURL}/conference?size=15&for[]=${option}`);
-        const data = await response.json();
-        dispatch(getResult(label, data.conferences));
-      }
-    }
-    else if (label === 'sources') {
-      for (const option of selectedOptions) {
-
-        const response = await fetch(`${baseURL}/conference?size=15&source[]=${option}`);
-        const data = await response.json();
-        dispatch(getResult(label, data.conferences));
-      }
-    }
-    else if (label === 'acronyms') {
-      for (const option of selectedOptions) {
-
-        const response = await fetch(`${baseURL}/conference?size=15&acronym[]=${option}`);
-        const data = await response.json();
-        dispatch(getResult(label, data.conferences));
-      }
-    }
-    else if (label === 'rating') {
-      for (const option of selectedOptions) {
-        const response = await fetch(`${baseURL}/conference?size=15&rating=${option}`);
-        const data = await response.json();
-        dispatch(getResult(label, data.conferences));
+        dispatch(getResult(label, data.data));
       }
     }
     else if (label === 'impactfactor') {
@@ -170,7 +159,7 @@ const useFilter = () => {
 
         const response = await fetch(`${baseURL}/conference?size=15&type=${option}`);
         const data = await response.json();
-        dispatch(getResult(label, data.conferences));
+        dispatch(getResult(label, data.data));
       }
     }
   }
@@ -179,7 +168,8 @@ const useFilter = () => {
     optionsSelected: state.optionsSelected,
     filterOptions: state.filterOptions,
     fetchedResults: state.fetchedResults,
-    filterOptionsFollowed: state.filterOptionsFollowed,
+    filterOptionsAuth: state.filterOptionsAuth,
+    getOptionsFilter,
     addKeywords,
     addFilterDate,
     deleteKeyword,

@@ -41,7 +41,7 @@ const Setting = () => {
   return (
     <Container
       fluid
-      className='pt-5 overflow-hidden' style={{marginLeft: "350px"}}>
+      className='pt-5 overflow-hidden' style={{marginLeft: "350px", marginTop: "60px" }}>
       <h4 className=''>Setting</h4>
       <h6 className='text-color-darker mb-2'>How would you like to recieve notifications?</h6>
       

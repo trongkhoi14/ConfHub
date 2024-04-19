@@ -1,6 +1,6 @@
 import { FOLLOW, UNFOLLOW } from "./actionTypes";
 
-export const followConferenceAction = (conference) => {
+export const getFollowedConferenceAction = (conference) => {
     return {
       type: FOLLOW,
       payload: conference,
