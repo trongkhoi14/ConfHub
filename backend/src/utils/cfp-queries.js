@@ -14,22 +14,22 @@ const selectConferenceByCondition = async function (filterConditions) {
                 [Op.and]: [
                     { status: true },
                     {
+                        "$ImportantDates.date_type$": filterConditions.date_type,
+                        "$ImportantDates.date_value$": filterConditions.date_value
+                    },
+                    {
+                        "$Organizations.start_date$": filterConditions.confStart,
+                        "$Organizations.end_date$": filterConditions.confEnd
+                    },
+                    {
                         [Op.or]: [
                             { rating: filterConditions.rating },
                             { rank: filterConditions.rank },
                             { "$Source.src_name$": filterConditions.source },
                             { "$Conference.conf_name$": filterConditions.search },
                             { "$Conference.acronym$": filterConditions.acronym },
-                            {
-                                "$ImportantDates.date_type$": filterConditions.date_type,
-                                "$ImportantDates.date_value$": filterConditions.date_value
-                            },
                             { "$Organizations.type$": filterConditions.type },
                             { "$Organizations.location$": filterConditions.location },
-                            {
-                                "$Organizations.start_date$": filterConditions.confStart,
-                                "$Organizations.end_date$": filterConditions.confEnd
-                            },
                             {
                                 "$CfpFors.FieldOfResearch.for_name$": filterConditions.fieldOfResearch
                             }
