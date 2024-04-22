@@ -1,11 +1,11 @@
 const { DataTypes, Model } = require('sequelize');
-const sequelize = require('./../config/database')
-const bcrypt = require('bcrypt')
-const crypto = require('crypto')
+const sequelize = require('./../config/database');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 class User extends Model {
     static async hashPassword(password) {
-        const salt = bcrypt.genSaltSync(10)
+        const salt = bcrypt.genSaltSync(10);
         return await bcrypt.hash(password, salt);
     }
 
@@ -14,30 +14,30 @@ class User extends Model {
     }
 
     static createPasswordChangedToken() {
-        const resetToken = crypto.randomBytes(32).toString('hex')
-        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
-        this.passwordResetExpires = Date.now() + 15 * 60 * 1000
-        return resetToken
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+        return resetToken;
     }
-}
+};
 
 User.init({
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     name: {
-        type: DataTypes.STRING(64),
-        allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false
     },
     phone: {
-        type: DataTypes.STRING(16),
+        type: DataTypes.STRING,
         allowNull: true,
         unique: true
     },
     email: {
-        type: DataTypes.STRING(128),
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -46,27 +46,33 @@ User.init({
     },
     address: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
     },
     nationality: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
     },
     role: {
         type: DataTypes.STRING,
-        defaultValue: 'user',
+        validate: {
+            isIn: {
+                args: [['user', 'admin']],
+                msg: 'Error: Invalid value.'
+            }
+        },
+        defaultValue: 'user'
     },
     license: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: false
     },
     receive_noti: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        defaultValue: true
     },
     refreshToken: {
         type: DataTypes.STRING,

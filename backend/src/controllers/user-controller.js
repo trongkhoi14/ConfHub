@@ -14,8 +14,8 @@ class UserController {
             return res.status(status.BAD_REQUEST).json({
                 status: false,
                 data: "Missing registration information"
-            })
-        }
+            });
+        };
         // check if the user with email are already existed
         const user = await userModel.findOne({
             where: {
@@ -44,11 +44,7 @@ class UserController {
                 data: []
             })
         }
-        const response = await userModel.findOne({
-            where: {
-                email: email,
-            }
-        });
+        const response = await userModel.findOne({ where: { email: email } });
         if (!response) {
             return res.status(status.BAD_REQUEST).json({
                 message: "Email not found.",
@@ -64,15 +60,8 @@ class UserController {
             const newRefreshToken = generateRefreshToken(response.id)
             // save refresh token to the database
             await userModel.update(
-                {
-                    refreshToken: newRefreshToken
-                },
-                {
-                    where: {
-                        id: response.id
-                    },
-                    returning: true,
-                })
+                { refreshToken: newRefreshToken },
+                { where: { id: response.id }, returning: true })
             // save refresh token to cookie
             res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000 })
             return res.status(status.OK).json({
@@ -162,9 +151,7 @@ class UserController {
         const response = await userModel.findOne({ id: rs._id, refreshToken: cookie.refreshToken })
         return res.status(status.OK).json({
             status: response ? true : false,
-            data: {
-                newAccessToken: response ? generateAccessToken(response.id, response.role) : 'Refresh token not matched'
-            }
+            data: { newAccessToken: response ? generateAccessToken(response.id, response.role) : 'Refresh token not matched' }
         })
     })
 
@@ -173,11 +160,7 @@ class UserController {
         const cookie = req.cookies
         if (!cookie || !cookie.refreshToken) throw new Error('No refresh token in cookies')
         // empty refreshToken in the database
-        await userModel.update({ refreshToken: '' }, {
-            where: {
-                refreshToken: cookie.refreshToken
-            }
-        });
+        await userModel.update({ refreshToken: '' }, { where: { refreshToken: cookie.refreshToken } });
         // delete refreshToken in the browser's cookie
         res.clearCookie('refreshToken', {
             httpOnly: true,
@@ -212,7 +195,7 @@ class UserController {
                 message: "Nothing was updated."
             })
         }
-        
+
         const { name, phone, address, nationality, license } = req.body
         if (!name || !phone || !address || !nationality) {
             return res.status(status.BAD_REQUEST).json({
@@ -231,9 +214,7 @@ class UserController {
                     address: address,
                     nationality: nationality
                 },
-                {
-                    where: { id: _id }
-                }
+                { where: { id: _id } }
             )
         } else { // admin role
             await userModel.update(
@@ -244,12 +225,10 @@ class UserController {
                     nationality: nationality,
                     license: license || "false"
                 },
-                {
-                    where: { id: _id }
-                }
+                { where: { id: _id } }
             )
         }
-        
+
         try {
             res.status(status.OK).json({
                 message: "Update user successfully",

@@ -1,44 +1,41 @@
-const { DataTypes, DATEONLY } = require('sequelize');
-const sequelize = require('./../config/database')
+const { DataTypes } = require('sequelize');
+const sequelize = require('./../config/database');
 
-var ImportantDate = sequelize.define('ImportantDate', {
+const ImportantDate = sequelize.define('ImportantDate', {
     date_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     date_type: {
-        type: DataTypes.STRING(8),
-        validate: {
-            isIn: {
-                args: [['sub', 'noti', 'cmr', 'reg']],
-                msg: 'Error: invalid value'
-            }
-        },
+        type: DataTypes.STRING,
+        // validate: {
+        //     isIn: {
+        //         args: [['sub', 'noti', 'cmr', 'reg']],
+        //         msg: 'Error: invalid value'
+        //     }
+        // },
         allowNull: false,
-        defaultValue: 'sub'
+        defaultValue: 'Submission'
     },
     date_value: {
         type: DataTypes.DATEONLY,
         allowNull: false,
         defaultValue: new Date()
     },
-    keyword: {
-        type: DataTypes.STRING(128),
-    },
     status: {
-        type: DataTypes.STRING(8),
+        type: DataTypes.STRING,
         validate: {
             isIn: {
                 args: [['new', 'old']],
-                msg: 'Error: invalid value'
+                msg: 'Error: Invalid value.'
             }
         },
         defaultValue: 'new'
     }
 }, {
     timestamps: false,
-    tableName: 'important_dates',
-})
+    tableName: 'important_dates'
+});
 
-module.exports = ImportantDate
+module.exports = ImportantDate;

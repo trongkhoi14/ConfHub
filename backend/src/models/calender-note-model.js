@@ -1,20 +1,19 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/database');
 
-const Post = sequelize.define('Post', {
+const CalenderNote = sequelize.define('CalenderNote', {
     tid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true
     },
-    post_time: {
-        type: DataTypes.DATEONLY,
-        allowNull: false,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    note: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
 }, {
     timestamps: false,
-    tableName: 'posts'
+    tableName: 'calender_notes'
 });
 
-module.exports = Post;
+module.exports = CalenderNote;

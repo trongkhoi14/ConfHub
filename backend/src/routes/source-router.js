@@ -4,6 +4,6 @@ const { SourceController } = require('../controllers');
 const router = express.Router();
 const sourceController = new SourceController();
 
-router.get('/', sourceController.getAll);
+router.get('/', sourceController.getAllSource);
 
 module.exports = router;

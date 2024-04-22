@@ -1,46 +1,53 @@
-const userModel = require('./user-model')
-const conferenceModel = require('./conference-model')
-const callForPaperModel = require('./call-for-paper-model')
-const sourceModel = require('./source-model')
-const fieldOfResearchModel = require('./field-of-research-model')
-const cfpForModel = require('./cfp-for-model')
-const importantDateModel = require('./important-date-model')
-const organizationModel = require('./organization-model')
-const followModel = require('./follow-model')
-const postModel = require('./post-model')
-const feedbackModel = require('./feedback-model')
+const userModel = require('./user-model');
+const conferenceModel = require('./conference-model');
+const callForPaperModel = require('./call-for-paper-model');
+const sourceModel = require('./source-model');
+const fieldOfResearchModel = require('./field-of-research-model');
+const cfpForModel = require('./cfp-for-model');
+const importantDateModel = require('./important-date-model');
+const organizationModel = require('./organization-model');
+const followModel = require('./follow-model');
+const postModel = require('./post-model');
+const feedbackModel = require('./feedback-model');
+const calenderNote = require('./calender-note-model');
 
-conferenceModel.hasMany(callForPaperModel)
-callForPaperModel.belongsTo(conferenceModel)
+// Assocation
+conferenceModel.hasMany(callForPaperModel, { onDelete: 'CASCADE' });
+callForPaperModel.belongsTo(conferenceModel);
 
-sourceModel.hasMany(callForPaperModel)
-callForPaperModel.belongsTo(sourceModel)
+sourceModel.hasMany(callForPaperModel);
+callForPaperModel.belongsTo(sourceModel);
 
-callForPaperModel.hasMany(cfpForModel)
-cfpForModel.belongsTo(callForPaperModel)
-fieldOfResearchModel.hasMany(cfpForModel)
-cfpForModel.belongsTo(fieldOfResearchModel)
+callForPaperModel.hasMany(cfpForModel, { onDelete: 'CASCADE' });
+cfpForModel.belongsTo(callForPaperModel);
+fieldOfResearchModel.hasMany(cfpForModel, { onDelete: 'CASCADE' });
+cfpForModel.belongsTo(fieldOfResearchModel);
 
-callForPaperModel.hasMany(importantDateModel)
-importantDateModel.belongsTo(callForPaperModel)
+callForPaperModel.hasMany(importantDateModel, { onDelete: 'CASCADE' });
+importantDateModel.belongsTo(callForPaperModel);
 
-callForPaperModel.hasMany(organizationModel)
-organizationModel.belongsTo(callForPaperModel)
+callForPaperModel.hasMany(organizationModel, { onDelete: 'CASCADE' });
+organizationModel.belongsTo(callForPaperModel);
 
-userModel.hasMany(followModel)
-followModel.belongsTo(userModel)
-callForPaperModel.hasMany(followModel)
-followModel.belongsTo(callForPaperModel)
+userModel.hasMany(followModel, { onDelete: 'CASCADE' });
+followModel.belongsTo(userModel);
+callForPaperModel.hasMany(followModel, { onDelete: 'CASCADE' });
+followModel.belongsTo(callForPaperModel);
 
-userModel.hasMany(postModel)
-postModel.belongsTo(userModel)
-callForPaperModel.hasOne(postModel)
-postModel.belongsTo(callForPaperModel)
+userModel.hasMany(postModel, { onDelete: 'CASCADE' });
+postModel.belongsTo(userModel);
+callForPaperModel.hasOne(postModel, { onDelete: 'CASCADE' });
+postModel.belongsTo(callForPaperModel);
 
-userModel.hasMany(feedbackModel)
-feedbackModel.belongsTo(userModel)
-callForPaperModel.hasMany(feedbackModel)
-feedbackModel.belongsTo(callForPaperModel)
+userModel.hasMany(feedbackModel, { onDelete: 'CASCADE' });
+feedbackModel.belongsTo(userModel);
+callForPaperModel.hasMany(feedbackModel, { onDelete: 'CASCADE' });
+feedbackModel.belongsTo(callForPaperModel);
+
+followModel.hasMany(calenderNote, { onDelete: 'CASCADE' });
+calenderNote.belongsTo(followModel);
+importantDateModel.hasOne(calenderNote, { onDelete: 'CASCADE' });
+calenderNote.belongsTo(importantDateModel);
 
 module.exports = {
     userModel,
@@ -54,4 +61,5 @@ module.exports = {
     followModel,
     postModel,
     feedbackModel,
+    calenderNote
 }

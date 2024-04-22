@@ -1,19 +1,19 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./../config/database')
+const sequelize = require('./../config/database');
 
-var FieldOfResearch = sequelize.define('FieldOfResearch', {
+const FieldOfResearch = sequelize.define('FieldOfResearch', {
     for_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     for_name: {
-        type: DataTypes.STRING(256),
-        allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false
     }
 }, {
     timestamps: false,
-    tableName: 'field_of_researches',
-})
+    tableName: 'fields_of_research'
+});
 
-module.exports = FieldOfResearch
+module.exports = FieldOfResearch;

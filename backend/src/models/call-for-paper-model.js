@@ -1,34 +1,35 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./../config/database')
+const sequelize = require('./../config/database');
 
-var CallForPaper = sequelize.define('CallForPaper', {
+const CallForPaper = sequelize.define('CallForPaper', {
     cfp_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     content: {
-        type: DataTypes.TEXT,
+        type: DataTypes.TEXT
     },
     link: {
-        type: DataTypes.STRING(256), 
+        type: DataTypes.STRING
     },
     status: {
-        type: DataTypes.STRING(16),
-        validate: {
-            isIn: {
-                args: [['valid', 'invalid']],
-                msg: 'Error: invalid value'
-            }
-        },
-        defaultValue: 'valid'
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     },
     rating: {
-        type: DataTypes.DOUBLE,
-        defaultValue: 5.0,
+        type: DataTypes.DOUBLE
     },
     rank: {
-        type: DataTypes.STRING(16),
+        type: DataTypes.STRING
+    },
+    owner: {
+        type: DataTypes.STRING,
+        isIn: {
+            args: [['admin', 'user', 'crawler']],
+            msg: 'Error: Invalid value.'
+        },
+        defaultValue: "crawler"
     },
     createdAt: {
         type: DataTypes.DATEONLY,
@@ -42,7 +43,7 @@ var CallForPaper = sequelize.define('CallForPaper', {
     }
 }, {
     timestamps: false,
-    tableName: 'call_for_papers',
-})
+    tableName: 'call_for_papers'
+});
 
-module.exports = CallForPaper
+module.exports = CallForPaper;

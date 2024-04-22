@@ -1,33 +1,33 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./../config/database')
+const sequelize = require('./../config/database');
 
-var Organization = sequelize.define('Organization', {
+const Organization = sequelize.define('Organization', {
     org_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     type: {
-        type: DataTypes.STRING(8),
+        type: DataTypes.STRING,
         validate: {
             isIn: {
                 args: [['online', 'offline', 'hybrid']],
                 msg: 'Error: invalid value'
             }
-        },
+        }
     },
     location: {
-        type: DataTypes.STRING(256),
+        type: DataTypes.STRING
     },
-    conf_date: {
-        type: DataTypes.DATEONLY,
+    start_date: {
+        type: DataTypes.DATEONLY
     },
-    keyword: {
-        type: DataTypes.STRING(128),
+    end_date: {
+        type: DataTypes.DATEONLY
     }
 }, {
     timestamps: false,
-    tableName: 'organizations',
-})
+    tableName: 'organizations'
+});
 
-module.exports = Organization
+module.exports = Organization;

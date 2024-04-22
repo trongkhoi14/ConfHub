@@ -3,14 +3,14 @@ const { sourceModel } = require('../models/index.js');
 const asyncHandler = require('express-async-handler');
 
 class SourceController {
-    getAll = asyncHandler(async (req, res, next) => {
-        const sources = await sourceModel.findAll({ attributes: ['src_name'] });
-        const data = sources.map(item => item.src_name);
+    getAllSource = asyncHandler(async (req, res, next) => {
         try {
-            res.status(status.OK).json({
+            const sources = await sourceModel.findAll({ attributes: ['src_name'] });
+            const sourceArr = sources.map(item => item.src_name);
+            return res.status(status.OK).json({
                 message: "Get all sources successfully",
-                data: data
-            })
+                data: sourceArr
+            });
         } catch (err) {
             next(err);
         }

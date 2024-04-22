@@ -1,15 +1,15 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./../config/database')
+const sequelize = require('./../config/database');
 
-var Follow = sequelize.define('Follow', {
+const Follow = sequelize.define('Follow', {
     tid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
 }, {
     timestamps: false,
-    tableName: 'follows',
-})
+    tableName: 'follows'
+});
 
-module.exports = Follow
+module.exports = Follow;

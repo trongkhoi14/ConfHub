@@ -6,4 +6,4 @@ module.exports = {
     FieldOfResearchController: require('./field-of-research-controller'),
     FollowController: require('./follow-controller'),
     PostController: require('./post-controller'),
-}
+};

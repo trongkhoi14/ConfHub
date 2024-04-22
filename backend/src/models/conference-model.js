@@ -1,23 +1,23 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./../config/database')
+const sequelize = require('./../config/database');
 
-var Conference = sequelize.define('Conference', {
+const Conference = sequelize.define('Conference', {
     conf_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+        primaryKey: true
     },
     conf_name: {
-        type: DataTypes.STRING(256),
-        allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false
     },
     acronym: {
-        type: DataTypes.STRING(16),
-        allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false
     }
 }, {
     timestamps: false,
-    tableName: 'conferences',
+    tableName: 'conferences'
 })
 
-module.exports = Conference
+module.exports = Conference;
