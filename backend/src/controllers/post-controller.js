@@ -27,7 +27,7 @@ class postController {
         try {
             const { _id } = req.user;
             const user = await model.userModel.findByPk(_id, { attributes: ['id', 'role', 'license'] });
-            if (user.role === "user" && user.license === false) {
+            if (!user || (user.role === "user" && user.license === false)) {
                 return res.status(status.UN_AUTHORIZED).json({
                     message: "You do not have permission."
                 });
@@ -61,7 +61,7 @@ class postController {
             params.id = req.params?.id;
 
             const user = await model.userModel.findByPk(_id, { attributes: ['id', 'role', 'license'] });
-            if (user.role === "user" && user.license === false) {
+            if (!user || (user.role === "user" && user.license === false)) {
                 return res.status(status.UN_AUTHORIZED).json({
                     message: "You do not have permission."
                 });
