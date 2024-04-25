@@ -1,29 +1,23 @@
-const { status } = require('../constants/index.js');
 const model = require('../models/index.js');
+const query = require('../utils/queries.js');
+const { status } = require('../constants/index.js');
+const input = require('../utils/input-handler.js');
 const asyncHandler = require('express-async-handler');
-const queries = require('../utils/cfp-queries.js');
-const { makeFilterConditions } = require('../utils/input-handler.js');
 require('dotenv').config();
 
 class followController {
     // [GET] /api/v1/follow
     getFollowedConferences = asyncHandler(async (req, res, next) => {
         try {
-            let params = {
-                userID: req.user._id,
-                page: parseInt(req.query.page) || parseInt(process.env.DEFAULT_PAGE),
-                size: parseInt(req.query.size) || process.env.DEFAULT_SIZE,
-                offset: parseInt(process.env.DEFAULT_OFFSET)
-            };
-            const filterConditions = makeFilterConditions(params);
+            const filterConditions = await input.getFilterConditions(req);
             const followedConferenceIDs = await model.followModel.findAll({
                 attributes: ['CallForPaperCfpId'],
-                where: { UserId: params.userID },
+                where: { UserId: filterConditions.userID },
                 limit: filterConditions.size,
                 offset: filterConditions.offset
             });
             const followedConferences = await Promise.all(followedConferenceIDs.map(async (id) => {
-                return await queries.selectConferenceByID(id.CallForPaperCfpId)
+                return await query.CallForPaperQuery.selectCallForPaper(id.CallForPaperCfpId)
             }));
             return res.status(status.OK).json({
                 quantity: followedConferences.length,

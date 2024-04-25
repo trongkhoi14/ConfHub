@@ -1,11 +1,11 @@
+const query = require("../utils/queries.js");
 const { status } = require('../constants/index.js');
-const { sourceModel } = require('../models/index.js');
 const asyncHandler = require('express-async-handler');
 
 class SourceController {
     getAllSource = asyncHandler(async (req, res, next) => {
         try {
-            const sources = await sourceModel.findAll({ attributes: ['src_name'] });
+            const sources = await query.SourceQuery.selectAllSources();
             const sourceArr = sources.map(item => item.src_name);
             return res.status(status.OK).json({
                 message: "Get all sources successfully",

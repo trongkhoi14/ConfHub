@@ -24,6 +24,10 @@ const Organization = sequelize.define('Organization', {
     },
     end_date: {
         type: DataTypes.DATEONLY
+    },
+    status: {
+        type: DataTypes.STRING,
+        defaultValue: 'new'
     }
 }, {
     timestamps: false,

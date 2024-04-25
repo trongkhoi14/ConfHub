@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/database');
 
-const CalenderNote = sequelize.define('CalenderNote', {
+const CalenderNoteModel = sequelize.define('CalenderNote', {
     tid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -16,4 +16,4 @@ const CalenderNote = sequelize.define('CalenderNote', {
     tableName: 'calender_notes'
 });
 
-module.exports = CalenderNote;
+module.exports = CalenderNoteModel;

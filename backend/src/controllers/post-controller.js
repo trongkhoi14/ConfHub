@@ -1,33 +1,17 @@
-const sequelize = require('../config/database');
-const { status } = require('../constants/index.js');
 const model = require('../models/index.js');
+const input = require('../utils/input-handler.js');
+const query = require('../utils/queries.js');
+const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
-const queries = require('../utils/cfp-queries.js');
-const inputs = require('../utils/input-handler.js');
-const { QueryInterface } = require('sequelize');
+const queries = require('../utils/queries.js');
 require('dotenv').config();
 
 class postController {
     // [GET] /api/v1/post
     getAllPosts = asyncHandler(async (req, res, next) => {
         try {
-            let params = {
-                userID: req.user._id,
-                page: parseInt(req.query.page) || parseInt(process.env.DEFAULT_PAGE),
-                size: parseInt(req.query.size) || process.env.DEFAULT_SIZE,
-                offset: parseInt(process.env.DEFAULT_OFFSET)
-            };
-            const filterConditions = inputs.makeFilterConditions(params);
-            const postedConferenceIDs = await model.postModel.findAll({
-                attributes: ['CallForPaperCfpId'],
-                where: { UserId: params.userID },
-                limit: filterConditions.size,
-                offset: filterConditions.offset
-            });
-
-            const postedConferences = await Promise.all(postedConferenceIDs.map(async (id) => {
-                return await queries.selectConferenceByID(id.CallForPaperCfpId)
-            }));
+            const filterConditions = await input.getFilterConditions(req);
+            const postedConferences = await query.PostQuery.selectAllPosts(filterConditions);
 
             return res.status(status.OK).json({
                 quantity: postedConferences.length,
@@ -49,16 +33,18 @@ class postController {
                 });
             };
 
-            const conference = inputs.makeConferenceObject(req.body);
+            let params = req.body;
+            params.owner = user.role;
+            const conference = inputs.makeConferenceObject(params);
 
-            if (inputs.containsEmptyValue(conference)) {
+            if (inputs.containsEmptyValue(conference, ['cfp_id', 'organizations', 'importantDates'])) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
                 });
             };
 
-            await queries.insertConference(conference, user);
+            await query.PostQuery.insertPost(conference, user);
 
             return res.status(status.OK).json({
                 message: "Add new post successfully."
@@ -72,7 +58,8 @@ class postController {
     updatePost = asyncHandler(async (req, res, next) => {
         try {
             const { _id } = req.user;
-            const conferenceID = req.params?.id;
+            let params = req.body;
+            params.id = req.params?.id;
 
             const user = await model.userModel.findByPk(_id, { attributes: ['id', 'role', 'license'] });
             if (user.role === "user" && user.license === false) {
@@ -81,22 +68,23 @@ class postController {
                 });
             };
 
-            const post = await model.postModel.findOne({ where: { UserId: _id, CallForPaperCfpId: conferenceID } });
+            const post = await model.postModel.findOne({ where: { UserId: _id, CallForPaperCfpId: params.id } });
             if (!post) {
                 return res.status(status.NOT_FOUND).json({
                     message: "This post is not existed."
                 });
             };
 
-            const conference = inputs.makeConferenceObject(req.body);
-            if (inputs.containsEmptyValue(conference)) {
+            const conference = inputs.makeConferenceObject(params);
+            if (inputs.containsEmptyValue(conference, ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates'])) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
                 });
             };
 
-            await queries.updateConference(conferenceID, conference);
+            await query.PostQuery.updatePost(conference);
+
             return res.status(status.OK).json({
                 message: "Update post successfully."
             });
@@ -125,7 +113,8 @@ class postController {
                 });
             };
 
-            await queries.deleteConferenceByID(conferenceID);
+            await queries.PostQuery.deletePost(conferenceID);
+
             return res.status(status.OK).json({
                 message: "Delete post successfully."
             });

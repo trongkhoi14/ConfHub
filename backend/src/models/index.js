@@ -9,7 +9,7 @@ const organizationModel = require('./organization-model');
 const followModel = require('./follow-model');
 const postModel = require('./post-model');
 const feedbackModel = require('./feedback-model');
-const calenderNote = require('./calender-note-model');
+const calenderNoteModel = require('./calender-note-model');
 
 // Assocation
 conferenceModel.hasMany(callForPaperModel, { onDelete: 'CASCADE' });
@@ -44,10 +44,12 @@ feedbackModel.belongsTo(userModel);
 callForPaperModel.hasMany(feedbackModel, { onDelete: 'CASCADE' });
 feedbackModel.belongsTo(callForPaperModel);
 
-followModel.hasMany(calenderNote, { onDelete: 'CASCADE' });
-calenderNote.belongsTo(followModel);
-importantDateModel.hasOne(calenderNote, { onDelete: 'CASCADE' });
-calenderNote.belongsTo(importantDateModel);
+userModel.hasMany(calenderNoteModel, { onDelete: 'CASCADE' });
+calenderNoteModel.belongsTo(userModel);
+importantDateModel.hasOne(calenderNoteModel, { onDelete: 'CASCADE' });
+calenderNoteModel.belongsTo(importantDateModel);
+organizationModel.hasOne(calenderNoteModel, { onDelete: 'CASCADE' });
+calenderNoteModel.belongsTo(organizationModel);
 
 module.exports = {
     userModel,
@@ -61,5 +63,5 @@ module.exports = {
     followModel,
     postModel,
     feedbackModel,
-    calenderNote
+    calenderNoteModel
 }

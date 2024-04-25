@@ -25,12 +25,6 @@ const ImportantDate = sequelize.define('ImportantDate', {
     },
     status: {
         type: DataTypes.STRING,
-        validate: {
-            isIn: {
-                args: [['new', 'old']],
-                msg: 'Error: Invalid value.'
-            }
-        },
         defaultValue: 'new'
     }
 }, {
