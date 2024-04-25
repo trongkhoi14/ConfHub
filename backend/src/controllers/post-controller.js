@@ -33,11 +33,10 @@ class postController {
                 });
             };
 
-            let params = req.body;
-            params.owner = user.role;
-            const conference = inputs.makeConferenceObject(params);
+            let conference = input.getConferenceObject(req);
+            conference.owner = user.role
 
-            if (inputs.containsEmptyValue(conference, ['cfp_id', 'organizations', 'importantDates'])) {
+            if (input.containsEmptyValue(conference, ['cfp_id', 'organizations', 'importantDates'])) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
@@ -75,8 +74,9 @@ class postController {
                 });
             };
 
-            const conference = inputs.makeConferenceObject(params);
-            if (inputs.containsEmptyValue(conference, ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates'])) {
+            const conference = input.getConferenceObject(req);
+
+            if (input.containsEmptyValue(conference, ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates'])) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
