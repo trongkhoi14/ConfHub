@@ -1,6 +1,7 @@
 const model = require('../models/index.js');
 const { Op } = require('sequelize');
 const moment = require('moment');
+const { raw } = require('express');
 require('dotenv').config();
 
 function isEmpty(value) {
@@ -23,6 +24,14 @@ function containsEmptyValue(object, excludeProperties) {
         return isEmpty(object);
     }
 };
+
+async function getUser(conditions) {
+    if (!isEmpty(conditions.userID)) {
+        return await model.userModel.findByPk(conditions.userID);
+    } else {
+        return null;
+    }
+}
 
 function getPagination(conditions) {
     return {
@@ -56,18 +65,18 @@ function getConferenceDate(conditions) {
     } else if (!isEmpty(conditions.confStart) && isEmpty(conditions.confEnd)) {
         return {
             "$Organizations.status$": "new",
-            "$Organizations.start_date$": { [Op.gte]: moment(conditions.confStart).toDate() }
+            "$Organizations.start_date$": { [Op.gte]: moment.utc(conditions.confStart).toDate() }
         }
     } else if (isEmpty(conditions.confStart) && !isEmpty(conditions.confEnd)) {
         return {
             "$Organizations.status$": "new",
-            "$Organizations.end_date$": { [Op.lte]: moment(conditions.confEnd).toDate() }
+            "$Organizations.end_date$": { [Op.lte]: moment.utc(conditions.confEnd).toDate() }
         }
     } else if (!isEmpty(conditions.confStart) && !isEmpty(conditions.confEnd)) {
         return {
             "$Organizations.status$": "new",
-            "$Organizations.start_date$": { [Op.gte]: moment(conditions.confStart).toDate() },
-            "$Organizations.end_date$": { [Op.lte]: moment(conditions.confEnd).toDate() }
+            "$Organizations.start_date$": { [Op.gte]: moment.utc(conditions.confStart).toDate() },
+            "$Organizations.end_date$": { [Op.lte]: moment.utc(conditions.confEnd).toDate() }
         }
     }
 };
@@ -96,21 +105,29 @@ function getAcronym(conditions) {
     }
 };
 
-async function getLocation(conditions) {
-    if (!isEmpty(conditions.userID)) {
-        const user = await model.userModel.findByPk(conditions.userID);
-        if (user && user.location && conditions.location.toLowerCase() === "domestic") {
-            const address = user.address.split(",").pop().trim();
+function getLocation(conditions) {
+    if (!isEmpty(conditions.user) && !isEmpty(conditions.location)) {
+        if (conditions.user.location && conditions.location.toLowerCase() === "domestic") {
+            const address = conditions.user.address.split(",").pop().trim();
             return {
                 "$Organizations.status$": "new",
                 "$Organizations.location$": { [Op.iLike]: `%${address}%` }
             };
+        } else {
+            return {
+                "$Organizations.status$": "new",
+                "$Organizations.location$": { [Op.iLike]: `%${conditions.location}%` }
+            };
         }
-        else {
-            return null;
-        }
-    } else {
+    } else if (isEmpty(conditions.user) && !isEmpty(conditions.location)) {
+        return {
+            "$Organizations.status$": "new",
+            "$Organizations.location$": { [Op.iLike]: `%${conditions.location}%` }
+        };
+    } else if (isEmpty(conditions.user) && isEmpty(conditions.location)) {
         return null;
+    } else {
+        throw new Error("Undefined error.");
     }
 };
 
@@ -121,16 +138,22 @@ function getSubmissionDate(conditions) {
         return {
             "$ImportantDates.status$": "new",
             "$ImportantDates.date_type$": { [Op.iLike]: `%${"sub"}%` },
-            "$ImportantDates.date_value$": { [Op.between]: [moment().toDate(conditions.subStart), moment(process.env.MAX_DATE).toDate()] }
+            "$ImportantDates.date_value$": { [Op.between]: [moment.utc(conditions.subStart).toDate(), moment.utc(process.env.MAX_DATE).toDate()] }
         }
     } else if (isEmpty(conditions.subStart) && !isEmpty(conditions.subEnd)) {
         return {
             "$ImportantDates.status$": "new",
             "$ImportantDates.date_type$": { [Op.iLike]: `%${"sub"}%` },
-            "$ImportantDates.date_value$": { [Op.between]: [moment().toDate(process.env.MIN_DATE), moment(conditions.subEnd).toDate()] }
+            "$ImportantDates.date_value$": { [Op.between]: [moment.utc(process.env.MIN_DATE).toDate(), moment.utc(conditions.subEnd).toDate()] }
+        }
+    } else if (!isEmpty(conditions.subStart) && !isEmpty(conditions.subEnd)) {
+        return {
+            "$ImportantDates.status$": "new",
+            "$ImportantDates.date_type$": { [Op.iLike]: `%${"sub"}%` },
+            "$ImportantDates.date_value$": { [Op.between]: [moment.utc(conditions.subStart).toDate(), moment.utc(conditions.subEnd).toDate()] }
         }
     }
-}
+};
 
 function getSource(conditions) {
     if (!isEmpty(conditions.source)) {
@@ -138,7 +161,7 @@ function getSource(conditions) {
     } else {
         return null;
     }
-}
+};
 
 function getConferenceType(conditions) {
     if (!isEmpty(conditions.type)) {
@@ -146,7 +169,7 @@ function getConferenceType(conditions) {
     } else {
         return null;
     }
-}
+};
 
 function getFieldsOfResearch(conditions) {
     if (!isEmpty(conditions.fieldOfResearch)) {
@@ -154,7 +177,7 @@ function getFieldsOfResearch(conditions) {
     } else {
         return null;
     }
-}
+};
 
 function makeFilterCondition(compulsoryConditions, optionalConditions) {
     if (optionalConditions.length === 0) {
@@ -169,7 +192,7 @@ function makeFilterCondition(compulsoryConditions, optionalConditions) {
             ]
         }
     }
-}
+};
 
 async function getFilterConditions(req) {
     try {
@@ -192,6 +215,7 @@ async function getFilterConditions(req) {
             status: req.query.status || "true"
         }
 
+        rawConditions.user = await getUser(rawConditions);
         let pagination = getPagination(rawConditions);
         let name = getConferenceName(rawConditions);
         let status = getStatus(rawConditions);
@@ -199,7 +223,7 @@ async function getFilterConditions(req) {
         let rating = getRating(rawConditions);
         let rank = getRank(rawConditions);
         let acronym = getAcronym(rawConditions);
-        let location = await getLocation(rawConditions);
+        let location = getLocation(rawConditions);
         let subDate = getSubmissionDate(rawConditions);
         let source = getSource(rawConditions);
         let type = getConferenceType(rawConditions);
@@ -221,7 +245,7 @@ async function getFilterConditions(req) {
         if (!isEmpty(type)) optionalConditions.push(type);
         if (!isEmpty(fieldOfResearch)) optionalConditions.push(fieldOfResearch);
 
-        let filter = makeFilterCondition(compulsoryConditions, optionalConditions)
+        let filter = makeFilterCondition(compulsoryConditions, optionalConditions);
 
         return {
             userID: rawConditions.userID,
