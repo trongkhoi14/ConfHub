@@ -124,10 +124,8 @@ function getLocation(conditions) {
             "$Organizations.status$": "new",
             "$Organizations.location$": { [Op.iLike]: `%${conditions.location}%` }
         };
-    } else if (isEmpty(conditions.user) && isEmpty(conditions.location)) {
-        return null;
     } else {
-        throw new Error("Undefined error.");
+        return null;
     }
 };
 
