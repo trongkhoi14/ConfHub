@@ -1,7 +1,6 @@
 const model = require('../models/index.js');
 const { Op } = require('sequelize');
 const moment = require('moment');
-const { raw } = require('express');
 require('dotenv').config();
 
 function isEmpty(value) {
@@ -90,40 +89,39 @@ function getRating(conditions) {
 };
 
 function getRank(conditions) {
-    if (!isEmpty(conditions.rank)) {
-        return { rank: { [Op.eq]: conditions.rank } };
+    if (!containsEmptyValue(conditions.rank)) {
+        const ranks = conditions.rank.map(item => item.toUpperCase());
+        return { rank: { [Op.in]: ranks } };
     } else {
         return null;
     }
 };
 
 function getAcronym(conditions) {
-    if (!isEmpty(conditions.acronym)) {
-        return { "$Conference.acronym$": { [Op.eq]: conditions.acronym } };
+    if (!containsEmptyValue(conditions.acronym)) {
+        return { "$Conference.acronym$": { [Op.in]: conditions.acronym } };
     } else {
         return null;
     }
 };
 
 function getLocation(conditions) {
-    if (!isEmpty(conditions.user) && !isEmpty(conditions.location)) {
-        if (conditions.user.location && conditions.location.toLowerCase() === "domestic") {
+    if (!containsEmptyValue(conditions.location)) {
+        if (!isEmpty(conditions.user) && conditions.user.address && conditions.location.includes("Domestic")) {
             const address = conditions.user.address.split(",").pop().trim();
-            return {
-                "$Organizations.status$": "new",
-                "$Organizations.location$": { [Op.iLike]: `%${address}%` }
-            };
-        } else {
-            return {
-                "$Organizations.status$": "new",
-                "$Organizations.location$": { [Op.iLike]: `%${conditions.location}%` }
-            };
-        }
-    } else if (isEmpty(conditions.user) && !isEmpty(conditions.location)) {
+            conditions.location = conditions.location.filter(item => item !== "Domestic");
+            conditions.location.push(address);
+        };
+
+        const locations = conditions.location.map(location => ({
+            "$Organizations.location$": { [Op.iLike]: `%${location}%` }
+        }));
+
         return {
             "$Organizations.status$": "new",
-            "$Organizations.location$": { [Op.iLike]: `%${conditions.location}%` }
+            [Op.or]: locations
         };
+
     } else {
         return null;
     }
@@ -154,24 +152,24 @@ function getSubmissionDate(conditions) {
 };
 
 function getSource(conditions) {
-    if (!isEmpty(conditions.source)) {
-        return { "$Source.src_name$": conditions.source };
+    if (!containsEmptyValue(conditions.source)) {
+        return { "$Source.src_name$": { [Op.in]: conditions.source } };
     } else {
         return null;
     }
 };
 
 function getConferenceType(conditions) {
-    if (!isEmpty(conditions.type)) {
-        return { "$Organizations.type$": conditions.type };
+    if (!containsEmptyValue(conditions.type)) {
+        return { "$Organizations.type$": { [Op.in]: conditions.type } };
     } else {
         return null;
     }
 };
 
 function getFieldsOfResearch(conditions) {
-    if (!isEmpty(conditions.fieldOfResearch)) {
-        return { "$CfpFors.FieldOfResearch.for_name$": conditions.fieldOfResearch };
+    if (!containsEmptyValue(conditions.fieldOfResearch)) {
+        return { "$CfpFors.FieldOfResearch.for_name$": { [Op.in]: conditions.fieldOfResearch } };
     } else {
         return null;
     }
