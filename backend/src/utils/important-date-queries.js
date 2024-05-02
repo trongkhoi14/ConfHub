@@ -1,6 +1,7 @@
 const model = require('../models/index.js');
 const { isEmpty } = require('../utils/input-handler.js');
 const moment = require('moment');
+const SettingQuery = require('./setting-queries.js');
 require('dotenv').config();
 
 const selectConferenceDates = async function (cfpID, option) {
@@ -94,7 +95,7 @@ const updateDates = async function (conference, transaction) {
                             userID: follow.UserId,
                             name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE
                         }
-                        const isEnable = await query.SettingQuery.isEnable(autoAddNoteSetting);
+                        const isEnable = await SettingQuery.isEnable(autoAddNoteSetting);
                         if (isEnable) {
                             await model.calenderNoteModel.create({
                                 UserId: follow.UserId,
