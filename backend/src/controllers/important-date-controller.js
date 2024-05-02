@@ -5,9 +5,8 @@ const asyncHandler = require('express-async-handler');
 class ImportantDateController {
     getConferenceDates = asyncHandler(async (req, res, next) => {
         try {
-            const cfpID = req.body.cfp_id;
+            const cfpID = req.params?.id;
             const dates = await query.ImportantDatesQuery.selectConferenceDates(cfpID);
-            // permission
             return res.status(status.OK).json({
                 message: "Get all dates of this conference successfully",
                 data: dates
@@ -18,15 +17,15 @@ class ImportantDateController {
         }
     });
 
-    deleteDateByID = asyncHandler(async (req, res, next) => {
+    getDate = asyncHandler(async (req, res, next) => {
         try {
             const dateID = req.params?.id;
-            await query.ImportantDatesQuery.deleteDateByID(dateID);
-            // permission
+            const date = await query.ImportantDatesQuery.selectDate(dateID);
             return res.status(status.OK).json({
-                message: "Delete successfully"
+                data: date
             });
-        } catch (error) {
+
+        } catch (err) {
             next(err);
         }
     });

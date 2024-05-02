@@ -1,5 +1,4 @@
 const model = require('../models/index.js');
-const input = require('../utils/input-handler.js');
 const SourceQuery = require("./source-queries");
 const FieldOfResearchQuery = require("./for-queries");
 const ConferenceQuery = require("./conference-queries");
@@ -7,7 +6,6 @@ const ImportantDatesQuery = require("./important-date-queries");
 const OrganizationQuery = require("./organization-queries");
 const sequelize = require('../config/database.js');
 require('dotenv').config();
-const { Op } = require('sequelize');
 
 const selectAllCallForPapers = async function (filterConditions) {
     try {

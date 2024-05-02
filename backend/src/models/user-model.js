@@ -70,10 +70,6 @@ User.init({
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    receive_noti: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
-    },
     refreshToken: {
         type: DataTypes.STRING,
         allowNull: true

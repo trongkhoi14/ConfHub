@@ -3,13 +3,28 @@ const { isEmpty } = require('../utils/input-handler.js');
 const moment = require('moment');
 require('dotenv').config();
 
-const selectConferenceOrganizations = async function (cfpID) {
+const selectConferenceOrganizations = async function (cfpID, option) {
     try {
+        if (option === "new") {
+            return await model.organizationModel.findAll({
+                where: {
+                    CallForPaperCfpId: cfpID,
+                    status: "new"
+                }
+            });
+        }
         return await model.organizationModel.findAll(
-            { attributes: { exclude: ['CallForPaperCfpId'] } },
             { where: { CallForPaperCfpId: cfpID } }
         );
 
+    } catch (error) {
+        throw (error);
+    }
+};
+
+const selectOrganization = async function (orgID) {
+    try {
+        return await model.organizationModel.findByPk(orgID);
     } catch (error) {
         throw (error);
     }
@@ -62,16 +77,36 @@ const updateOrganizations = async function (conference, transaction) {
                         );
 
                         await model.organizationModel.destroy({ where: { status: isExisted.org_id } }, { transaction: transaction });
+                        const oldNotes = await model.calenderNoteModel.findAll({ where: { OrganizationOrgId: isExisted.org_id } });
+                        await Promise.all(oldNotes.map(async (oldNote) => {
+                            await oldNote.update({
+                                date_value: [newOrganization.start_date, newOrganization.end_date].join(" to "),
+                                OrganizationOrgId: newOrganization.org_id
+                            }, { transaction: transaction });
+                        }));
                     }
                 }
             } else if (!isEmpty(element.start_date) && !isEmpty(element.end_date)) {
-                await model.organizationModel.create({
+                const newOrganization = await model.organizationModel.create({
                     type: element.type,
                     location: element.location,
                     start_date: element.start_date,
                     end_date: element.end_date,
                     CallForPaperCfpId: conference.cfp_id
                 }, { transaction: transaction });
+
+                const follows = await model.followModel.findAll({ where: { CallForPaperCfpId: conference.cfp_id } });
+                if (follows) {
+                    await Promise.all(follows.map(async (follow) => {
+                        await model.calenderNoteModel.create({
+                            UserId: follow.UserId,
+                            date_value: [newOrganization.start_date, newOrganization.end_date].join(" to "),
+                            OrganizationOrgId: newOrganization.org_id,
+                            FollowTid: follow.tid
+                        }, { transaction: transaction });
+                    }));
+                }
+
             };
         }
 
@@ -99,6 +134,7 @@ const deleteOrganizationByID = async function (orgID, transaction) {
 
 module.exports = {
     selectConferenceOrganizations,
+    selectOrganization,
     insertOrganizations,
     updateOrganizations,
     deleteOrganizationByID

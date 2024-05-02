@@ -1,10 +1,11 @@
 const model = require('../models/index.js');
 const sequelize = require('../config/database');
+require('dotenv').config();
 
 const dataSeeding = async () => {
     await sequelize.transaction(async (t) => {
         // User admin
-        await model.userModel.create(
+        const admin = await model.userModel.create(
             {
                 name: "Admin",
                 phone: "0123456789",
@@ -13,11 +14,20 @@ const dataSeeding = async () => {
                 nationality: "Vietnam",
                 password: "123456",
                 role: "admin",
-                license: "true",
-                receive_noti: "false"
+                license: "true"
             },
             { transaction: t }
-        );
+        ).then(async (admin) => {
+            await model.settingModel.bulkCreate([
+                { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: admin.id },
+                { name: process.env.EXTEND_DATE, status: true, UserId: admin.id },
+                { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: admin.id },
+                { name: process.env.UPCOMING_EVENT, status: true, UserId: admin.id },
+                { name: process.env.CANCELLED_EVENT, status: true, UserId: admin.id },
+                { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: admin.id },
+                { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: admin.id }
+            ], { transaction: t })
+        });
 
         // Source
         const srcArr = await model.sourceModel.bulkCreate([

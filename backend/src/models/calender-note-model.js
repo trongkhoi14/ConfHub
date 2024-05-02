@@ -11,6 +11,9 @@ const CalenderNoteModel = sequelize.define('CalenderNote', {
         type: DataTypes.TEXT,
         allowNull: true
     },
+    date_value: {
+        type: DataTypes.STRING
+    }
 }, {
     timestamps: false,
     tableName: 'calender_notes'

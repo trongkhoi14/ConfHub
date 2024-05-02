@@ -5,8 +5,11 @@ const conferenceRouter = require('./conference-router');
 const fieldOfResearchRouter = require('./field-of-research-router');
 const followRouter = require('./follow-router');
 const postRouter = require('./post-router');
+const dateRouter = require('./important-date-router');
+const organizationRouter = require('./organization-router');
+const calenderNoteRouter = require('./calender-note-router');
 
-module.exports = function(app) {
+module.exports = function (app) {
     app.use('/api/v1/user', userRouter);
     app.use('/api/v1/conference', conferenceCFPRouter);
     app.use('/api/v1/source', sourceRouter);
@@ -14,4 +17,7 @@ module.exports = function(app) {
     app.use('/api/v1/for', fieldOfResearchRouter);
     app.use('/api/v1/follow', followRouter);
     app.use('/api/v1/post', postRouter);
+    app.use('/api/v1/date', dateRouter);
+    app.use('/api/v1/org', organizationRouter);
+    app.use('/api/v1/note', calenderNoteRouter);
 }

@@ -3,6 +3,7 @@ const query = require('../utils/queries.js');
 const { status } = require('../constants/index.js');
 const input = require('../utils/input-handler.js');
 const asyncHandler = require('express-async-handler');
+const sequelize = require('../config/database.js');
 require('dotenv').config();
 
 class followController {
@@ -11,13 +12,16 @@ class followController {
         try {
             const filterConditions = await input.getFilterConditions(req);
             const followedConferenceIDs = await model.followModel.findAll({
-                attributes: ['CallForPaperCfpId'],
                 where: { UserId: filterConditions.userID },
                 limit: filterConditions.size,
                 offset: filterConditions.offset
             });
             const followedConferences = await Promise.all(followedConferenceIDs.map(async (id) => {
-                return await query.CallForPaperQuery.selectCallForPaper(id.CallForPaperCfpId)
+                const conference = await query.CallForPaperQuery.selectCallForPaper(id.CallForPaperCfpId);
+                return {
+                    followId: id.tid,
+                    callForPaper: conference
+                }
             }));
             return res.status(status.OK).json({
                 quantity: followedConferences.length,
@@ -35,12 +39,45 @@ class followController {
                 userID: req.user._id,
                 cfp_id: req.body.cfp_id
             };
+
             const [follow, created] = await model.followModel.findOrCreate({
-                where: { UserId: params.userID, CallForPaperCfpId: params.cfp_id }
+                where: { UserId: params.userID, CallForPaperCfpId: params.cfp_id },
             });
+
+            let autoAddNoteSetting = {
+                userID: req.user?._id,
+                name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE
+            }
+
+            const isEnable = await query.SettingQuery.isEnable(autoAddNoteSetting);
+
+            if (isEnable && created) {
+                const dates = await query.ImportantDatesQuery.selectConferenceDates(follow.CallForPaperCfpId, "new");
+                const orgs = await query.OrganizationQuery.selectConferenceOrganizations(follow.CallForPaperCfpId, "new");
+
+                await Promise.all(dates.map(async (date) => {
+                    const note = {
+                        UserId: params.userID,
+                        ImportantDateDateId: date.date_id,
+                        FollowTid: follow.tid,
+                    }
+                    await query.NoteQuery.insertNote(note)
+                }));
+
+                await Promise.all(orgs.map(async (org) => {
+                    const note = {
+                        UserId: params.userID,
+                        OrganizationOrgId: org.org_id,
+                        FollowTid: follow.tid,
+                    }
+                    await query.NoteQuery.insertNote(note)
+                }));
+            }
+
             return res.status(status.OK).json({
                 message: created ? "Followed!" : "Nothing happened.",
             });
+
         } catch (err) {
             next(err);
         }
@@ -53,9 +90,16 @@ class followController {
                 userID: req.user._id,
                 cfp_id: req.body.cfp_id
             };
+
+            const t = await sequelize.transaction();
+
             await model.followModel.destroy({
-                where: { UserId: params.userID, CallForPaperCfpId: params.cfp_id }
+                where: { UserId: params.userID, CallForPaperCfpId: params.cfp_id },
+                transaction: t
             });
+
+            await t.commit();
+
             return res.status(status.OK).json({
                 message: "Unfollowed!",
             });

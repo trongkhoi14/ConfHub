@@ -30,7 +30,7 @@ async function getUser(conditions) {
     } else {
         return null;
     }
-}
+};
 
 function getPagination(conditions) {
     return {
@@ -99,7 +99,11 @@ function getRank(conditions) {
 
 function getAcronym(conditions) {
     if (!containsEmptyValue(conditions.acronym)) {
-        return { "$Conference.acronym$": { [Op.in]: conditions.acronym } };
+        const acronyms = conditions.acronym.map(acronym => ({
+            "$Conference.acronym$": { [Op.iLike]: `%${acronym}%` }
+        }));
+        return { [Op.or]: acronyms };
+
     } else {
         return null;
     }
@@ -109,10 +113,10 @@ function getLocation(conditions) {
     if (!containsEmptyValue(conditions.location)) {
         if (!isEmpty(conditions.user) && conditions.user.address && conditions.location.includes("Domestic")) {
             const address = conditions.user.address.split(",").pop().trim();
-            conditions.location = conditions.location.filter(item => item !== "Domestic");
             conditions.location.push(address);
         };
 
+        conditions.location = conditions.location.filter(item => item !== "Domestic");
         const locations = conditions.location.map(location => ({
             "$Organizations.location$": { [Op.iLike]: `%${location}%` }
         }));
@@ -153,7 +157,11 @@ function getSubmissionDate(conditions) {
 
 function getSource(conditions) {
     if (!containsEmptyValue(conditions.source)) {
-        return { "$Source.src_name$": { [Op.in]: conditions.source } };
+        const sources = conditions.source.map(source => ({
+            "$Source.src_name$": { [Op.iLike]: `%${source}%` }
+        }));
+        return { [Op.or]: sources };
+
     } else {
         return null;
     }
@@ -161,7 +169,11 @@ function getSource(conditions) {
 
 function getConferenceType(conditions) {
     if (!containsEmptyValue(conditions.type)) {
-        return { "$Organizations.type$": { [Op.in]: conditions.type } };
+        const types = conditions.type.map(type => ({
+            "$Organizations.type$": { [Op.iLike]: `${type}` }
+        }));
+        return { [Op.or]: types };
+
     } else {
         return null;
     }
@@ -169,7 +181,11 @@ function getConferenceType(conditions) {
 
 function getFieldsOfResearch(conditions) {
     if (!containsEmptyValue(conditions.fieldOfResearch)) {
-        return { "$CfpFors.FieldOfResearch.for_name$": { [Op.in]: conditions.fieldOfResearch } };
+        const fors = conditions.fieldOfResearch.map(fieldOfResearch => ({
+            "$CfpFors.FieldOfResearch.for_name$": { [Op.iLike]: `%${fieldOfResearch}%` }
+        }));
+        return { [Op.or]: fors };
+
     } else {
         return null;
     }
@@ -193,7 +209,7 @@ function makeFilterCondition(compulsoryConditions, optionalConditions) {
 async function getFilterConditions(req) {
     try {
         let rawConditions = {
-            userID: req.user?._id || req.body.id,
+            userID: req.user?._id,
             page: req.query.page,
             size: req.query.size,
             search: req.query.search,
@@ -275,9 +291,39 @@ function getConferenceObject(req) {
     }
 };
 
+function getNote(req) {
+    try {
+        return {
+            noteID: req.params?.id,
+            note: req.body.note,
+            date_value: req.body.date_value,
+            UserId: req.user?._id,
+            ImportantDateDateId: req.body.dateID,
+            OrganizationOrgId: req.body.orgID
+        }
+    } catch (error) {
+        throw (error);
+    }
+}
+
+function getSetting(req) {
+    try {
+        return {
+            userID: req.user?._id,
+            name: req.body.name,
+            value: req.body.value,
+            status: req.body.status
+        }
+    } catch (error) {
+        throw (error);
+    }
+}
+
 module.exports = {
     isEmpty,
     containsEmptyValue,
     getFilterConditions,
     getConferenceObject,
+    getNote,
+    getSetting
 }

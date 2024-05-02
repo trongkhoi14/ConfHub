@@ -2,7 +2,7 @@ const FieldOfResearch = require("../models/field-of-research-model");
 
 module.exports = {
     CallForPaperQuery: require("./cfp-queries"),
-    NoteQuery: require("./note-queries"),
+    NoteQuery: require("./calender-note-queries"),
     UserQuery: require("./user-queries"),
     SourceQuery: require("./source-queries"),
     FieldOfResearchQuery: require("./for-queries"),
@@ -10,4 +10,5 @@ module.exports = {
     PostQuery: require("./post-queries"),
     ImportantDatesQuery: require("./important-date-queries"),
     OrganizationQuery: require("./organization-queries"),
+    SettingQuery: require("./setting-queries"),
 }

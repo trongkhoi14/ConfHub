@@ -3,7 +3,6 @@ const input = require('../utils/input-handler.js');
 const query = require('../utils/queries.js');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
-const queries = require('../utils/queries.js');
 require('dotenv').config();
 
 class postController {
@@ -25,16 +24,8 @@ class postController {
     // [POST] /api/v1/post
     addPost = asyncHandler(async (req, res, next) => {
         try {
-            const { _id } = req.user;
-            const user = await model.userModel.findByPk(_id, { attributes: ['id', 'role', 'license'] });
-            if (!user || (user.role === "user" && user.license === false)) {
-                return res.status(status.UN_AUTHORIZED).json({
-                    message: "You do not have permission."
-                });
-            };
-
+            const user = req.userInfo;
             let conference = input.getConferenceObject(req);
-            conference.owner = user.role
 
             if (input.containsEmptyValue(conference, ['cfp_id', 'organizations', 'importantDates'])) {
                 return res.status(status.BAD_REQUEST).json({
@@ -59,13 +50,6 @@ class postController {
             const { _id } = req.user;
             let params = req.body;
             params.id = req.params?.id;
-
-            const user = await model.userModel.findByPk(_id, { attributes: ['id', 'role', 'license'] });
-            if (!user || (user.role === "user" && user.license === false)) {
-                return res.status(status.UN_AUTHORIZED).json({
-                    message: "You do not have permission."
-                });
-            };
 
             const post = await model.postModel.findOne({ where: { UserId: _id, CallForPaperCfpId: params.id } });
             if (!post) {
@@ -98,14 +82,7 @@ class postController {
         try {
             const { _id } = req.user;
             const conferenceID = req.params?.id;
-            const user = await model.userModel.findByPk(_id);
             const post = await model.postModel.findOne({ where: { UserId: _id, CallForPaperCfpId: conferenceID } });
-
-            if (!user) {
-                return res.status(status.UN_AUTHORIZED).json({
-                    message: "You do not have permission."
-                });
-            };
 
             if (!post) {
                 return res.status(status.NOT_FOUND).json({
@@ -113,7 +90,7 @@ class postController {
                 });
             };
 
-            await queries.PostQuery.deletePost(conferenceID);
+            await query.PostQuery.deletePost(conferenceID);
 
             return res.status(status.OK).json({
                 message: "Delete post successfully."

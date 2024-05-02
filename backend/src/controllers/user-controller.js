@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const { generateAccessToken, generateRefreshToken } = require('../middlewares/jwt');
 const { status } = require('./../constants');
 const { Op } = require('sequelize');
+const sequelize = require('../config/database.js');
+const model = require('../models')
 
 class UserController {
     // [POST] /api/v1/user/register
@@ -19,13 +21,30 @@ class UserController {
         // check if the user with email are already existed
         const user = await userModel.findOne({
             where: {
-                email: email,
+                [Op.or]: [
+                    { email: email },
+                    { phone: phone }
+                ]
             }
         })
         if (user) {
-            throw new Error('Email already exists')
+            throw new Error('Email or phone number already exists.')
         } else {
-            const newUser = await userModel.create(req.body);
+            const t = await sequelize.transaction();
+            const newUser = await userModel.create(req.body, { transaction: t });
+
+            await model.settingModel.bulkCreate([
+                { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: newUser.id },
+                { name: process.env.EXTEND_DATE, status: true, UserId: newUser.id },
+                { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: newUser.id },
+                { name: process.env.UPCOMING_EVENT, status: true, UserId: newUser.id },
+                { name: process.env.CANCELLED_EVENT, status: true, UserId: newUser.id },
+                { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: newUser.id },
+                { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: newUser.id }
+            ], { transaction: t });
+
+            await t.commit();
+
             return res.status(status.CREATED).json({
                 message: "Registration was successfully, please login",
                 data: newUser
@@ -92,7 +111,6 @@ class UserController {
                 exclude: [
                     'refreshToken',
                     'password',
-                    'role',
                     'passwordChangedAt',
                     'passwordResetToken',
                     'passwordResetExpires'

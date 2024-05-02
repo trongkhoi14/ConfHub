@@ -5,9 +5,8 @@ const asyncHandler = require('express-async-handler');
 class OrganizationController {
     getConferenceOrganizations = asyncHandler(async (req, res, next) => {
         try {
-            const cfpID = req.body.cfp_id;
-            const organiztions = query.OrganizationQuery.selectConferenceDates(cfpID);
-            // permission
+            const cfpID = req.params?.id;
+            const organiztions = await query.OrganizationQuery.selectConferenceOrganizations(cfpID);
             return res.status(status.OK).json({
                 message: "Get all organiztions of this conference successfully",
                 data: organiztions
@@ -18,13 +17,17 @@ class OrganizationController {
         }
     });
 
-    deleteOrganizationByID = asyncHandler(async (req, res, next) => {
-        const orgID = req.params?.id;
-        await query.OrganizationQuery.deleteOrganizationByID(orgID);
-        // permission
-        return res.status(status.OK).json({
-            message: "Delete successfully"
-        });
+    getOrganization = asyncHandler(async (req, res, next) => {
+        try {
+            const orgID = req.params?.id;
+            const organiztion = await query.OrganizationQuery.selectOrganization(orgID);
+            return res.status(status.OK).json({
+                data: organiztion
+            });
+
+        } catch (err) {
+            next(err);
+        }
     });
 }
 

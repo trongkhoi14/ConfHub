@@ -11,7 +11,7 @@ const Post = sequelize.define('Post', {
         type: DataTypes.DATEONLY,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
-    },
+    }
 }, {
     timestamps: false,
     tableName: 'posts'

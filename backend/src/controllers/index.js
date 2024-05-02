@@ -6,4 +6,8 @@ module.exports = {
     FieldOfResearchController: require('./field-of-research-controller'),
     FollowController: require('./follow-controller'),
     PostController: require('./post-controller'),
+    ImportantDateController: require('./important-date-controller'),
+    OrganizationController: require('./organization-controller'),
+    SettingController: require('./setting-controller'),
+    CalenderNoteController: require('./calender-note-controller')
 };
