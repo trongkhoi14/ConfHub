@@ -97,14 +97,21 @@ const updateOrganizations = async function (conference, transaction) {
 
                 const follows = await model.followModel.findAll({ where: { CallForPaperCfpId: conference.cfp_id } });
                 if (follows) {
-                    await Promise.all(follows.map(async (follow) => {
-                        await model.calenderNoteModel.create({
-                            UserId: follow.UserId,
-                            date_value: [newOrganization.start_date, newOrganization.end_date].join(" to "),
-                            OrganizationOrgId: newOrganization.org_id,
-                            FollowTid: follow.tid
-                        }, { transaction: transaction });
-                    }));
+                    let autoAddNoteSetting = {
+                        userID: follow.UserId,
+                        name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE
+                    }
+                    const isEnable = await query.SettingQuery.isEnable(autoAddNoteSetting);
+                    if (isEnable) {
+                        await Promise.all(follows.map(async (follow) => {
+                            await model.calenderNoteModel.create({
+                                UserId: follow.UserId,
+                                date_value: [newOrganization.start_date, newOrganization.end_date].join(" to "),
+                                OrganizationOrgId: newOrganization.org_id,
+                                FollowTid: follow.tid
+                            }, { transaction: transaction });
+                        }));
+                    }
                 }
 
             };
