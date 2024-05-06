@@ -26,14 +26,15 @@ class postController {
         try {
             const user = req.userInfo;
             let conference = input.getConferenceObject(req);
-
+            console.log(req.body);
+            console.log(conference);
             if (input.containsEmptyValue(conference, ['cfp_id', 'organizations', 'importantDates'])) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
                 });
             };
-
+        
             await query.PostQuery.insertPost(conference, user);
 
             return res.status(status.OK).json({
