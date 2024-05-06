@@ -7,9 +7,12 @@ class FeedbackController {
     getAllFeedbacks = asyncHandler(async (req, res, next) => {
         try {
             const cfpID = req.params?.id;
-            if (!cfpID) {
+
+            const cfp = await model.callForPaperModel.findByPk(cfpID);
+            if (!cfp) {
                 throw new Error("This call for paper is not existed.");
             }
+
             const feedbacks = await model.feedbackModel.findAndCountAll({
                 where: { CallForPaperCfpId: cfpID }
             });
@@ -42,10 +45,14 @@ class FeedbackController {
             const cfpID = req.params?.id;
             const userID = req.user?._id;
 
-            if (!userID) {
-                throw new Error("User is not existed.");
-            } else if (!cfpID) {
+            const cfp = await model.callForPaperModel.findByPk(cfpID);
+            if (!cfp) {
                 throw new Error("This call for paper is not existed.");
+            }
+
+            const user = await model.userModel.findByPk(userID);
+            if (!user) {
+                throw new Error("User is not existed.");
             }
 
             const newFeedback = await model.feedbackModel.create();
