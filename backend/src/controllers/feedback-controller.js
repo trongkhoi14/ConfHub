@@ -7,6 +7,9 @@ class FeedbackController {
     getAllFeedbacks = asyncHandler(async (req, res, next) => {
         try {
             const cfpID = req.params?.id;
+            if (!cfpID) {
+                throw new Error("This call for paper is not existed.");
+            }
             const feedbacks = await model.feedbackModel.findAndCountAll({
                 where: { CallForPaperCfpId: cfpID }
             });
