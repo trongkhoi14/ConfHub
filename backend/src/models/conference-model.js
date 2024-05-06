@@ -9,7 +9,7 @@ const Conference = sequelize.define('Conference', {
     },
     conf_name: {
         type: DataTypes.STRING,
-        allowNull: false
+        // allowNull: false
     },
     acronym: {
         type: DataTypes.STRING,
