@@ -108,6 +108,7 @@ const AddConference = ({ show, handleClose }) => {
     }
 
     const handleCloseForm = () => {
+        handleClose()
         handleClearForm()
         setPage(0)
     }
