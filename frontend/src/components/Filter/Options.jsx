@@ -39,23 +39,11 @@ const Options = ({ label }) => {
     const { filterOptions } = useConference()
     const { getOptionsFilter } = useFilter()
     const [options, setOptions] = useState([])
-    const { addKeywords, sendFilter } = useFilter()
-    const [statename, setStateName] = useState('')
-    const location = useLocation();
-    const pathname = location.pathname;
-    useEffect(()=>{
-      if(pathname === '/' || pathname === '/home'){
-        setStateName('optionsSelected')
-      }
-      else setStateName('filterOptionsAuth')
-    }, [pathname])
+    const { addKeywords } = useFilter()
     
     const handleOptionChange = (item) => {
         const selectedValues = item.map(option => option.label);
-        addKeywords(statename, label, selectedValues)
-        if(statename === 'optionsSelected'){
-            sendFilter(label, selectedValues)
-        }
+        addKeywords(label, selectedValues)    
     };
     useEffect(() => {
         const staticValue = ["location", "rank", "type", "category"]

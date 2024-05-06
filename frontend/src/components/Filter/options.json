@@ -235,7 +235,7 @@
         {"label": "Uzbekistan", "value": "UZ"},
         {"label": "Vanuatu", "value": "VU"},
         {"label": "Venezuela", "value": "VE"},
-        {"label": "Viet Nam", "value": "VN"},
+        {"label": "Vietnam", "value": "VN"},
         {"label": "Virgin Islands, British", "value": "VG"},
         {"label": "Virgin Islands, U.S.", "value": "VI"},
         {"label": "Wallis and Futuna", "value": "WF"},
@@ -257,7 +257,6 @@
     {"label": "Offline", "value": "offline"}
   ],
   "category": [
-    {"label": "Conference", "value": 1},
-    {"label": "Journals", "value": 2}
+    {"label": "Conference", "value": 1}
   ]
 }

@@ -12,7 +12,7 @@ import { formatDate } from '../../utils/formatDate';
 import { formatLabel } from '../../utils/formatWord';
 import { useLocation } from 'react-router-dom';
 const DateRangePicker = ({ label }) => {
-  const { addFilterDate } = useFilter()
+  const { sendFilterDate, addKeywords } = useFilter()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -27,13 +27,10 @@ const DateRangePicker = ({ label }) => {
     setEndDate(date);
   };
 
-  const location = useLocation()
   const handleApplyFilter = () => {
     const keywordFormat = `${formatLabel(label)}: from ${formatDate(startDate)} to ${formatDate(endDate)}`    
-    if(location.pathname === '/home' || location.pathname === '/') {
-        addFilterDate('optionsSelected', startDate, endDate, label, [keywordFormat])
-    }
-    else addFilterDate('filterOptionsAuth', startDate, endDate, label, [keywordFormat])
+    
+    sendFilterDate(startDate, endDate, label, [keywordFormat])
     
     handleToggleClick()
   };

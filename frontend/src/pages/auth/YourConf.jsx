@@ -5,34 +5,30 @@ import editIcon from '../../assets/imgs/edit.png'
 import AddConference from '../../components/Modals/AddConference'
 import usePost from '../../hooks/usePost'
 import Conference from '../../components/Conference'
-import useSessionToken from '../../hooks/useToken'
 import useLocalStorage from '../../hooks/useLocalStorage'
 import Filter from '../../components/Filter/Filter'
-import { getUniqueConferences } from '../../utils/checkFetchedResults'
 import useFilter from '../../hooks/useFilter'
-import { filterListbyCondition } from '../../utils/filterAuth'
 
 const YourConf = () => {
   const [showAddForm, setShowAddForm] = useState(false)
-  const { filterOptionsAuth } = useFilter()
+  const { resultFilter } = useFilter()
   const { postedConferences, getPostedConferences} = usePost()
   const [displayConferences, setdisplayConferences] = useState(postedConferences)
-  const {token} = useSessionToken()
   const {user} = useLocalStorage()
   useEffect(()=> {
     getPostedConferences()
   }, [user])
+  
   useEffect(() => {
-    console.log('follow', getUniqueConferences(filterOptionsAuth))
-    if (getUniqueConferences(filterOptionsAuth).length > 0) {
-      const filterResults = filterListbyCondition(postedConferences, filterOptionsAuth)
+    if (resultFilter.length > 0) {
+      const filterResults = resultFilter.filter(itemFilter => postedConferences.some(itemPosted => itemPosted.id === itemFilter.id));
       setdisplayConferences(filterResults)
     }
     else {
       setdisplayConferences(postedConferences)
     }
 
-  }, [filterOptionsAuth, postedConferences, user])
+  }, [resultFilter, postedConferences, user])
   const handleClose = () => setShowAddForm(false);
   const handleShow = () => setShowAddForm(true);
   return (
@@ -53,20 +49,13 @@ const YourConf = () => {
     {
       postedConferences && postedConferences.length > 0
         ?
-
         <>
-        <div style={{ width: "1000px" }}>
-        <Filter
-          optionsSelected={filterOptionsAuth}
-          statenameOption={'filterOptionsAuth'}
-        />
-      </div>
+          <Filter/>
           <Conference conferences={displayConferences} width={960} />
         </>
         :
         <p>No conferences available.</p>
     }
-
   </Container>
   )
 }

@@ -17,9 +17,9 @@ import { getUniqueConferences } from '../../utils/checkFetchedResults'
 import useFollow from '../../hooks/useFollow'
 import { isObjectInList } from '../../utils/checkExistInList'
 import { DropdownSort } from '../DropdownSort'
-import { sortConferences } from '../../utils/sortConferences'
+import { isUpcoming, sortConferences } from '../../utils/sortConferences'
 import useAuth from '../../hooks/useAuth'
-import Loading from '../Loading'
+import ArrowIcon from './../../assets/imgs/arrow.png'
 
 const FetchedResults = () => {
   const { loading } = useAuth()
@@ -29,7 +29,6 @@ const FetchedResults = () => {
   const navigate = useNavigate()
 
   const [page, setPage] = useState(0)
-  const itemsPerPage = 5; // Số lượng mục hiển thị trên mỗi trang
   const [currentPage, setCurrentPage] = useState(0);
   const [displayedConferences, setDisplayedConferences] = useState([]);
   const [copiedConferences, setcopiedConferences] = useState([])
@@ -37,6 +36,7 @@ const FetchedResults = () => {
   const pagesVisited = page * usersPerPage;
 
   useEffect(() => {
+    console.log({fetchedResults})
     const sortedConferenecs = sortConferences('Random', fetchedResults)
       setDisplayedConferences(sortedConferenecs);
       setcopiedConferences([...sortedConferenecs])
@@ -89,67 +89,72 @@ const FetchedResults = () => {
             .slice(pagesVisited, pagesVisited + usersPerPage)
             .map((conf) => (
               <Card
-                className='my-conf-card'
-                style={{ width: "1260px" }}
-                id={conf.cfp_id} key={conf.cfp_id}>
-                <Stack className=' p-0' direction='horizontal'>
-                  <div className='bg-white rounded-4 h1 fw-bolder d-flex align-items-center justify-content-center ' style={{ width: '120px', height: "120px" }}>
+                                className='my-conf-card'
+                                style={{width: "1260px"}}
+                                id={conf.id}
+                                key={conf.id}>
+                                <Stack className='p-0' direction='horizontal'>
+                                    <div className='bg-white rounded-4 fw-bolder d-flex align-items-center justify-content-center acronym-container '>
+                                        <span className='fw-bold fs-4'>{conf.infomation.acronym}</span>
+                                    </div>
 
-                    <span className='fw-bold fs-5'>{conf.acronym}</span>
+                                    <div className=''>
+                                        <Card.Body className='' onClick={() => chooseConf(conf.id)}>
+                                            <Card.Title className='text-color-black'>
+                                                <Stack direction='horizontal'>
+                                                    {isUpcoming(conf.organizations[0].start_date)
+                                                        &&
+                                                        <div className='bg-yellow-normal text-light p-2 rounded-2 me-2 fs-6 fw-bold'>
+                                                            Upcoming
+                                                        </div>
+                                                    }
+                                                    <span className='fw-bold'>{conf.infomation.name}</span>
+                                                </Stack>
 
-                  </div>
-                  <div className=''>
+                                            </Card.Title>
+                                            <Stack direction="horizontal" gap={5}>
+                                                <Card.Text className='d-flex align-items-center mb-1'>
+                                                    <Image src={TimeIcon} className='me-2' width={18} />
+                                                    <label className='conf-data-label'>Submission Date: </label>
+                                                    <span className='conf-data'>{getDateValue("submission date", conf.importantDates)}</span>
+                                                </Card.Text>
 
-                    <Card.Body className='' onClick={() => chooseConf(conf.cfp_id)}>
-                      <Card.Title className='text-color-black'>
-                        <Stack direction='horizontal'>
-                          {conf.isUpcoming
-                            &&
-                            <div className='bg-yellow text-light p-1 rounded-3 me-2 fs-6 fw-bold'>
-                              Upcoming
-                            </div>
-                          }
-                          <span className='fw-bold'>{conf.name}</span>
-                        </Stack>
+                                                <Card.Text className='d-flex align-items-center mb-1'>
+                                                    <Image src={TimeIcon} className='me-2' width={18} />
+                                                    <label className='conf-data-label'>Conference Date: </label>
+                                                    <span className='conf-data'>
+                                                        {conf.organizations[0].start_date}
+                                                        <>
+                                                            <Image src={ArrowIcon} width={20} className='mx-2' />
+                                                        </>
+                                                        {conf.organizations[0].end_date}
+                                                    </span>
+                                                </Card.Text>
+                                            </Stack>
+                                            <Card.Text className='d-flex align-items-center'>
+                                                <Image src={LocationIcon} className='me-2' width={18} />
+                                                {conf.organizations[0].location}
+                                            </Card.Text>
+                                        </Card.Body>
 
-                      </Card.Title>
-                      <Stack direction="horizontal" gap={5}>
-                        <Card.Text className='d-flex align-items-center mb-1'>
-                          <Image src={TimeIcon} className='me-2' width={20} />
-                          <label className='conf-data-label'>Submission Date: </label>
-                          <span className='conf-data'>{getDateValue("sub", conf.importantDates)}</span>
-                        </Card.Text>
+                                        {
+                                            isObjectInList(conf.id, listFollowed)
+                                                ?
+                                                <Button className='icon-follow' onClick={() => handleUnfollow(conf.id)} title='Unfollow'>
+                                                    <Image src={FollowIcon} className='me-2' width={18} />
+                                                    <span>Unfollow</span>
+                                                </Button>
+                                                :
+                                                <Button className='icon-follow' onClick={() => handleFollow(conf.id)}>
+                                                    <Image src={UnfollowIcon} className='me-2 ' width={18} />
+                                                    <span>Follow</span>
+                                                </Button>
+                                        }
 
-                        <Card.Text className='d-flex align-items-center mb-1'>
-                          <Image src={TimeIcon} className='me-2' width={20} />
-                          <label className='conf-data-label'>Conference Date: </label>
-                          <span className='conf-data'>{conf.organizations[0].conf_date}</span>
-                        </Card.Text>
-                      </Stack>
-                      <Card.Text className='d-flex align-items-center'>
-                        <Image src={LocationIcon} className='me-2' style={{ width: '18px' }} />
-                        {conf.organizations[0].location}
-                      </Card.Text>
-                    </Card.Body>
+                                    </div>
 
-                    {
-                      isObjectInList(conf.cfp_id, listFollowed)
-                        ?
-                        <Button className='icon-follow' onClick={() => handleUnfollow(conf.cfp_id)} title='Unfollow'>
-                          <Image src={FollowIcon} className='me-2' style={{ width: '18px' }} />
-                          <span>Follwed</span>
-                        </Button>
-                        :
-                        <Button className='icon-follow' onClick={() => handleFollow(conf.cfp_id)} title='Follow'>
-                          <Image src={UnfollowIcon} className='me-2 ' style={{ width: '18px' }} />
-                          <span>Follow</span>
-                        </Button>
-                    }
-
-                  </div>
-
-                </Stack>
-              </Card>
+                                </Stack>
+                            </Card>
             ))}
         </>
       ) : (

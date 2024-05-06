@@ -8,9 +8,12 @@ import editIcon from '../../assets/imgs/edit.png'
 import ChangePasswordModal from '../../components/Modals/ChangePasswordModal'
 import useLocalStorage from '../../hooks/useLocalStorage'
 import useToken from '../../hooks/useToken'
+import SuccessfulModal from '../../components/Modals/SuccessModal'
 const Account = () => {
   const { updateProfile } = useAuth()
   const [profile, setProfile] = useState([])
+  const [showModalSuccess, setShowModalSuccess] = useState(false);
+  const [message, setMessage] = useState('')
   const { user } = useLocalStorage()
   const { token } = useToken()
   useEffect(() => {
@@ -20,10 +23,9 @@ const Account = () => {
         { title: "Phone", infor: user.phone, val: 'phone', placeholder: 'phone number' },
         { title: "Address", infor: user.address, val: 'address', placeholder: 'your address' },
         { title: "Nationality", infor: user.nationality, val: 'nationality', placeholder: 'your nationality' },
-        { infor: user.license, val: 'license' }
       ])
     }
-  }, [user, token])
+  }, [user, token, ])
   //profile 
   const [isUpdated, setIsUpdated] = useState(false)
 
@@ -31,7 +33,6 @@ const Account = () => {
   const [showModalChangePassword, setShowModalChangePassword] = useState(false);
 
   const handleOpenModal = () => setShowModalChangePassword(true);
-  const handleCloseModal = () => setShowModalChangePassword(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -41,6 +42,14 @@ const Account = () => {
     setIsUpdated(true)
   };
 
+  const handleCheckStatus = (status, messageSuccess) => {
+    if(status){
+      setMessage(messageSuccess)
+      setShowModalChangePassword(false)
+      setShowModalSuccess(true)
+    
+    }
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = profile.reduce((acc, item) => {
@@ -50,6 +59,7 @@ const Account = () => {
     // Gửi formData đến API tại đây
     updateProfile(formData)
     setIsUpdated(false)
+    window.location.reload()
   };
   return (
     <Container
@@ -93,7 +103,9 @@ const Account = () => {
             <Image width={18} height={20} className='me-2' src={lockIcon} />
             Change password
           </Button>
-          {showModalChangePassword && <ChangePasswordModal show={showModalChangePassword} handleClose={handleCloseModal} />}
+
+          {showModalSuccess && <SuccessfulModal message={message} show={showModalSuccess} handleClose={()=>setShowModalSuccess(false)} />}
+          {showModalChangePassword && <ChangePasswordModal show={showModalChangePassword} handleClose={setShowModalChangePassword} handleShow={handleCheckStatus}/>}
           <h4 className='mt-5 mb-4'>Personal Data</h4>
           <Form onSubmit={handleSubmit}>
             {

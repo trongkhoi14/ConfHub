@@ -1,35 +1,55 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Modal, Form, Button, Col} from 'react-bootstrap'
 import useAuth from '../../hooks/useAuth';
-import SuccessModal from './SuccessModal';
-const ChangePasswordModal = ({ show, handleClose }) => {
-    const { changePassword, error } = useAuth()
+const ChangePasswordModal = ({ show, handleClose, handleShow }) => {
+    const { changePassword} = useAuth()
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [message, setMessage] = useState('');
+    const [status, setStatus] = useState(false)
     const [isMatch, setMatch] = useState(true)
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  const handleOpenSuccessModal = () => setShowSuccessModal(true);
-    const handleChangePassword = () => {
-      if (newPassword !== confirmNewPassword) {
-        setErrorMessage('The new password does not match the old one.');
-        setMatch(false)
-      } 
-      else if (newPassword === oldPassword) {
-        setErrorMessage('The new password matches the old password');
-        setMatch(false)
-      }
-      else {
-        // Thực hiện xử lý thay đổi mật khẩu ở đây
-        setMatch(true)
-        changePassword(oldPassword, newPassword)
-        if(error === null) {
-          handleOpenSuccessModal()    
+    const [isClickedChange, setClickedChange] = useState(false)
+  const handleChangePassword = async () => {
+    
+    setClickedChange(true)
+    if (oldPassword === '') {
+      setMessage('Please enter your password');
+      setMatch(false)
+    }
+    else if (newPassword !== confirmNewPassword) {
+      setMessage('The new password does not match the old one.');
+      setMatch(false)
+    } 
+    else if (newPassword === oldPassword) {
+      setMessage(`The new password cannot be the same as the old password.`);
+      setMatch(false)
+    }
+    else {
+      const responseData = await changePassword(oldPassword, newPassword)
+      console.log({responseData})
+      setStatus(responseData.status)
+      if(responseData.status) {        
+      // Thực hiện xử lý thay đổi mật khẩu ở đây
+        setStatus(true)
+          setMatch(true)      
+          setMessage('')  
+          handleShow(true, responseData.message)
         }
+        else {        
+        setMatch(true)      
+        setMessage('')
+        setStatus(false)
+        setMessage(responseData.message)
       }
-    };
+    }
+  };
+
+
+  useEffect(()=>{
+    setMessage('')
+  },[oldPassword, newPassword, confirmNewPassword])
+  
     
     return (
       <Modal 
@@ -42,19 +62,20 @@ const ChangePasswordModal = ({ show, handleClose }) => {
           <Modal.Title className="text-center w-100 fw-bold text-color-black">Change Password</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form className='px-5' on>
+          <Form className='px-5'>
             <Form.Group as={Col} className="my-4 d-flex align-items-center">
-              <Form.Label column sm="4">Old password</Form.Label>
+              <Form.Label column sm="4">Current password:</Form.Label>
               <Form.Control
                 type="password"
                 value={oldPassword}
                 autoComplete='off'
-                className='border-blue-normal'
+                className={isClickedChange && ((oldPassword === '') || !status) ? 'border border-danger' : 'border-blue-normal'}
+
                 onChange={(e) => setOldPassword(e.target.value)}
               />
             </Form.Group>
             <Form.Group as={Col} className="my-4 d-flex align-items-center">
-              <Form.Label column sm="4">New password</Form.Label>
+              <Form.Label column sm="4">New password:</Form.Label>
               <Form.Control
                 type="password"
                 value={newPassword}
@@ -64,16 +85,16 @@ const ChangePasswordModal = ({ show, handleClose }) => {
               />
             </Form.Group>
             <Form.Group as={Col} className="my-4 d-flex align-items-center">
-              <Form.Label column sm="4">Confirm new password</Form.Label>
+              <Form.Label column sm="4">Confirm new password:</Form.Label>
               <Form.Control
                 type="password"
                 value={confirmNewPassword}
                 autoComplete='off'
-                className={isMatch ? 'border-blue-normal' : 'border border danger'}
+                className={!isClickedChange && ((confirmNewPassword !== '') || !status) ? 'border-blue-normal' : 'border border-danger'}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
               />
             </Form.Group>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+            {message && <p className='text-danger text-center  '>{message}</p>}
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -84,7 +105,7 @@ const ChangePasswordModal = ({ show, handleClose }) => {
             Change Password
           </Button>
         </Modal.Footer>
-        <SuccessModal show={showSuccessModal} handleClose={handleClose} />
+       
       </Modal>
     );
   };

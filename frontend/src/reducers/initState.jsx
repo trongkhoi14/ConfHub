@@ -17,11 +17,12 @@ export const initialState = {
   filterOptions: [],
   filterResults: [],
   fetchedResults: {
-    location: [], //['Vietnam', 'Silicon Valley', 'San Francisco', 'Seattle', 'Austin']
-    rank: [], //["A", "B"]
-    for: [], //['4605 - Machine Learning', '']
-    source: [], //['Score2023', 'Score2024']
-    acronym: [], //['ACM', 'KDD']
+    //lưu kết quả đã filter theo từng tiêu chí
+    location: [], 
+    rank: [], 
+    for: [], 
+    source: [],
+    acronym: [],
     type: [],
     date: [],
     submissionDate: [],
@@ -32,11 +33,11 @@ export const initialState = {
   },
 
   optionsSelected: {
-    location: [], //['Vietnam', 'Silicon Valley', 'San Francisco', 'Seattle', 'Austin']
-    rank: [], //["A", "B"]
-    for: [], //['4605 - Machine Learning', '']
-    source: [], //['Score2023', 'Score2024']
-    acronym: [], //['ACM', 'KDD']
+    location: [],
+    rank: [], 
+    for: [], 
+    source: [], 
+    acronym: [], 
     type: [],
     date: [],
     submissionDate: [],
@@ -47,6 +48,7 @@ export const initialState = {
   },
 
   keywordFilter: [],//filter
+  resultFilter: [],
 
   
   listFollowed: [],
@@ -66,6 +68,6 @@ export const initialState = {
     rating: [],
     category: [],
   },
-
+  
 };
 

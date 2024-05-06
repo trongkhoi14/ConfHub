@@ -10,11 +10,9 @@ import { findKeyByKeyword, getUniqueConferences,  } from "../../utils/checkFetch
 
 import { useEffect, useState } from 'react';
 
-const FilterSelected = ({optionsSelected, statenameOption}) => {
-  const { deleteKeyword, clearKeywords } = useFilter()
+const FilterSelected = ({isClickedSearch}) => {
+  const { sendFilter, deleteKeyword, clearKeywords, optionsSelected } = useFilter()
   
-  const {handleGetList} = useConference()
-  const [statename, setStateName] = useState(statenameOption)
   const [keywordsSelected, setKeywordsSelected] = useState(null)
   const [total, setTotal] = useState(0)
   
@@ -22,11 +20,14 @@ const FilterSelected = ({optionsSelected, statenameOption}) => {
     const tempList = getUniqueConferences(optionsSelected)
     setKeywordsSelected(tempList)
     setTotal(tempList.length)
+    sendFilter()
   }, [optionsSelected])
   
+  const handleDeletekeyword = (keyword) => {
+    deleteKeyword(findKeyByKeyword(optionsSelected, keyword),keyword)
+  }
   const handleClearKeyword = () => {
-    clearKeywords(statename)
-    handleGetList()
+    clearKeywords()
   }
   return (
     <>
@@ -35,17 +36,16 @@ const FilterSelected = ({optionsSelected, statenameOption}) => {
           ?
           <div className="d-flex flex-wrap border-1 border border-light-subtle p-3 my-3 me-4 rounded-3">
             {keywordsSelected.map((keyword, index) => (
-              <div
-                onClick={() => { deleteKeyword(statename, findKeyByKeyword(optionsSelected, keyword),keyword) }}
+              <Button
+                disabled={!isClickedSearch}
+                onClick={() => handleDeletekeyword(keyword)}
                 key={index}
-                className="fs-6 py-1 px-2 fw-bold border border-secondary rounded-pill d me-3 mb-3  d-flex align-items-center">
+                className="fs-6 py-1 px-2 fw-bold border bg-transparent border-secondary rounded-pill d me-3 mb-3  d-flex align-items-center">
+                  
                 {keyword}
-                <Button
                  
-                  className="border-0 p-0  bg-transparent  d-flex align-items-center">
                   <Image width={20} src={deleteIcon} alt="" className="ms-1" />
-                </Button>
-              </div>
+              </Button>
               ))}
 
             <Button

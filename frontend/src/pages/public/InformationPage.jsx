@@ -21,7 +21,7 @@ const InformationPage = () => {
   };
   
   return (
-    <div className='px-5 mx-5 pt-4'>
+    <div className='px-5 mx-5 pt-4 content' >
       <div className='fs-4 fw-bold d-flex justify-content-between '>
         <span>Conference information</span>
         <RedirectButton conference={conference}/>
@@ -29,7 +29,7 @@ const InformationPage = () => {
       {conference ? 
       <>
       
-      <div className='fs-5 fw-bold mt-2 ps-3'>{conference.name}</div>
+      <div className='fs-5 fw-bold mt-2 ps-3'>{conference.infomation.name}</div>
       <div className='mt-2'>
         <Row className='bg-blue-light py-3 ps-5'>
 
@@ -38,7 +38,9 @@ const InformationPage = () => {
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Conference date:</Col>
-          <Col className='fw-bold'>{formatDate(conference.organizations[0].conf_date)}</Col>         
+          <Col className='fw-bold'>
+           From {conference.organizations[0].start_date} to {conference.organizations[0].end_date}
+          </Col>         
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Category:</Col>
@@ -46,36 +48,30 @@ const InformationPage = () => {
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Acronym:</Col>
-          <Col  className='fw-bold'>{conference.acronym}</Col>
+          <Col  className='fw-bold'>{conference.infomation.acronym}</Col>
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Source:</Col>
-          <Col className='fw-bold'>{conference.source}</Col>
+          <Col className='fw-bold'>{conference.infomation.source}</Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Rank:</Col>
-          <Col className='fw-bold'>{conference.rank}
+          <Col className='fw-bold'>{conference.infomation.rank}
           </Col>         
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Type:</Col>
           <Col className='fw-bold'>{capitalizeFirstLetter(conference.organizations[0].type)}</Col>
         </Row>
-        <Row className=' py-3 ps-5'>
-          <Col xs={4} className='d-flex align-items-center'>Average rating:</Col>
-          <Col className='fw-bold'>
-            {conference.rating}
-          {/*{Object.entries(conference.rating).map(([key, value]) => (
-          <div key={key}>
-            <span>{capitalizeFirstLetter(key)}: </span>{value}
-          </div>
-        ))}*/}
-          </Col>
+        <Row className='py-3 ps-5'>
+          <Col xs={4}>Rating:</Col>
+          <Col className='fw-bold'>{conference.infomation.rating ? conference.infomation.rating : `N/A`}
+          </Col>         
         </Row>
         <Row className='py-3 ps-5 bg-blue-light'>
           <Col xs={4} className='d-flex align-items-center'>Field of research:</Col>
           <Col  className='fw-bold'>
-            {renderFieldOfResearch(conference.fieldOfResearch)}
+            {renderFieldOfResearch(conference.infomation.fieldOfResearch)}
           </Col>
         </Row>
       </div>

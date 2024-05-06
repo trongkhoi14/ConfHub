@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-
+import { baseURL } from './api/baseApi';
 const useToken = () => {
   // Kiểm tra xem có dữ liệu người dùng trong localStorage không
   const [token, setToken] = useState(null);
@@ -12,9 +12,28 @@ const useToken = () => {
     }
   }, []);
 
+  const refreshToken = async (oldToken) => {
+    console.log('token', oldToken)
+    try {
+      const response = await fetch(`${baseURL}/user/refreshToken`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${oldToken}`
+        }
+      });
+      if (response.ok) {
+        const responseData = await response.data.newAccessToken
+        console.log(responseData)
+        savetokenToLocalStorage(responseData)
+      } else {
+        const errorData = await response.message
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
   // Hàm để lưu thông tin người dùng vào localStorage
   const savetokenToLocalStorage = (tokenData) => {
-    console.log('token', tokenData)
     localStorage.setItem('token', JSON.stringify(tokenData));
     setToken(tokenData);
   };
@@ -29,6 +48,7 @@ const useToken = () => {
     token,
     savetokenToLocalStorage,
     deletetokenFromLocalStorage,
+    refreshToken
   };
 };
 

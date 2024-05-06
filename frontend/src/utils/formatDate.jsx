@@ -7,7 +7,7 @@ export function formatDate(inputString) {
     const year = date.getFullYear();
   
     // Format lại chuỗi ngày tháng
-    const formattedDate = `${month}/${day}/${year}`;
+    const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
   }
 
@@ -23,8 +23,7 @@ return formattedDateString
 }
 
 export function getDateValue(date_type, list) {
-  const foundDate = list.find(date => date.date_type === date_type);
-
+  const foundDate = list.find(date => date.date_type.includes(date_type));
   if (foundDate) {
     return foundDate.date_value;
   } else {

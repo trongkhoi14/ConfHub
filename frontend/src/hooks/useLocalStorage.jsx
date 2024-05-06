@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useAppContext } from '../context/authContext';
-import { loginSuccess } from '../actions/actions';
 import useToken from './useToken';
 
 const useLocalStorage = () => {
-  const { savetokenToLocalStorage } = useToken()
+  const { savetokenToLocalStorage, refreshToken } = useToken()
+  
   // Kiểm tra xem có dữ liệu người dùng trong localStorage không
   const [user, setUser] = useState(null);
 
@@ -13,7 +12,7 @@ const useLocalStorage = () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      if(JSON.parse(storedUser).accessToken){
+      if(JSON.parse(storedUser).accessToken){        
         savetokenToLocalStorage(JSON.parse(storedUser).accessToken)
       } 
     }
@@ -30,6 +29,7 @@ const useLocalStorage = () => {
   // Hàm để xóa thông tin người dùng khỏi localStorage
   const deleteUserFromLocalStorage = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     setUser(null);
   };
 

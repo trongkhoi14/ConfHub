@@ -7,15 +7,13 @@ import LocationDate from './../assets/imgs/location_white.png'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { getIdFromPathname } from '../utils/getID'
 import useConference from '../hooks/useConferences'
-import { formatDate } from '../utils/formatDate'
 import UpdateNowButton from './UpdateNowButton'
 import FollowButton from './FollowButton'
 
 const NavBarDetailPage = () => {
-  const {conference, handleGetOne} = useConference()
+  const { conference, handleGetOne } = useConference()
   const [fetchCount, setFetchCount] = useState(0);
-  const {pathname} = useLocation()
-  const [topnavHeight, setTopnavHeight] = useState(0)
+  const { pathname } = useLocation()
   const id = getIdFromPathname(pathname)
 
   const [navs, setNav] = useState([
@@ -23,41 +21,26 @@ const NavBarDetailPage = () => {
     { event: "2", title: "Imoprtant Dates", path: `detail/importantdates/${id}` },
     { event: "3", title: "Call For Paper", path: `detail/callforpaper/${id}` }
   ])
+
   useEffect(() => {
-    // Lấy chiều cao của topnav
-    const topnav = document.getElementById('header');
-    if (topnav) {
-      setTopnavHeight(topnav.offsetHeight);
-    }
 
-    // Thêm sự kiện lắng nghe cho scroll
-    window.addEventListener('scroll', handleScroll);
+    window.onscroll = function () { myFunction() };
 
-    // Loại bỏ sự kiện lắng nghe khi component unmount
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+    var header = document.getElementById("tab-header");
+    var sticky = header.offsetTop;
 
-  const handleScroll = () => {
-    const navbar = document.getElementById('navbar');
-    if (navbar) {
-      const sticky = navbar.offsetTop;
-      // Thêm margin-top cho navbar dựa trên chiều cao của header và vị trí scroll
+    function myFunction() {
       if (window.scrollY > sticky) {
-        
-        navbar.style.marginTop = `${topnavHeight}px`;
-        navbar.classList.add("sticky");
+        header.classList.add("sticky");
       } else {
-        navbar.style.marginTop = 0;
-        navbar.classList.remove("sticky");
+        header.classList.remove("sticky");
       }
     }
-  };
+  }, [])
+
 
   useEffect(() => {
-    console.log({conference})
-    if (fetchCount < 5 ) {
+    if (fetchCount < 5) {
       handleGetOne(id)
       // Tăng giá trị fetchCount sau khi fetch
       setFetchCount(fetchCount + 1);
@@ -65,28 +48,33 @@ const NavBarDetailPage = () => {
   }, [fetchCount, conference, handleGetOne, id]);
   return (
     <Container className='m-0 w-100 p-0 mw-100 mt-5' fluid>
-      <Stack className='bg-blue-normal p-5 w-100 mw-100 text-center text-white'>
+      <Stack className='bg-blue-normal p-5 w-100 mw-100 text-center text-white top-container'>
         <Stack className='w-50 m-4 d-flex justify-content-center align-items-center align-self-center'>
           {
             conference ?
-            <div className='information'>
-            <span className='fs-3 fw-bold word-break mw-50'>{conference.name}</span>
-          <div className='d-flex align-items-center my-3'>
-            <Image width={25} height={25} src={DateIcon} className='me-2' />
-            <span className='fs-5'>{conference.organizations[0].conf_date}</span>
-          </div>
-          <div className='d-flex align-items-center my-3'>
-            <Image width={25} height={28} src={LocationDate} className='me-2' />
-            <span className='fs-5'>{conference.organizations[0].location}</span>
-          </div>
-            </div>
-            :
-            <p className="text-white fs-3">No conference available</p>
+              <div>
+                <span className='fs-3 fw-bold word-break mw-50'>{conference.infomation.name}</span>
+                <div className='d-flex align-items-center my-3 justify-content-center'>
+                  <Image width={25} height={25} src={DateIcon} className='me-2' />
+                  <span className='fs-5'>
+                    From {conference.organizations[0].start_date} to {conference.organizations[0].end_date}
+                  </span>
+                </div>
+                <div className='d-flex align-items-center my-3 justify-content-center'>
+                  <Image width={25} height={28} src={LocationDate} className='me-2' />
+                  <span className='fs-5'>{conference.organizations[0].location}</span>
+                </div>
+              </div>
+              :
+              <p className="text-white fs-3">No conference available</p>
           }
         </Stack>
       </Stack>
 
-      <Navbar id="navbar" className='bg-white text-black'>
+      <Navbar
+        id='tab-header'
+        className='bg-white text-black tab-header'
+      >
         <Container>
 
           <Nav
@@ -104,8 +92,8 @@ const NavBarDetailPage = () => {
             )}
           </Nav>
           <ButtonGroup>
-            <UpdateNowButton path={conference}/>
-            <FollowButton conference_id={id} conference={conference}/>
+            <UpdateNowButton path={conference} />
+            <FollowButton conference_id={id} conference={conference} />
           </ButtonGroup>
         </Container>
       </Navbar>

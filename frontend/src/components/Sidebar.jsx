@@ -9,24 +9,25 @@ import useLocalStorage from '../hooks/useLocalStorage'
 import { useEffect } from 'react'
 import useAuth from '../hooks/useAuth'
 import useToken from '../hooks/useToken'
+import usePageNavigation from '../hooks/usePageNavigation'
 
 const sidebar = [
   { path: `/account`, title: 'Account', icon: test },
   { path: '/followed', title: 'Followed Conferences', icon: test },
   { path: '/yourconferences', title: 'Your conferences', icon: test },
-  { path: '/schedule', title: 'Schedule', icon: test },
+  { path: '/schedule', title: 'Note', icon: test },
   { path: '/notifications', title: 'Notifications', icon: test },
   { path: '/setting', title: 'Setting', icon: test },
 ]
 
 const Sidebar = () => {
   const {user} = useLocalStorage()
-  const { token } = useToken()
   const location = useLocation()
   const navigate = useNavigate()
+  usePageNavigation()
   useEffect(()=>{
-    console.log('user', user)
-  }, [user])
+   
+  }, [location])
 
   return (
     <Container fluid className="my-sidebar">

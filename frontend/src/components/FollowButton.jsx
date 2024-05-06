@@ -2,13 +2,11 @@
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import useFollow from '../hooks/useFollow';
 import { isObjectInList } from '../utils/checkExistInList';
-import useConference from '../hooks/useConferences';
 
 import { useLocation } from 'react-router-dom'
 import { getIdFromPathname } from '../utils/getID';
 const FollowButton = () => {
     const { listFollowed, followConference, unfollowConference} = useFollow()
-    const {conference} = useConference()
     
   const {pathname} = useLocation()
   const id = getIdFromPathname(pathname)
@@ -29,7 +27,7 @@ const FollowButton = () => {
                 className='bg-red-normal border-0 rounded-2 px-4 fw-bold py-2'
                 onClick={()=>unfollowConference(id)}
                 >
-                Unfollow</Button>
+                Followed</Button>
                 :
                 <Button 
                 className='bg-red-normal border-0 rounded-2 px-4 fw-bold py-2'

@@ -1,106 +1,71 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Col, Form, Image, Modal, Row, Carousel } from 'react-bootstrap'
+import { Button, Col, Form, Image, Modal, Carousel, CarouselItem, Accordion, Card } from 'react-bootstrap'
 import AddButtonIcon from './../../assets/imgs/edit.png'
 import ChooseFORs from '../ChooseFORs';
 import data from './../Filter/options.json'
 import usePost from '../../hooks/usePost';
-const useImportantDateInput = (initialValue) => {
-    const [dates, setDates] = useState(initialValue);
-
-    const handleChange = (index, key, value) => {
-        const updatedDates = [...dates];
-        updatedDates[index][key] = value;
-        setDates(updatedDates);
-    };
-
-    return { dates, handleChange };
-};
+import useAccordionDates from '../../hooks/useAccordionDates';
+import AccordionDates from '../AccordionDates';
+import useFormDataInput from '../../hooks/useFormDataInput';
+import StatusModal from './SuccessModal';
+import SuccessfulModal from './SuccessModal';
 
 const AddConference = ({ show, handleClose }) => {
-    const { postConference } = usePost()
+    const { status, postConference, getPostedConferences } = usePost()
+    const { dateListByRound, mergeDatesByRound, addDateToRound } = useFormDataInput()
     const [page, setPage] = useState(0)
+    const [isPosted, setIsPosted] = useState(false)
     const [formData, setFormData] = useState({
         conf_name: '',
         acronym: '',
-        content: '',
+        callForPaper: '',
         link: '',
-        rating: '',
         rank: '',
-        source_name: 'CORE2024',
-        fieldOfResearch: [],
-        organization: {
-            conf_date: '',
+        fieldsOfResearch: [],
+        organizations: [{
+            start_date: '',
+            end_date: '',
             type: '',
             location: '',
-        },
-        important_date: [],
+        }],
+        importantDates: [],
     });
 
     const [requiredFields, setRequiredFields] = useState({
         conf_name: true,
         acronym: true,
-        content: true,
+        callForPaper: true,
         link: true,
-        rating: true,
-        rank: true,
-        source_name: true,
-        organization: {
-            type: true,
-            location: true,
-            conf_date: true,
-        },
-        fieldOfResearch: true,
-        important_date: [
-            { date_type: 'sub', date_value: true },
-            { date_type: 'cmr', date_value: true },
-            { date_type: 'reg', date_value: true },
-            { date_type: 'noti', date_value: true },
-        ],
+        fieldsOfResearch: true,
+
     });
-    const [isInput, setIsInput] = useState(false)
-
-    const [importantDates, setImportantDates] = useState([
-        { date_type: 'sub', date_value: '' },
-        { date_type: 'cmr', date_value: '' },
-        { date_type: 'reg', date_value: '' },
-        { date_type: 'noti', date_value: '' },
-    ]);
-
-    const { dates, handleChange } = useImportantDateInput(importantDates);
-
-    const handleDateChange = (index, key) => (e) => {
-        const { value } = e.target;
-        handleChange(index, key, value);
-        
-    };
-
-    const handleImportantDateUpdate = () => {
-        const formDataUpdated = {
-            ...formData,
-            important_date: dates,
-        };
-        setFormData(formDataUpdated);
-    };
-    useEffect(()=>{
-        handleImportantDateUpdate()
-    }, [dates])
-
-    const [selectedFieldOfResearch, setSelectedFieldOfResearch] = useState([]);
 
 
-    const handleFieldOfResearchChange = (selectedOption) => {
-        setSelectedFieldOfResearch(selectedOption);
+    const handleImportantDatesChange = (round, date) => {
+        addDateToRound(round, date)
+    }
+
+    useEffect(() => {
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            importantDates: mergeDatesByRound(),
+        }));
+    }, [dateListByRound])
+    const [selectedfieldsOfResearch, setSelectedfieldsOfResearch] = useState([]);
+
+
+    const handlefieldsOfResearchChange = (selectedOption) => {
+        setSelectedfieldsOfResearch(selectedOption);
         const selectedValues = selectedOption.map(option =>
-        ({
-            for_name: option.value
-        })
+            (option.value)
         );
+
         // Cập nhật formData với giá trị mới
         setFormData({
             ...formData,
-            fieldOfResearch: selectedValues,
+            fieldsOfResearch: selectedValues,
         });
-        
+
     };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -108,118 +73,87 @@ const AddConference = ({ show, handleClose }) => {
             ...formData,
             [name]: value,
         });
-        
+
     };
 
-    const handleOrganizationChange = (event) => {
+    const handleorganizationsChange = (event) => {
         const { name, value } = event.target;
-        console.log({ name, value })
-        // Cập nhật giá trị cho trường tương ứng
         setFormData((prevState) => ({
             ...prevState,
-            organization: {
-                ...prevState.organization,
+            organizations: prevState.organizations.map((org) => ({
+                ...org,
                 [name]: value,
-            },
-        }));
-        
+            })),
+        }))
+        if (name === 'startDate') {
+            // Ẩn các ngày trước hoặc bằng ngày start date đã chọn trên end date
+            document.getElementById('endDate').min = value;
+        } else if (name === 'endDate') {
+            // Ẩn các ngày sau hoặc bằng ngày end date đã chọn trên start date
+            document.getElementById('startDate').max = value;
+        }
     };
 
     const handleClearForm = () => {
-        setFormData({
-            conf_name: '',
-            acronym: '',
-            content: '',
-            link: '',
-            rating: '',
-            rank: '',
-            source_name: '',
-            fieldOfResearch: [],
-            organization: {
-                conf_date: '',
-                type: '',
-                location: '',
-            },
-            important_date: [],
-        });
+
         setRequiredFields({
             conf_name: true,
             acronym: true,
-            content: true,
+            callForPaper: true,
             link: true,
-            rating: true,
-            rank: true,
-            source_name: true,
-            organization: {
-                type: true,
-                location: true,
-                conf_date: true,
-            },
-            fieldOfResearch: true,
-            important_date: [
-                { date_type: 'sub', date_value: true },
-                { date_type: 'cmr', date_value: true },
-                { date_type: 'reg', date_value: true },
-                { date_type: 'noti', date_value: true },
-            ],
+            fieldsOfResearch: true,
         })
-        
-        setSelectedFieldOfResearch([])
+
+        setSelectedfieldsOfResearch([])
+    }
+
+    const handleCloseForm = () => {
+        handleClearForm()
+        setPage(0)
     }
     const handleFormSubmit = () => {
-        handleImportantDateUpdate()
+        let allValid = true
+        for (const field in requiredFields) {
+            if (formData[field] === '' || formData[field] === undefined || (field === 'fieldsOfResearch' && formData[field].length === 0)) {
+                allValid = false;
+                console.log('allvalid', allValid)
+                requiredFields[field] = false
 
-        // Kiểm tra các trường cần thiết
-        const missingFields = {};
-        let formIsValid = true;
+            } else {
+                requiredFields[field] = true
+            }
+        }
 
-       // Kiểm tra các trường cần thiết cho formData
-for (const key in formData) {
-    if (key !== 'organization' && key !== 'source_name') {
-        if (!formData[key] && formData[key] === '') {
-            missingFields[key] = false;
-            formIsValid = false;
-        }
-        else {
-            missingFields[key] = true;
-        }
-    } 
-    else if (key === 'important_date') {
-        for (const date in formData.important_date) {
-            if(date.date_value && date.date_value !== '') {
-                missingFields.important_date.date_value = false
-                formIsValid = false
-            }
-            else {
-                missingFields.important_date.date_value = true
-            }
-        }
-    }
-    else {
-        for (const orgKey in formData.organization) {
-            if (!formData.organization[orgKey] && formData.organization[orgKey] === '') {
-                missingFields.organization = { ...missingFields.organization, [orgKey]: false };
-                formIsValid = false;
-            }
-            else missingFields.organization = { ...missingFields.organization, [orgKey]: true };
-        }
-    }
-}
-        // Nếu có trường nào thiếu, cập nhật state để đánh dấu chúng
-        setRequiredFields({ ...requiredFields, ...missingFields });
-        // Sau khi xử lý xong, có thể reset giá trị trong state
-        
-        console.log(missingFields)
-        if(formIsValid){
+        if (allValid) {
             console.log(formData)
             postConference(formData)
-            handleClose()
-            
-            
+            if (status) {
+
+                setIsPosted(true)
+                setFormData({
+                    conf_name: '',
+                    acronym: '',
+                    callForPaper: '',
+                    link: '',
+                    rank: '',
+                    fieldsOfResearch: [],
+                    organizations: [{
+                        start_date: '',
+                        end_date: '',
+                        type: '',
+                        location: '',
+                    }],
+                    importantDates: [],
+                });
+                handleCloseForm()
+            }
 
         }
-    };
-
+        else {
+            setRequiredFields(requiredFields)
+            setPage(0)
+        }
+    }
     const handleSelect = (selectedIndex) => {
         setPage(selectedIndex);
     };
@@ -227,7 +161,7 @@ for (const key in formData) {
         <>
             <Modal
                 show={show}
-                onHide={handleClose}
+                onHide={handleCloseForm}
                 size="lg"
                 scrollable
 
@@ -235,18 +169,20 @@ for (const key in formData) {
                 <Modal.Header closeButton className='fixed'>
                     <Modal.Title className="text-center w-100 fw-bold text-color-black">Conference Information</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="modal-scrollable-content"
-                    style={{ minHeight: "520px" }}>
+                <Modal.Body className="modal-scrollable-content m-0"
+                    style={{ minHeight: '520px', maxHeight: '80vh' }}>
 
+                    {isPosted && <SuccessfulModal handleCloseForm={handleClose} />}
                     <Form className='px-5'>
                         <div className="modal-scrollable-body">
                             <Carousel activeIndex={page} onSelect={handleSelect} controls={false} interval={null} indicators={false}>
                                 <Carousel.Item>
                                     <Form.Group as={Col} className="mb-3 d-flex align-items-center">
                                         <Form.Label column sm="3">
-                                            Conference/Journal Name:
+                                            <span className='text-danger'>* </span>Conference name:
                                         </Form.Label>
                                         <Form.Control
+
                                             type="text"
                                             placeholder="Enter the conference/journal name..."
                                             name="conf_name"
@@ -258,7 +194,7 @@ for (const key in formData) {
                                     </Form.Group>
                                     <Form.Group as={Col} className="mb-3 d-flex align-items-center">
                                         <Form.Label column sm="3">
-                                            Acronym:
+                                            <span className='text-danger'>* </span>Acronym:
                                         </Form.Label>
                                         <Form.Control
                                             type="text"
@@ -270,21 +206,10 @@ for (const key in formData) {
                                             required
                                         />
                                     </Form.Group>
-                                    <Form.Group as={Col} className="mb-3 d-flex align-items-start">
-                                        <Form.Label column sm="3">Content:</Form.Label>
-                                        <Form.Control
-                                            as="textarea"
-                                            rows={7}
-                                            name="content"
-                                            value={formData.content}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter content..."
-                                            className={requiredFields.content ? 'border-blue-normal' : 'border border-danger '}
-                                            required
-                                        />
-                                    </Form.Group>
                                     <Form.Group as={Col} className="mb-3 d-flex align-items-center">
-                                        <Form.Label column sm="3">Link:</Form.Label>
+                                        <Form.Label column sm="3">
+                                            <span className='text-danger'>* </span> Link:
+                                        </Form.Label>
                                         <Form.Control
                                             name="link"
                                             value={formData.link}
@@ -294,6 +219,18 @@ for (const key in formData) {
                                             required
                                         />
                                     </Form.Group>
+                                    <Form.Group as={Col} className="mb-3 d-flex align-items-start">
+                                        <Form.Label column sm="3">
+                                            <span className='text-danger'>* </span> Field of Research:
+                                        </Form.Label>
+                                        <Col sm="9">
+                                            <ChooseFORs
+                                                selectedOptions={selectedfieldsOfResearch}
+                                                onChange={handlefieldsOfResearchChange}
+                                                requiredFields={requiredFields}
+                                            />
+                                        </Col>
+                                    </Form.Group>
                                     <Form.Group as={Col} className="mb-3 d-flex align-items-center">
                                         <Form.Label column sm="3">
                                             Rank:
@@ -302,7 +239,7 @@ for (const key in formData) {
                                             name="rank"
                                             value={formData.rank}
                                             onChange={handleInputChange}
-                                            className={requiredFields.conf_name ? 'border-blue-normal' : 'border border-danger '}
+                                            className='border-blue-normal'
                                         >
                                             <option value="N/A">Select rank...</option>
                                             {
@@ -313,80 +250,17 @@ for (const key in formData) {
                                             }
                                         </Form.Select>
                                     </Form.Group>
-                                    <Form.Group as={Col} className="mb-3 d-flex align-items-start">
-                                        <Form.Label column sm="3">
-                                            Field of Research:
-                                        </Form.Label>
-                                        <Col sm="9">
-                                            <ChooseFORs
-                                                selectedOptions={selectedFieldOfResearch}
-                                                onChange={handleFieldOfResearchChange}
-                                            />
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Col} className="mb-3 d-flex align-items-center">
-                                        <Form.Label column sm="3">
-                                            Average Rating:
-                                        </Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="Enter the average rating..."
-                                            name="rating"
-                                            value={formData.rating}
-                                            onChange={handleInputChange}
-                                            className={requiredFields.rating ? 'border-blue-normal' : 'border border-danger '}
-                                        />
-                                    </Form.Group>
-                                </Carousel.Item>
-                                <Carousel.Item>
-
-                                    {dates.map((date, index) => (
-                                        <Form.Group as={Col} key={index} className="mb-3 d-flex align-items-center">
-                                            <Form.Label column sm="3">
-                                                {date.date_type === 'sub' && 'Submission Date:'}
-                                                {date.date_type === 'cmr' && 'Camera Ready Date:'}
-                                                {date.date_type === 'reg' && 'Registration Date:'}
-                                                {date.date_type === 'noti' && 'Notification Date:'}
-                                            </Form.Label>
-                                            <Form.Control
-                                                placeholder="Select date..."
-                                                type="date"
-                                                value={date.date_value}
-                                                onChange={handleDateChange(index, 'date_value')}
-                                                className={
-                                                    requiredFields.important_date &&
-                                                    (date.date_value === '' || date.date_value === null)
-                                                        ? 'border border-danger'
-                                                        : 'border-blue-normal'
-                                                }
-                                            />
-                                        </Form.Group>
-                                    ))}
 
                                     <Form.Group as={Col} className="mb-3 d-flex align-items-center">
-                                        <Form.Label column sm="3">Conference date:</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            name="conf_date"
-                                            value={formData.organization?.conf_date || ''} 
-                                            onChange={handleOrganizationChange}
-                                            placeholder="Select conference date..."
-                                            className={requiredFields.organization.conf_date ? 'border-blue-normal' : 'border border-danger '}
-                                            required
-                                        />
-                                    </Form.Group>
-
-                                    <Form.Group as={Col} className="mb-3 d-flex align-items-center">
-                                        <Form.Label column sm="3">Organization type:</Form.Label>
+                                        <Form.Label column sm="3">Organizations type:</Form.Label>
                                         <Form.Select
                                             type="text"
                                             name="type"
-                                            value={formData.organization?.type || ''} 
-                                            onChange={handleOrganizationChange}
-                                            className={requiredFields.organization.type ? 'border-blue-normal' : 'border border-danger '}
-                                            
+                                            value={formData.organizations[0]?.type || ''}
+                                            onChange={handleorganizationsChange}
+
                                         >
-                                            <option value="">Select organization type...</option>
+                                            <option value="">Select organizations type...</option>
                                             {
                                                 data.type.map((r) => (
                                                     <option value={r.value} key={r.value}>{r.label}</option>
@@ -404,13 +278,35 @@ for (const key in formData) {
                                             type="text"
                                             placeholder="Enter the location..."
                                             name="location"
-                                            value={formData.organization?.location || ''} 
-                                            onChange={handleOrganizationChange}
-                                            className={requiredFields.organization.location ? 'border-blue-normal' : 'border border-danger '}
+                                            value={formData.organizations[0]?.location || ''}
+                                            onChange={handleorganizationsChange}
+
                                             required
                                         />
                                     </Form.Group>
                                 </Carousel.Item>
+                                <Carousel.Item>
+                                    <AccordionDates
+                                        formData={formData}
+                                        onChangeImportantDates={handleImportantDatesChange}
+                                        onChangeOrganizations={handleorganizationsChange}
+                                    />
+
+                                </Carousel.Item>
+                                <CarouselItem>
+                                    <Form.Group as={Col} className="mb-3 d-flex align-items-start">
+                                        <Form.Label column sm="3">Call for paper:</Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            rows={14}
+                                            name="callForPaper"
+                                            value={formData.callForPaper}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter callForPaper..."
+                                            className={requiredFields.callForPaper ? 'border-blue-normal' : 'border border-danger '}
+                                        />
+                                    </Form.Group>
+                                </CarouselItem>
                             </Carousel>
                         </div>
                     </Form>
@@ -419,14 +315,13 @@ for (const key in formData) {
                     <Button
                         onClick={() => setPage((prevIndex) => prevIndex - 1)}
                         disabled={page === 0}
-                        className='border-blue-normal text-blue-normal bg-transparent text  px-5 mx-3'>
-
+                        className='border-blue-normal text-blue-normal bg-transparent text-black  px-5 mx-3'>
                         Back
                     </Button>
                     {
-                        page === 0
+                        page < 2
                             ?
-                            <Button onClick={() => setPage((prevIndex) => prevIndex + 1)} className='bg-blue-normal px-5 mx-3'>
+                            <Button onClick={() => setPage((prevIndex) => prevIndex + 1)} className='bg-blue-normal px-5 mx-3 text-black'>
                                 Next
                             </Button>
                             :

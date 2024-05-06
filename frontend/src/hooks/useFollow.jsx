@@ -6,45 +6,43 @@ import useToken from './useToken'
 import useLocalStorage from './useLocalStorage'
 const useFollow = () => {
   const { state, dispatch } = useAppContext()
-  const {token} = useToken()
+  const {token, refreshToken} = useToken()
   const {user} = useLocalStorage()
   const getListFollowedConferences = async () => {
     if(user){
-      try {
-        const response = await fetch(`${baseURL}/follow`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${user.accessToken}`
-          }
-        });
-  
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+      const response = await fetch(`${baseURL}/follow`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-  
-        const data = await response.json();
-        dispatch(getFollowedConferenceAction(data.data))
-      } catch (error) {
-        console.error('Error:', error);
+      });
+      if (!response.ok) {
+        throw new Error(response.message);
       }
+      const data = await response.json();      
+      const extractData = data.data.map(item => item.callForPaper); // Trích xuất dữ liệu từ trường callForPaper của mỗi object và tạo một object mới trong danh sách data
+      dispatch(getFollowedConferenceAction(extractData))
     }
   }
   const followConference = async (id) => {
-    try {
-      const response = await fetch(`${baseURL}/follow`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ cfp_id: id})
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+    if(token){
+      console.log('token', token)
+      try {
+        const response = await fetch(`${baseURL}/follow`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ cfp_id: id})
+        });
+  
+        if (!response.ok) {
+          throw new Error(response.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
       }
-    } catch (error) {
-      console.error('Error:', error);
     }
     
   }

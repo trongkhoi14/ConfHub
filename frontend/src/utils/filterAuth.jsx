@@ -18,7 +18,6 @@ const filterListbyCondition = (conferences, listOptions) => {
 
                 // Kiểm tra xem subDate có nằm trong khoảng startdate và enddate không
                 const isWithinRange = subDate >= startDate && subDate <= endDate;
-                console.log('isWithinRange', isWithinRange);
                 return isWithinRange;
 
             }
@@ -51,6 +50,7 @@ const filterListbyCondition = (conferences, listOptions) => {
                     let formatKey = filterKey
                     let formatFilterOptions = listOptions[filterKey]
                     let conferenceValue = ''
+                    if (filterKey === '')
                     if (arrayKey.includes(filterKey)) {
                         if (filterKey === 'fieldOfResearch') {
                             conferenceValue = conference[formatKey]['for_name']

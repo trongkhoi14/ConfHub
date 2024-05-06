@@ -76,7 +76,7 @@ const StarDropdown = ({label}) => {
         
         if(location.pathname === '/home' || location.pathname === '/') {
           addKeywords('optionsSelected', label, [formatOption])
-          sendFilter( label, [selectedValues])
+          sendFilter()
       }
       else {
         addKeywords('filterOptionsAuth', label, [formatOption])

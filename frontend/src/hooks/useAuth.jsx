@@ -6,11 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import { baseURL } from './api/baseApi';
 import useLocalStorage from './useLocalStorage';
 import useToken from './useToken';
+import { useState } from 'react';
 
 const useAuth = () => {
   const { state, dispatch } = useAppContext();
-  const { token, savetokenToLocalStorage, deletetokenFromLocalStorage } = useToken()
-  const { user, saveUserToLocalStorage, deleteUserFromLocalStorage} = useLocalStorage()
+  const { token, savetokenToLocalStorage } = useToken()
+  const { saveUserToLocalStorage, deleteUserFromLocalStorage} = useLocalStorage()
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const [status, setStatus] = useState(false)
   const navigate = useNavigate()
 
   const handleLogin = async (email, password) => {
@@ -89,35 +93,13 @@ const useAuth = () => {
   const handleLogout = () => {
     dispatch(logoutUser());
     deleteUserFromLocalStorage()
-    
-    console.log('user', user)
     navigate('/home')
     window.location.reload()
   };
 
-  const getCurrentUser = async () => {
-    try {
-      const response = await fetch(`${baseURL}/user/current`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      saveUserToLocalStorage(data.data)
-      console.log('after updated', user)
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
 
   const updateProfile = (updateData) => {
-    fetch(`${baseURL}/user/current`, {
+    fetch(`${baseURL}/user/infomation`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -127,45 +109,44 @@ const useAuth = () => {
     })
       .then(response => {
         if (response.ok) {
-          getCurrentUser()
+          saveUserToLocalStorage(updateData)
         }
         return response.json();
       })
       .catch(error => {
-        console.error('Error:', error);
+        setError(error)
       });
   }
 
-  const changePassword = (currentPassword, newPassword) => {
-    console.log(state.user)
-    requestApi()
-    fetch(`${baseURL}/user/changePassword`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        currentPassword: currentPassword,
-        newPassword: newPassword
-      })
-    })
-      .then(response => {
-        if (!response.ok) {
-          setError(response.message)
-        }
-        console.log('Đổi mật khẩu thành công');
-      })
-      .catch(error => {
-        console.error(error);
+  const changePassword = async (currentPassword, newPassword) => {
+    
+    try {
+      const response = await fetch(`${baseURL}/user/changePassword`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPassword: currentPassword,
+          newPassword: newPassword
+        })
       });
+      const responseData = await response.json();
+      return responseData
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
 
   return {
     user: state.user,
     loading: state.loading,
-    error: state.error,
+    error: error,
+    message: message,
+    status: status,
     handleLogin,
     handleRegister,
     handleLogout,

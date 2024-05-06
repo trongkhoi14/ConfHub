@@ -4,16 +4,16 @@ import useLocalStorage from './useLocalStorage'
 import useSessionToken from './useToken'
 const usePost = () => {
   const [myConferences, setConferences] = useState([])
+  const [status, setStatus] = useState(false)
   const {user} = useLocalStorage()
-  const {token} = useSessionToken()
+  const {token, refreshToken} = useSessionToken()
   const getPostedConferences = async () => {
-    console.log({user, token})
     if(user){
       try {
         const response = await fetch(`${baseURL}/post`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${user.accessToken}`
+            'Authorization': `Bearer ${token}`
           }
         });
   
@@ -31,27 +31,28 @@ const usePost = () => {
 
   const postConference = async (conference) => {
     if(user){
-      fetch(`${baseURL}/post`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.accessToken}`
-        },
-        body: JSON.stringify(conference),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .catch(error => {
-          console.error('Error:', error);
+      try {
+        const response = await fetch(`${baseURL}/post`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ conference }),
         });
+  
+        if (response.ok) {
+          setStatus(true)
+        }
+      } catch (error) {
+        throw new Error('Network response was not ok');
+      }
     }
+
   }
   return {
     postedConferences: myConferences,
+    status: status,
+    setStatus,
     getPostedConferences,
     postConference
   }

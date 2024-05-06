@@ -1,5 +1,5 @@
 #root{
-    height: 92vh;
+    
     font-family: 'Roboto Slab', sans-serif !important; 
 }
 h1,h2,h3,h4,h5{
@@ -33,7 +33,7 @@ button.bg-primary-dark:active{
     background-color: #C2F1EB;
 }
 button.bg-primary-light:hover{
-    background-color: #E6F6F4;
+    background-color: #d1f0ec;
 }
 button.bg-primary-light:active{
     background-color: #CBEDE8;
@@ -238,6 +238,10 @@ a{
     background-color: white;
 }
 
+.btn:disabled{
+    background-color: #E8F1F3;
+    color: gray;
+}
 
 /*Slider*/
 
@@ -292,10 +296,10 @@ a{
     border-radius: 15px;
     border: none;
     background-color: #C2F1EB;
-    margin-bottom: 24px;
-    padding: 20px 40px;
     text-align: center;
     cursor: pointer;
+    padding: 20px 40px;
+    margin: 20px 0px;
 }
 .icon-slider-follow{
     position: absolute;
@@ -310,6 +314,11 @@ a{
     justify-content: center;
     align-items: center;
     border: none;
+}
+
+.acronym-container{
+    width: 120px;
+    height: 120px;
 }
 .icon-follow{
     position: absolute;
@@ -422,28 +431,23 @@ a{
     left: 300px;
   }
   
-/* Style the navbar */
-#navbar {
-    overflow: hidden;
-  }
-  
-  /* Navbar links */
-  #navbar a {
-    float: left;
-    display: block;
-    text-align: center;
-    text-decoration: none;
-  }
-  
-  
-  /* The sticky class is added to the navbar with JS when it reaches its scroll position */
+
+  /*Tab header*/
   .sticky {
-    position: fixed !important;
-    top: 0;
+    position: fixed;
+    top: 60px;
     width: 100%;
   }
   
-  /* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
-  .sticky + .information {
-    padding-top: 60px;
+  .sticky + .content {
+    padding-top: 102px;
   }
+
+.tooltip-arrow::before{
+    border-right-color: #4EB1A4 !important
+}
+.tooltip-inner {
+    background-color: #4EB1A4 !important;
+    padding: 4px;
+}
+

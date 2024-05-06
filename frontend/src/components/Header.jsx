@@ -1,24 +1,29 @@
 import { useEffect } from 'react'
 import { Navbar, Container, Nav, Image, Button, Dropdown,  } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import './../assets/styles/custom.css'
 import { useNavigate } from 'react-router-dom'
 import getNotifications from '../hooks/getNotifications'
-import { useAppContext } from '../context/authContext'
-
 import NotiIcon from './../assets/imgs/noti.png'
 import AvatarDropdown from './AvatarDropdown'
 import useLocalStorage from '../hooks/useLocalStorage'
+import usePageNavigation from '../hooks/usePageNavigation'
 
 const Header = () => {
   const {user} = useLocalStorage();
   const {notifications} = getNotifications()
   const navigate = useNavigate()
+  const {goToPreviousPage} = usePageNavigation()
   useEffect(()=>{ 
     if (user === null){
       navigate('/home')
     }
-  },[user])
+      const event = new KeyboardEvent('keydown', {
+        key: 'r',
+        ctrlKey: true, // hoặc metaKey: true nếu bạn đang sử dụng trên MacOS
+      });
+      
+      goToPreviousPage(event);
+  },[])
   return (
     <Navbar expand="md" 
     id='header'

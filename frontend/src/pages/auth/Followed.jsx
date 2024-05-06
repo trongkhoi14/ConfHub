@@ -3,30 +3,33 @@ import { Container, } from 'react-bootstrap'
 import Conference from './../../components/Conference'
 import useFollow from '../../hooks/useFollow'
 import useFilter from '../../hooks/useFilter'
-import { getUniqueConferences } from '../../utils/checkFetchedResults'
-import { filterListbyCondition } from '../../utils/filterAuth'
+
 import useLocalStorage from '../../hooks/useLocalStorage'
 import Filter from '../../components/Filter/Filter'
+import Loading from '../../components/Loading'
 
 const Followed = () => {
-  const { listFollowed } = useFollow()
-  const { filterOptionsAuth } = useFilter()
-  const [displayConferences, setdisplayConferences] = useState(listFollowed)
+  const { listFollowed, getListFollowedConferences } = useFollow()
+  const { optionsSelected, resultFilter } = useFilter()
+  const [displayConferences, setdisplayConferences] = useState([])
   const { user } = useLocalStorage()
+  useEffect(()=>{
+    getListFollowedConferences()
+  },[user])
   useEffect(() => {
-    console.log('follow', getUniqueConferences(filterOptionsAuth))
-    if (getUniqueConferences(filterOptionsAuth).length > 0) {
-      const filterResults = filterListbyCondition(listFollowed, filterOptionsAuth)
+    if (resultFilter.length > 0) {
+      const filterResults = resultFilter.filter(itemFilter => listFollowed.some(itemPosted => itemPosted.id === itemFilter.id));
       setdisplayConferences(filterResults)
     }
     else {
       setdisplayConferences(listFollowed)
     }
 
-  }, [filterOptionsAuth, listFollowed, user])
+  }, [optionsSelected, listFollowed])
 
+ 
   return (
-    <Container
+    <Container  
       fluid
       className='py-5 ' style={{ marginLeft: "350px", marginTop: "60px" }}>
       <h4 className=''>Followed Conference</h4>
@@ -37,15 +40,12 @@ const Followed = () => {
           ?
           <>
           <div style={{ width: "1000px" }}>
-          <Filter
-            optionsSelected={filterOptionsAuth}
-            statenameOption={'filterOptionsAuth'}
-          />
+          <Filter/>
         </div>
             <Conference conferences={displayConferences} width={960} />
           </>
           :
-          <p>No conferences available.</p>
+          <p>{`You haven't followed any conferences yet. `}</p>
       }
 
     </Container>

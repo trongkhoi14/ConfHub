@@ -1,93 +1,78 @@
-const { query } = require('express');
-const connection = require('./../config/database')
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 
-module.exports = {
-    // demo
-    getAllUser: async () => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            const result = await connection.request().query(`SELECT * FROM ACCOUNT`)
-            // Đóng kết nối
-            await connection.close();
-            return result.recordset;
-        } catch (error) {
-            console.log(error);
-        }
+var userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        maxLength: 60
     },
-
-    // Lấy người dùng theo Email
-    getUserByEmail: async (email) => {
-        try {
-            await connection.connect();
-            const result = await connection.request()
-            .query(`SELECT * FROM ACCOUNT WHERE ACC_EMAIL = '${email}'`)
-            await connection.close();
-            //console.log(result.recordset)
-            return result.recordset;
-        } catch (error) {
-            console.log(error);
-        }
+    phone: {
+        type: String,
+        required: false,
+        index: true,
+        unique: true,
+        maxLength: 15,
     },
-
-    // Tạo người dùng mới
-    createUser: async (acc) => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            queryStr = `INSERT INTO ACCOUNT (ACC_ID, ACC_NAME, ACC_PHONE, ACC_EMAIL, ACC_ADDRESS, ACC_NATIONALITY, ACC_PASSWORD) 
-            VALUES ('${acc.id}', '${acc.name}', '${acc.phone}', '${acc.email}', '${acc.address}', '${acc.nationality}', '${acc.password}')`;
-            const result = await connection.request().query(queryStr);
-            // Đóng kết nối
-            await connection.close();
-            return true;
-        } catch (error) {
-            console.log(error);
-        }
+    email: {
+        type: String,
+        required: true,
+        maxLength: 60,
+        unique: true,
     },
-
-    // Cập nhật người dùng
-    updateUser: async () => {
-        try {
-            
-        } catch (error) {
-            
-        }
+    address: {
+        type: String,
     },
-
-    // Cập nhật token người dùng theo id
-    updateUserTokenById: async (id, token) => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            queryStr = `UPDATE ACCOUNT SET ACC_TOKEN = '${token}' WHERE ACC_ID = '${id}'`;
-            const result = await connection.request().query(queryStr);
-            // Đóng kết nối
-            await connection.close();
-        } catch (error) {
-            
-        }
+    nationality: {
+        type: String,
     },
-
-    // Cập nhật token người dùng theo id
-    updateUserTokenByToken: async (old_token, new_token) => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            queryStr = `UPDATE ACCOUNT SET ACC_TOKEN = '${new_token}' WHERE ACC_TOKEN = '${old_token}'`;
-            const result = await connection.request().query(queryStr);
-            // Đóng kết nối
-            await connection.close();
-        } catch (error) {
-            
-        }
-    }
-
-    // Xóa người dùng
-
+    password: {
+        type: String,
+        required: true,
+    },
+    role: {
+        type: String,
+        default: 'user'
+    },
     
+    
+    refreshToken: {
+        type: String,
+    },
+    passwordChangedAt: {
+        type: String,
+    },
+    passwordResetToken: {
+        type: String,
+    },
+    passwordResetExpires: {
+        type: String,
+    }
+}, { timestamps: true 
+})
+
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) {
+        next()
+    }
+    const salt = bcrypt.genSaltSync(10)
+    this.password = await bcrypt.hash(this.password, salt)
+
+})
+
+userSchema.methods = {
+    isCorrectPassword: async function (password) {
+        return await bcrypt.compare(password, this.password)
+    },
+    createPasswordChangedToken: function() {
+        const resetToken = crypto.randomBytes(32).toString('hex')
+        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+        this.passwordResetExpires = Date.now() + 15 * 60 * 1000
+        return resetToken
+    }
 }
+
+module.exports = mongoose.model('User', userSchema);
+
+

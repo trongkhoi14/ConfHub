@@ -10,16 +10,16 @@ import Table from '../../components/TableComponent/Table'
 import TableContent from '../../components/TableComponent/TableContent'
 const Users = () => {
   const [showFilter, setShowFilter] = useState(false)
-  const {conferences, handleGetList} = useConference()
+  const {conferences, } = useConference()
   const [fetchCount, setFetchCount] = useState(0);
   useEffect(()=>{
     if (fetchCount < 3) {            
-      handleGetList(1, 10)
+      //handleGetList(1, 10)
       // Tăng giá trị fetchCount sau khi fetch
       setFetchCount(fetchCount + 1);
     }
       console.log(conferences)
-    }, [conferences, handleGetList])
+    }, [conferences, ])
 
   const fixedcolumns = [
     {

@@ -5,8 +5,14 @@ import styles from './calendar.module.css'
 import { formatDate } from '../../utils/formatDate';
 import EventOverlay from './EventOverlay';
 import useFollow from '../../hooks/useFollow';
+import useNote from '../../hooks/useNote';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import useConference from '../../hooks/useConferences';
 const Calendar = () => {
-  const {listFollowed} = useFollow()
+  const { user }= useLocalStorage()
+  const { handleGetList } = useConference()
+  const {listFollowed, getListFollowedConferences} = useFollow()
+  const { notes, getAllNotes} = useNote()
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState([
     { _id: "65b81b006de0bd3c98cc1d9e", date: '2024-03-12T17:00:00.000Z', description: 'Book hotel', type: "note-event" },
@@ -25,19 +31,17 @@ const Calendar = () => {
 
 
   useEffect(()=>{
-    
-  }, [])
+    handleGetList()
+    getAllNotes()
+  }, [user])
   
 
-  const filterEventsByDate = (date) => {
-    const dateStr = formatDate(date);   
-    return events.filter((event) => formatDate(event.date) === dateStr);
-  };
-
   const handleClick = (date, event) => {
-    setSelectedDate(date)
-    const eventsForDate = filterEventsByDate(selectedDate);
-    setExistEvents(eventsForDate)
+    // Tạo danh sách sự kiện cho ngày được chọn
+  const dateVal = formatDate(date);
+  const dateEvents = notes.filter((event) => event.date_value === dateVal);
+console.log({notes, dateEvents})
+    setExistEvents(dateEvents)
     setShow(!show);
     setTarget(event.target);
   };
@@ -59,38 +63,24 @@ const Calendar = () => {
       }
     }
   
-    // Thêm ngày của tháng trước
-    for (let i = firstDayOfMonth.getDay(); i > 0; i--) {
-      const date = new Date(year, month, 0 - i + 1);
-      daysInMonth.push(date);
-    }
-  
     // Thêm ngày của tháng hiện tại
     for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
       const date = new Date(year, month, i);
       daysInMonth.push(date);
     }
-  
-    // Lấy ngày của tháng sau nếu có ít hơn 35 ngày
-    while (daysInMonth.length < 35) {
-      const date = new Date(year, month + 1, daysInMonth.length - lastDayOfMonth.getDate() + 1);
-      daysInMonth.push(date);
+    // Thêm ngày của tháng sau để đảm bảo có đủ 35 ngày
+    const remainingDays = 35 - daysInMonth.length;
+    for (let i = 1; i <= remainingDays; i++) {
+      const nextMonthDate = new Date(year, month + 1, i);
+      daysInMonth.push(nextMonthDate);
     }
+  
   
     // Chỉ lấy 35 giá trị
     return daysInMonth.slice(0, 35);
   };
   
 
-  const isCurrentMonth = (date) => {
-    return date.getMonth() === currentMonth.getMonth();
-  };
-
-  const isPastDate = (date) => {
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    return date < currentDate;
-  };
 
   const handleNextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
@@ -100,9 +90,6 @@ const Calendar = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
 
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
-  };
 
   const handleSaveEvent = () => {
     setEvents([...events, { date: formatDate(selectedDate), description: eventDescription }]);
@@ -114,13 +101,16 @@ const Calendar = () => {
   };
 
   const renderEventsForDate = (date) => {
-    const dateStr = formatDate(date);
-    const dateEvents = events.filter((event) => formatDate(event.date) === dateStr);
-    return dateEvents.map((event, index) => (
-      <div key={index} className={`${styles['event']} ${styles[event.type]}`}>
-        {event.description}
-      </div>
-    ));
+    const dateVal = formatDate(date)
+    const dateEvents = notes.filter((event) => event.date_value === dateVal );
+    if(dateEvents.length > 0) {
+      return dateEvents.map((event, index) => (
+        <div key={index} className={`${styles['event']} ${styles[event.subStyle]} text-nowrap text-truncate overflow-hidden`}>
+          {event.name ? event.name : 'Input your note'}
+        </div>
+      ));
+    }
+    return null
   };
   const renderWeek = (week, rowIndex) => (
     <div className="d-flex flex-wrap" key={rowIndex}>
@@ -139,21 +129,21 @@ const Calendar = () => {
 
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentMonth.getMonth(), currentMonth.getFullYear());
-    const weeks = [];
-    let currentWeek = [];
+  const weeks = [];
+  let currentWeek = [];
+  let currentDayIndex = 0;
 
-    daysInMonth.forEach((day, index) => {
-      if (index % 7 === 0 && index > 0) {
-        weeks.push(currentWeek);
-        currentWeek = [];
-      }
-      currentWeek.push(day);
-    });
+  daysInMonth.forEach(() => {
+    // Thêm ngày vào currentWeek
+    currentWeek.push(daysInMonth[currentDayIndex]);
+    currentDayIndex++;
 
-    // Đảm bảo còn lại của currentWeek được thêm vào nếu có
-    if (currentWeek.length > 0) {
-      weeks.push(currentWeek);
+    // Nếu currentWeek đã có 7 ngày hoặc đã đến ngày cuối cùng của tháng
+    if (currentWeek.length === 7 || currentDayIndex === daysInMonth.length) {
+      weeks.push([...currentWeek]); // Thêm currentWeek vào mảng weeks
+      currentWeek = []; // Reset currentWeek
     }
+  });
 
     return weeks.map((week, index) => renderWeek(week, index));
   };

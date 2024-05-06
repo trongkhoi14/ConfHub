@@ -35,5 +35,13 @@ const findKeyByKeyword = (optionsSelected, keyword) => {
   return keysWithKeyword || null;
 };
 
+const filterCommonConferences = (filteredList, authList) => {
+  console.log({filteredList, authList})
+  if(!filteredList) return authList
+  return filteredList.filter(conf1 => 
+    authList.some(conf2 => conf1.id === conf2.id)
+  );
+};
 
-export { checkExistValue, getUniqueConferences, findKeyByKeyword };
+
+export { checkExistValue, getUniqueConferences, findKeyByKeyword, filterCommonConferences };

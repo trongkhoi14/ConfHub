@@ -1,63 +1,72 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select';
 import useConference from '../hooks/useConferences';
-import {FloatingLabel, Form} from "react-bootstrap"
-const customStyles = {
-  control: (provided, state) => ({
-    ...provided,
-    border: '1px solid #155D68', // Điều chỉnh màu và độ dày của border khi focus
-    borderRadius: '4px', // Điều chỉnh độ cong của góc
-    boxShadow: state.isFocused ? '0 0 0 0.2rem rgba(76, 139, 245, 0.25)' : null, // Hiệu ứng boxShadow khi focus
-    '&:hover': {
-      border: '2px solid #4c8bf5', // Điều chỉnh màu và độ dày của border khi hover
-    },
-  }),
-};
-const ChooseFORs = ({ selectedOptions, onChange }) => {
+import useFilter from '../hooks/useFilter';
+import { FloatingLabel, Form } from "react-bootstrap"
+
+
+const ChooseFORs = ({ selectedOptions, onChange, requiredFields }) => {
   const { filterOptions } = useConference()
+  const { getOptionsFilter } = useFilter()
   const [options, setOptions] = useState([]);
-  
+
   const [inputValue, setInputValue] = useState('');
-  useEffect(()=>{
-    if(filterOptions['for']){
+  useEffect(() => {
+    getOptionsFilter('', [])
+    if (filterOptions['for']) {
       const originalOptions = filterOptions['for'].map((item, index) => ({
         value: item,
         label: item,
       }));
       setOptions(originalOptions)
     }
-  },[])
-  
-  
+  }, [])
+
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      border: (requiredFields['fieldsOfResearch'] === false) ? '1px solid red' : state.isFocused ? '2px solid #4c8bf5' : '1px solid #155D68', // Điều chỉnh màu và độ dày của border khi focus và không focus
+      borderRadius: '4px', // Điều chỉnh độ cong của góc
+      boxShadow: state.isFocused ? '0 0 0 0.1rem rgba(76, 139, 245, 0.25)' : null, // Hiệu ứng boxShadow khi focus
+      '&:hover': {
+        border: '2px solid #4c8bf5', // Điều chỉnh màu và độ dày của border khi hover
+      },
+    }),
+    menuPortal: provided => ({ 
+      ...provided, 
+      zIndex: 9999,
+    }),
+  };
+
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
   const handleOnChange = (selectedOptions) => {
-    
+
     onChange(selectedOptions);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && inputValue.trim() !== '') {
-     const newValue = {
-      label: inputValue,
-      value: inputValue,
-    };
+      const newValue = {
+        label: inputValue,
+        value: inputValue,
+      };
       setOptions([...options, newValue]);
-      
+
       onChange([...selectedOptions, ...[newValue]]);
-      
+
       setInputValue('');
     }
   };
 
   const CustomOption = ({ innerProps, label, isSelected }) => (
-    <div {...innerProps}>
+    <div {...innerProps} className='p-2 overflow-y-hidden'>
       <input
         type="checkbox"
         checked={isSelected}
         onChange={() => { }}
-        className='align-self-center'
+        className='align-self-center me-1'
       />
       <label style={{ fontWeight: isSelected ? 'bold' : 'normal' }}>{label}</label>
     </div>
@@ -77,21 +86,21 @@ const ChooseFORs = ({ selectedOptions, onChange }) => {
         isSearchable={true}
         placeholder="Select the field of research..."
         required
-
+        menuPortalTarget={document.body}
+        maxMenuHeight={200}
       />
 
-<FloatingLabel controlId="floatingInput" label="+ Add new" className='text-center d-flex justify-content-center'>
-      <Form.Control
-        type="text"
-        placeholder="Enter something"
-        value={inputValue}
-        name='inputValue'
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        className='border-blue-normal'
-
-      />
-    </FloatingLabel>
+        <FloatingLabel controlId="floatingInput" label="+ Add new" className='text-center d-flex justify-content-center'>
+          <Form.Control
+            type="text"
+            placeholder="Enter something"
+            value={inputValue}
+            name='inputValue'
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            className={requiredFields.fieldsOfResearch ? 'border-blue-normal' : 'border border-danger '}
+          />
+        </FloatingLabel>
     </div>
   )
 }
