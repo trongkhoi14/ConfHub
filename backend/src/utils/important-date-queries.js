@@ -1,4 +1,5 @@
 const model = require('../models/index.js');
+const { Op } = require('sequelize');
 const { isEmpty } = require('../utils/input-handler.js');
 const moment = require('moment');
 const SettingQuery = require('./setting-queries.js');

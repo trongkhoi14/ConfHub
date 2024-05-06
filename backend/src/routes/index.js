@@ -8,6 +8,7 @@ const postRouter = require('./post-router');
 const dateRouter = require('./important-date-router');
 const organizationRouter = require('./organization-router');
 const calenderNoteRouter = require('./calender-note-router');
+const feedbackRouter = require('./feedback-router');
 
 module.exports = function (app) {
     app.use('/api/v1/user', userRouter);
@@ -20,4 +21,5 @@ module.exports = function (app) {
     app.use('/api/v1/date', dateRouter);
     app.use('/api/v1/org', organizationRouter);
     app.use('/api/v1/note', calenderNoteRouter);
+    app.use('/api/v1/feedback', feedbackRouter);
 }

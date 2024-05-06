@@ -206,51 +206,41 @@ class UserController {
 
     // [PUT] /api/v1/user/:id
     updateUser = asyncHandler(async (req, res, next) => {
-        const { _id } = req.user
-        if (!_id || Object.keys(req.body).length === 0) {
-            return res.status(status.BAD_REQUEST).json({
-                status: false,
-                message: "Nothing was updated."
-            })
-        }
-
-        const { name, phone, address, nationality, license } = req.body
-        if (!name || !phone || !address || !nationality) {
-            return res.status(status.BAD_REQUEST).json({
-                status: false,
-                data: "Missing informations."
-            })
-        }
-
-        const user = await userModel.findByPk(_id, { attributes: ['role'] });
-        const role = user.role;
-        if (role === "user") {
-            await userModel.update(
-                {
-                    name: name,
-                    phone: phone,
-                    address: address,
-                    nationality: nationality
-                },
-                { where: { id: _id } }
-            )
-        } else { // admin role
-            await userModel.update(
-                {
-                    name: name,
-                    phone: phone,
-                    address: address,
-                    nationality: nationality,
-                    license: license || "false"
-                },
-                { where: { id: _id } }
-            )
-        }
-
         try {
+            const { _id } = req.user
+            if (!_id || Object.keys(req.body).length === 0) {
+                return res.status(status.BAD_REQUEST).json({
+                    status: false,
+                    message: "Nothing was updated."
+                })
+            }
+
+            const { name, phone, address, nationality, license } = req.body
+            if (!name || !phone || !address || !nationality) {
+                return res.status(status.BAD_REQUEST).json({
+                    status: false,
+                    data: "Missing informations."
+                })
+            }
+
+            const user = await userModel.findByPk(_id, { attributes: ['role'] });
+            const role = user.role;
+            if (role) {
+                await userModel.update(
+                    {
+                        name: name,
+                        phone: phone,
+                        address: address,
+                        nationality: nationality
+                    },
+                    { where: { id: _id } }
+                );
+            }
+
             res.status(status.OK).json({
                 message: "Update user successfully",
-            })
+            });
+
         } catch (err) {
             next(err);
         }

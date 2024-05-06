@@ -5,6 +5,7 @@ const ConferenceQuery = require("./conference-queries");
 const ImportantDatesQuery = require("./important-date-queries");
 const OrganizationQuery = require("./organization-queries");
 const sequelize = require('../config/database.js');
+const { Op } = require('sequelize');
 require('dotenv').config();
 
 const selectAllCallForPapers = async function (filterConditions) {
