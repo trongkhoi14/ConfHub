@@ -11,7 +11,7 @@ const CallForPaper = sequelize.define('CallForPaper', {
         type: DataTypes.TEXT
     },
     link: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
     },
     status: {
         type: DataTypes.BOOLEAN,
@@ -21,15 +21,19 @@ const CallForPaper = sequelize.define('CallForPaper', {
         type: DataTypes.DOUBLE
     },
     rank: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
     },
     owner: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         isIn: {
             args: [['admin', 'user', 'crawler']],
             msg: 'Error: Invalid value.'
         },
         defaultValue: "crawler"
+    },
+    nkey: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
     createdAt: {
         type: DataTypes.DATE,

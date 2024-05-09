@@ -15,7 +15,7 @@ Notification.init({
         primaryKey: true
     },
     title: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
     },
     message: {
         type: DataTypes.TEXT

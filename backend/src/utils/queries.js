@@ -1,5 +1,3 @@
-const FieldOfResearch = require("../models/field-of-research-model");
-
 module.exports = {
     CallForPaperQuery: require("./cfp-queries"),
     NoteQuery: require("./calender-note-queries"),

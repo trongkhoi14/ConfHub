@@ -6,9 +6,10 @@ const dbConnect = async () => {
         console.log("DB is connecting!");
         await sequelize.sync({
             // force: true,
-            // alter: true,
+            // alter: true
         });
         console.log("All models were synchronized successfully.");
+
     } catch (e) {
         console.log('Error at connecting to DB');
         throw new Error('Cannot connect to the Database:\n' + e);

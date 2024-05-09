@@ -8,7 +8,7 @@ const FieldOfResearch = sequelize.define('FieldOfResearch', {
         primaryKey: true
     },
     for_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     }
 }, {

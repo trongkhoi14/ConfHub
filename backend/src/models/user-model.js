@@ -29,16 +29,16 @@ User.init({
         primaryKey: true
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     phone: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
         unique: true
     },
     email: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
         unique: true,
         validate: {
@@ -46,19 +46,19 @@ User.init({
         }
     },
     address: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     nationality: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true
     },
     password: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     role: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         validate: {
             isIn: {
                 args: [['user', 'admin']],
@@ -72,7 +72,7 @@ User.init({
         defaultValue: false
     },
     refreshToken: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true
     },
     passwordChangedAt: {
@@ -80,7 +80,7 @@ User.init({
         allowNull: true
     },
     passwordResetToken: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true
     },
     passwordResetExpires: {

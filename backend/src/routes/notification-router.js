@@ -5,6 +5,8 @@ const { verifyAccessToken, checkUserLicense } = require('../middlewares/verifyTo
 const router = express.Router();
 const notificationController = new NotificationController();
 
-router.get('/', notificationController.test);
+router.get('/', verifyAccessToken, notificationController.getAllNotifications);
+router.get('/:id', verifyAccessToken, notificationController.getNotification);
+router.get('/test', notificationController.test);
 
 module.exports = router;

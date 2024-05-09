@@ -8,15 +8,8 @@ const ImportantDate = sequelize.define('ImportantDate', {
         primaryKey: true
     },
     date_type: {
-        type: DataTypes.STRING,
-        // validate: {
-        //     isIn: {
-        //         args: [['sub', 'noti', 'cmr', 'reg']],
-        //         msg: 'Error: invalid value'
-        //     }
-        // },
-        allowNull: false,
-        defaultValue: 'Submission'
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     date_value: {
         type: DataTypes.DATEONLY,
@@ -24,7 +17,7 @@ const ImportantDate = sequelize.define('ImportantDate', {
         defaultValue: new Date()
     },
     status: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         defaultValue: 'new'
     }
 }, {

@@ -44,7 +44,6 @@ const getCurrentUser = asyncHandler(async (req, res, next) => {
 const checkUserLicense = asyncHandler(async (req, res, next) => {
     const user = await query.UserQuery.selectUser(req.user?._id);
     if (user && (user.role.toLowerCase() === "admin" || (user.role.toLowerCase() === "user" && user.license))) {
-        req.userInfo = user;
         next();
 
     } else {

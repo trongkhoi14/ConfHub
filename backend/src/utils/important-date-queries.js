@@ -50,39 +50,35 @@ const insertDates = async function (conference, transaction) {
 
 const updateDates = async function (conference, transaction) {
     try {
-        for (const element of conference.importantDates) {
-            if (!isEmpty(element.date_id)) {
-                const isExisted = await model.importantDateModel.findByPk(element.date_id)
+        const currentDates = await model.importantDateModel.findAll({
+            where: {
+                status: "new",
+                CallForPaperCfpId: conference.cfp_id
+            }
+        });
+        const currentDateTypes = currentDates.map(date => { return date.date_type });
+        const newDateTypes = conference.importantDates.map(date => { return date.date_type });
+        const toDeleteDates = currentDateTypes.filter(type => !newDateTypes.includes(type));
 
-                if (isExisted && isExisted.status === "new") {
-                    if (isEmpty(element.date_value)) {
-                        await deleteDateByID(isExisted.date_id, transaction);
-
-                    } else if (!(moment(isExisted.date_value)).isSame(moment(element.date_value))) {
-                        const newDate = await model.importantDateModel.create({
-                            date_type: element.date_type,
-                            date_value: element.date_value,
-                            CallForPaperCfpId: conference.cfp_id
-                        }, { transaction: transaction });
-
-                        await isExisted.update(
-                            { status: newDate.date_id },
-                            { where: { date_id: isExisted.date_id } },
-                            { transaction: transaction }
-                        );
-
-                        await model.importantDateModel.destroy({ where: { status: isExisted.date_id } }, { transaction: transaction });
-                        const oldNotes = await model.calenderNoteModel.findAll({ where: { ImportantDateDateId: isExisted.date_id } });
-                        await Promise.all(oldNotes.map(async (oldNote) => {
-                            await oldNote.update({
-                                date_value: newDate.date_value,
-                                ImportantDateDateId: newDate.date_id
-                            }, { transaction: transaction });
-                        }));
-                    }
+        for (const element of toDeleteDates) {
+            const isExisted = await model.importantDateModel.findOne({
+                where: {
+                    date_type: element,
+                    CallForPaperCfpId: conference.cfp_id
                 }
+            });
+            if (isExisted) deleteDateByID(isExisted.date_id);
+        }
 
-            } else if (!isEmpty(element.date_value)) {
+        for (const element of conference.importantDates) {
+            const isExisted = await model.importantDateModel.findOne({
+                where: {
+                    date_type: element.date_type,
+                    CallForPaperCfpId: conference.cfp_id
+                }
+            });
+
+            if (!isExisted) {
                 const newDate = await model.importantDateModel.create({
                     date_type: element.date_type,
                     date_value: element.date_value,
@@ -91,7 +87,7 @@ const updateDates = async function (conference, transaction) {
 
                 const follows = await model.followModel.findAll({ where: { CallForPaperCfpId: conference.cfp_id } });
                 if (follows) {
-                    await Promise.all(follows.map(async (follow) => {
+                    for (const follow of follows) {
                         let autoAddNoteSetting = {
                             userID: follow.UserId,
                             name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE
@@ -105,12 +101,32 @@ const updateDates = async function (conference, transaction) {
                                 FollowTid: follow.tid
                             }, { transaction: transaction });
                         }
-                    }));
+                    }
                 }
 
-            };
-        };
+            } else if (isExisted) {
+                const newDate = await model.importantDateModel.create({
+                    date_type: element.date_type,
+                    date_value: element.date_value,
+                    CallForPaperCfpId: conference.cfp_id
+                }, { transaction: transaction });
 
+                await isExisted.update(
+                    { status: newDate.date_id },
+                    { where: { date_id: isExisted.date_id } },
+                    { transaction: transaction }
+                );
+
+                await model.importantDateModel.destroy({ where: { status: isExisted.date_id } }, { transaction: transaction });
+                const oldNotes = await model.calenderNoteModel.findAll({ where: { ImportantDateDateId: isExisted.date_id } });
+                for (const oldNote of oldNotes) {
+                    await oldNote.update({
+                        date_value: newDate.date_value,
+                        ImportantDateDateId: newDate.date_id
+                    }, { transaction: transaction });
+                }
+            }
+        }
         return true;
 
     } catch (error) {

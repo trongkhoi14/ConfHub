@@ -281,7 +281,8 @@ function getConferenceObject(req) {
             link: req.body.link,
             source: req.body.source || process.env.DEFAULT_SOURCE,
             rank: req.body.rank,
-            owner: req.body.owner || "user",
+            owner: req.body.owner,
+            nkey: req.body.nkey || null,
             fieldsOfResearch: req.body.fieldsOfResearch || [],
             organizations: req.body.organizations || [],
             importantDates: req.body.importantDates || []

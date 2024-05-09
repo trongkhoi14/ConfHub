@@ -6,6 +6,7 @@ const asyncHandler = require('express-async-handler');
 class FeedbackController {
     getAllFeedbacks = asyncHandler(async (req, res, next) => {
         try {
+            const userID = req.user?._id;
             const cfpID = req.params?.id;
 
             const cfp = await model.callForPaperModel.findByPk(cfpID);
@@ -14,7 +15,11 @@ class FeedbackController {
             }
 
             const feedbacks = await model.feedbackModel.findAndCountAll({
-                where: { CallForPaperCfpId: cfpID }
+                where: { CallForPaperCfpId: cfpID },
+                include: {
+                    model: model.userModel,
+                    attributes: ['name', 'email', 'phone']
+                }
             });
 
             return res.status(status.OK).json({
@@ -30,7 +35,13 @@ class FeedbackController {
     getFeedback = asyncHandler(async (req, res, next) => {
         try {
             const fbID = req.params?.id;
-            const feedback = await model.feedbackModel.findByPk(fbID);
+            const feedback = await model.feedbackModel.findOne({
+                where: { tid: fbID },
+                include: {
+                    model: model.userModel,
+                    attributes: ['name', 'email', 'phone']
+                }
+            });
             return res.status(status.OK).json({
                 message: feedback ? "Get this feedback successfully." : "Something went wrong!",
                 data: feedback

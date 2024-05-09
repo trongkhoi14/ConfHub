@@ -8,7 +8,7 @@ const Source = sequelize.define('Source', {
         primaryKey: true
     },
     src_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     }
 }, {

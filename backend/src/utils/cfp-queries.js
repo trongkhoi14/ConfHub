@@ -73,7 +73,7 @@ const selectCallForPaper = async function (cfpID) {
 
         const conferenceData = {
             id: conference.cfp_id,
-            infomation: {
+            information: {
                 name: conference.Conference.conf_name,
                 acronym: conference.Conference.acronym,
                 link: conference.link,
@@ -107,6 +107,7 @@ const insertCallForPaper = async function (conference, transaction) {
             link: conference.link,
             rank: conference.rank,
             owner: conference.owner,
+            nkey: conference.nkey,
             ConferenceConfId: conf.conf_id,
             SourceSrcId: src.src_id
         }, { transaction: transaction });

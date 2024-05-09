@@ -3,10 +3,10 @@ const cors = require('cors');
 const router = require('./src/routes');
 const dbConnect = require('./src/config/dbconnect');
 const cookieParser = require('cookie-parser');
+const { dataSeeding } = require('./src/seeders/data-seeding');
 const { notFound, errorHandler } = require('./src/middlewares/errorHandling');
 const { rateLimiter } = require('./src/utils/rate-limiter');
 const { infoLogger } = require('./src/utils/logger');
-const dataSeeding = require('./src/seeders/data-seeding');
 require('dotenv').config();
 
 const app = express();
@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // connect to database
 dbConnect();
-// dataSeeding();
+// dataSeeding(['admin']);
 
 // create router
 router(app);

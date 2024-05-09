@@ -24,17 +24,21 @@ class postController {
     // [POST] /api/v1/post
     addPost = asyncHandler(async (req, res, next) => {
         try {
-            const user = req.userInfo;
+            const userID = req.user._id;
+            const user = await query.UserQuery.selectUser(userID);
             let conference = input.getConferenceObject(req);
+            conference.userID = userID;
+            conference.owner = user.role;
 
-            if (input.containsEmptyValue(conference, ['cfp_id', 'organizations', 'importantDates'])) {
+            const excludes = ['cfp_id', 'organizations', 'importantDates', 'nkey']
+            if (input.containsEmptyValue(conference, excludes)) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
                 });
             };
 
-            await query.PostQuery.insertPost(conference, user);
+            await query.PostQuery.insertPost(conference);
 
             return res.status(status.OK).json({
                 message: "Add new post successfully."
@@ -48,18 +52,34 @@ class postController {
     etlPost = asyncHandler(async (req, res, next) => {
         try {
             let conference = input.getConferenceObject(req);
-            const user = {
-                role: "crawler"
-            }
-            if (input.containsEmptyValue(conference, ['cfp_id', 'callForPaper', 'organizations', 'importantDates'])) {
+            conference.owner = "crawler";
+
+            const excludes = ['cfp_id', 'callForPaper', 'organizations', 'importantDates', 'nkey'];
+            if (input.containsEmptyValue(conference, excludes)) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."
                 });
             };
 
-            await query.PostQuery.insertPost(conference, user);
+            if (conference.nkey) {
+                const isExisted = await model.callForPaperModel.findOne({ where: { nkey: conference.nkey } });
+                if (!isExisted) {
+                    return res.status(status.BAD_REQUEST).json({
+                        status: false,
+                        data: `Can not find the conference that has nkey = ${conference.nkey}.`
+                    });
 
+                } else {
+                    conference.cfp_id = isExisted.cfp_id;
+                    await query.PostQuery.updatePost(conference);
+                    return res.status(status.OK).json({
+                        message: "Update post successfully."
+                    });
+                }
+            }
+
+            await query.PostQuery.insertPost(conference);
             return res.status(status.OK).json({
                 message: "Add new post successfully."
             });
@@ -72,19 +92,18 @@ class postController {
     updatePost = asyncHandler(async (req, res, next) => {
         try {
             const { _id } = req.user;
-            let params = req.body;
-            params.id = req.params?.id;
+            const conferenceID = req.params?.id;
+            const post = await model.postModel.findOne({ where: { UserId: _id, CallForPaperCfpId: conferenceID } });
+            const conference = input.getConferenceObject(req);
 
-            const post = await model.postModel.findOne({ where: { UserId: _id, CallForPaperCfpId: params.id } });
             if (!post) {
                 return res.status(status.NOT_FOUND).json({
                     message: "This post is not existed."
                 });
             };
 
-            const conference = input.getConferenceObject(req);
-
-            if (input.containsEmptyValue(conference, ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates'])) {
+            const excludes = ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates', 'nkey'];
+            if (input.containsEmptyValue(conference, excludes)) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
                     data: "Missing information."

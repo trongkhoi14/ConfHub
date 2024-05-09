@@ -8,7 +8,7 @@ const Setting = sequelize.define('Setting', {
         primaryKey: true
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     value: {

@@ -7,8 +7,12 @@ const Organization = sequelize.define('Organization', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true
     },
+    name: {
+        type: DataTypes.TEXT,
+        defaultValue: "location 1"
+    },
     type: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         validate: {
             isIn: {
                 args: [['online', 'offline', 'hybrid']],
@@ -17,7 +21,7 @@ const Organization = sequelize.define('Organization', {
         }
     },
     location: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
     },
     start_date: {
         type: DataTypes.DATEONLY
@@ -26,14 +30,12 @@ const Organization = sequelize.define('Organization', {
         type: DataTypes.DATEONLY
     },
     status: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         defaultValue: 'new'
     }
 }, {
     timestamps: false,
     tableName: 'organizations'
 });
-
-// function ()
 
 module.exports = Organization;

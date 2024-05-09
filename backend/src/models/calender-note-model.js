@@ -12,7 +12,7 @@ const CalenderNoteModel = sequelize.define('CalenderNote', {
         allowNull: true
     },
     date_value: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
     }
 }, {
     timestamps: false,

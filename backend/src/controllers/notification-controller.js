@@ -1,6 +1,7 @@
 const emailService = require('../services/mail-services.js');
 const model = require('../models');
-const query = require('../utils/queries.js')
+const query = require('../utils/queries.js');
+const { status } = require('../constants/index.js');
 const { Op } = require('sequelize');
 const asyncHandler = require('express-async-handler');
 require('dotenv').config();
@@ -113,14 +114,40 @@ class NotificationController {
     //     }
     // })
 
-    test = asyncHandler(async (req, res) => {
+    test = asyncHandler(async (req, res, next) => {
         try {
-            await query.NotificationQuery.insertNotification()
+            const data = await query.NotificationQuery.insertNotification()
             return res.status(200).json({
                 message: "Get all successfully",
+                data: data
             });
         } catch (err) {
-            throw err
+            next(err);
+        }
+    });
+
+    getAllNotifications = asyncHandler(async (req, res, next) => {
+        try {
+            const userID = req.user._id;
+            const notifications = await query.NotificationQuery.selectAllNotifications(userID);
+            return res.status(status.OK).json({
+                message: "Get all notifications successfully",
+                data: notifications
+            });
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    getNotification = asyncHandler(async (req, res, next) => {
+        try {
+            const notiID = req.params?.id;
+            const notification = await query.NotificationQuery.selectNotification(notiID);
+            return res.status(status.OK).json({
+                data: notification
+            });
+        } catch (err) {
+            next(err);
         }
     });
 };

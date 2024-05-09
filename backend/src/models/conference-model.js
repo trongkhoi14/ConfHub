@@ -8,11 +8,11 @@ const Conference = sequelize.define('Conference', {
         primaryKey: true
     },
     conf_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     acronym: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     }
 }, {

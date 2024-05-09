@@ -21,12 +21,19 @@ const selectAllPosts = async function (filterConditions) {
     }
 };
 
-const insertPost = async function (conference, user) {
+const insertPost = async function (conference) {
     try {
         return await sequelize.transaction(async (t) => {
-            conference.owner = user.role;
             const cfp = await CallForPaperQuery.insertCallForPaper(conference, t);
-            await model.postModel.create({ post_time: new Date(), UserId: user.id, CallForPaperCfpId: cfp.cfp_id }, { transaction: t });
+            if (conference.userID) {
+                await model.postModel.create(
+                    {
+                        post_time: new Date(),
+                        UserId: conference.userID,
+                        CallForPaperCfpId: cfp.cfp_id
+                    },
+                    { transaction: t });
+            }
             return true;
         });
 

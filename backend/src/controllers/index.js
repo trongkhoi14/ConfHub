@@ -11,5 +11,6 @@ module.exports = {
     SettingController: require('./setting-controller'),
     CalenderNoteController: require('./calender-note-controller'),
     FeedbackController: require('./feedback-controller'),
-    NotificationController: require('./notification-controller')
+    NotificationController: require('./notification-controller'),
+    RankController: require('./rank-controller')
 };
