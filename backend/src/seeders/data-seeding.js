@@ -16,17 +16,17 @@ const dataSeeding = async () => {
                 role: "admin",
                 license: "true"
             },
-            { transaction: t }
+            // { transaction: t }
         ).then(async (admin) => {
-            await model.settingModel.bulkCreate([
-                { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: admin.id },
-                { name: process.env.EXTEND_DATE, status: true, UserId: admin.id },
-                { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: admin.id },
-                { name: process.env.UPCOMING_EVENT, status: true, UserId: admin.id },
-                { name: process.env.CANCELLED_EVENT, status: true, UserId: admin.id },
-                { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: admin.id },
-                { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: admin.id }
-            ], { transaction: t })
+            // await model.settingModel.bulkCreate([
+            //     { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: admin.id },
+            //     { name: process.env.EXTEND_DATE, status: true, UserId: admin.id },
+            //     { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: admin.id },
+            //     { name: process.env.UPCOMING_EVENT, status: true, UserId: admin.id },
+            //     { name: process.env.CANCELLED_EVENT, status: true, UserId: admin.id },
+            //     { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: admin.id },
+            //     { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: admin.id }
+            // ], { transaction: t })
         });
 
         // Source

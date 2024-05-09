@@ -162,6 +162,28 @@ const deleteCallForPaper = async function (cfpID) {
     }
 };
 
+const updateRating = async function (cfpID) {
+    const numbersOfFeedbacks = await model.feedbackModel.findAndCountAll({
+        where: { CallForPaperCfpId: cfpID, rating: { [Op.ne]: null } }
+    });
+
+    let sum = 0;
+    numbersOfFeedbacks.rows.map(fb => {
+        sum = sum + fb.rating;
+    });
+
+    const cfp = await model.callForPaperModel.findByPk(cfpID);
+    if (cfp) {
+        let avgRating = sum / numbersOfFeedbacks.count
+        if (avgRating) {
+            cfp.rating = avgRating;
+            cfp.save();
+        }
+    }
+
+    return cfp;
+};
+
 module.exports = {
     selectAllCallForPapers,
     selectCallForPaper,

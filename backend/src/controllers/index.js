@@ -1,5 +1,3 @@
-const FeedbackController = require('./feedback-controller');
-
 module.exports = {
     UserController: require('./user-controller'),
     ConferenceCFPController: require('./conference-cfp-controller'),
@@ -12,5 +10,6 @@ module.exports = {
     OrganizationController: require('./organization-controller'),
     SettingController: require('./setting-controller'),
     CalenderNoteController: require('./calender-note-controller'),
-    FeedbackController: require('./feedback-controller')
+    FeedbackController: require('./feedback-controller'),
+    NotificationController: require('./notification-controller')
 };

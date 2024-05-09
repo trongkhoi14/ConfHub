@@ -11,6 +11,7 @@ const postModel = require('./post-model');
 const feedbackModel = require('./feedback-model');
 const calenderNoteModel = require('./calender-note-model');
 const settingModel = require('./setting-model');
+const notificationModel = require('./notification-model');
 
 // Assocation
 conferenceModel.hasMany(callForPaperModel, { onDelete: 'CASCADE' });
@@ -60,6 +61,9 @@ calenderNoteModel.belongsTo(followModel);
 userModel.hasMany(settingModel, { onDelete: 'CASCADE' });
 settingModel.belongsTo(userModel);
 
+followModel.hasMany(notificationModel, { onDelete: 'CASCADE' });
+notificationModel.belongsTo(followModel);
+
 module.exports = {
     userModel,
     conferenceModel,
@@ -73,5 +77,6 @@ module.exports = {
     postModel,
     feedbackModel,
     calenderNoteModel,
-    settingModel
+    settingModel,
+    notificationModel
 }

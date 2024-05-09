@@ -9,6 +9,7 @@ const dateRouter = require('./important-date-router');
 const organizationRouter = require('./organization-router');
 const calenderNoteRouter = require('./calender-note-router');
 const feedbackRouter = require('./feedback-router');
+const notificationRouter = require('./notification-router');
 
 module.exports = function (app) {
     app.use('/api/v1/user', userRouter);
@@ -22,4 +23,5 @@ module.exports = function (app) {
     app.use('/api/v1/org', organizationRouter);
     app.use('/api/v1/note', calenderNoteRouter);
     app.use('/api/v1/feedback', feedbackRouter);
+    app.use('/api/v1/notification', notificationRouter);
 }

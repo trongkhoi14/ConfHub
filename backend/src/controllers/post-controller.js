@@ -45,6 +45,30 @@ class postController {
         }
     });
 
+    etlPost = asyncHandler(async (req, res, next) => {
+        try {
+            let conference = input.getConferenceObject(req);
+            const user = {
+                role: "crawler"
+            }
+            if (input.containsEmptyValue(conference, ['cfp_id', 'callForPaper', 'organizations', 'importantDates'])) {
+                return res.status(status.BAD_REQUEST).json({
+                    status: false,
+                    data: "Missing information."
+                });
+            };
+
+            await query.PostQuery.insertPost(conference, user);
+
+            return res.status(status.OK).json({
+                message: "Add new post successfully."
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    });
+
     updatePost = asyncHandler(async (req, res, next) => {
         try {
             const { _id } = req.user;

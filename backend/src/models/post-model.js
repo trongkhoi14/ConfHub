@@ -8,7 +8,7 @@ const Post = sequelize.define('Post', {
         primaryKey: true
     },
     post_time: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     }

@@ -11,4 +11,5 @@ module.exports = {
     ImportantDatesQuery: require("./important-date-queries"),
     OrganizationQuery: require("./organization-queries"),
     SettingQuery: require("./setting-queries"),
+    NotificationQuery: require("./notification-queries")
 }

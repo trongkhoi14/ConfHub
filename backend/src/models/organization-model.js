@@ -34,4 +34,6 @@ const Organization = sequelize.define('Organization', {
     tableName: 'organizations'
 });
 
+// function ()
+
 module.exports = Organization;

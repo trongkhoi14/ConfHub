@@ -13,7 +13,7 @@ const Feedback = sequelize.define('Feedback', {
         type: DataTypes.TEXT
     },
     time: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },

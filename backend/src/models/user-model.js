@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('./../config/database');
+const settingModel = require('./setting-model');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
@@ -97,6 +98,16 @@ User.beforeSave(async (user, options) => {
     if (user.changed('password')) {
         user.password = await User.hashPassword(user.password);
     }
+});
+
+User.afterCreate(async (user, options) => {
+    await settingModel.bulkCreate([
+        { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: user.id },
+        { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: user.id },
+        { name: process.env.CANCELLED_EVENT, status: true, UserId: user.id },
+        { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: user.id },
+        { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: user.id }
+    ]);
 });
 
 module.exports = User;

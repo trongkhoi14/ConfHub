@@ -30,20 +30,7 @@ class UserController {
         if (user) {
             throw new Error('Email or phone number already exists.')
         } else {
-            const t = await sequelize.transaction();
-            const newUser = await userModel.create(req.body, { transaction: t });
-
-            await model.settingModel.bulkCreate([
-                { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: newUser.id },
-                { name: process.env.EXTEND_DATE, status: true, UserId: newUser.id },
-                { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: newUser.id },
-                { name: process.env.UPCOMING_EVENT, status: true, UserId: newUser.id },
-                { name: process.env.CANCELLED_EVENT, status: true, UserId: newUser.id },
-                { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: newUser.id },
-                { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: newUser.id }
-            ], { transaction: t });
-
-            await t.commit();
+            const newUser = await userModel.create(req.body);
 
             return res.status(status.CREATED).json({
                 message: "Registration was successfully, please login",
