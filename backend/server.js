@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // connect to database
 dbConnect();
-// dataSeeding(['admin']);
+// dataSeeding(['admin', 'conferences']);
 
 // create router
 router(app);

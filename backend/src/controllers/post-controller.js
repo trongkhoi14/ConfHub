@@ -65,9 +65,9 @@ class postController {
             if (conference.nkey) {
                 const isExisted = await model.callForPaperModel.findOne({ where: { nkey: conference.nkey } });
                 if (!isExisted) {
-                    return res.status(status.BAD_REQUEST).json({
-                        status: false,
-                        data: `Can not find the conference that has nkey = ${conference.nkey}.`
+                    await query.PostQuery.insertPost(conference);
+                    return res.status(status.OK).json({
+                        message: "Add new post successfully."
                     });
 
                 } else {
