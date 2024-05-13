@@ -17,37 +17,46 @@ import { DropdownSort } from './DropdownSort'
 import { isUpcoming, sortByFollow, sortConferences } from '../utils/sortConferences'
 
 import ArrowIcon from './../assets/imgs/arrow.png'
-import usePost from '../hooks/usePost'
-import Filter from './Filter/Filter'
-import { LOADING } from '../actions/actionTypes'
 import Loading from './Loading'
 
-const Conference = ({ conferences, width }) => {
+const Conference = ({ conferencesProp, width }) => {
     const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
-    const { resultFilter, optionsSelected, getOptionsFilter } = useFilter()
+    const { resultFilter, appliedFilterResult, optionsSelected, getOptionsFilter } = useFilter()
+    const {handleGetList} = useConference()
     const navigate = useNavigate()
     const [page, setPage] = useState(0)
     const [fetchCount, setFetchCount] = useState(0);
     const [selectOptionSort, setSelectOptionSort] = useState('')
     const [copiedConferences, setcopiedConferences] = useState([])
     const [displayConferences, setDisplayedConferences] = useState([])
-    const usersPerPage = 5;
+    const [loading, setLoading] = useState(false)
+    const usersPerPage = 7;
     const pagesVisited = page * usersPerPage;
-    const location = useLocation()
     useEffect(() => {
-        if (fetchCount < 2) {
+        const fetchData = async () => {
+            setLoading(true)
             getListFollowedConferences()
+            setLoading(false)
             getOptionsFilter("", [])
+            
+            if(conferencesProp.length ===0 || !conferencesProp){
+                await handleGetList()
+            }
+
+        }
+
+        if (fetchCount < 1) {
+            fetchData()
             setFetchCount(fetchCount + 1);
         }
-        let listConferences = conferences.filter(itemB => resultFilter.some(itemA => itemA.id === itemB.id));
+        setLoading(false)
         
-        const sortedByFollow = sortByFollow(conferences, listFollowed)
+        
+        const sortedByFollow = sortByFollow(conferencesProp, listFollowed)
         setDisplayedConferences([...sortedByFollow])
         setcopiedConferences([...sortedByFollow])
-    }, [fetchCount, conferences, page, optionsSelected, listFollowed, resultFilter]);
-
-
+    }, [fetchCount, conferencesProp, page, optionsSelected, listFollowed, resultFilter]);
+    
     const handlePageClick = (event) => {
         setPage(event.selected)
         // Cuộn lên đầu danh sách khi chuyển trang
@@ -80,10 +89,6 @@ const Conference = ({ conferences, width }) => {
         }
 
     };
-    // Hàm để quyết định giá trị cần hiển thị
-  const displayValue = item => {
-    return location.pathname === "/followed" ? item.callForPaper : item;
-  };
     return (
         <Container className='d-flex flex-column align-items-center p-0'>
 
@@ -112,20 +117,25 @@ const Conference = ({ conferences, width }) => {
                                 key={conf.id}>
                                 <Stack className='p-0' direction='horizontal'>
                                     <div className='bg-white rounded-4 fw-bolder d-flex align-items-center justify-content-center acronym-container '>
-                                        <span className='fw-bold fs-4'>{conf.infomation.acronym}</span>
+                                        <span className='fw-bold fs-4'>{conf.information.acronym}</span>
                                     </div>
 
                                     <div className=''>
                                         <Card.Body className='' onClick={() => chooseConf(conf.id)}>
                                             <Card.Title className='text-color-black'>
                                                 <Stack direction='horizontal'>
-                                                    {isUpcoming(conf.organizations[0].start_date)
+                                                   {
+                                                    conf.organizations.length > 0 && 
+                                                    <>
+                                                     {isUpcoming(conf.organizations[0].start_date)
                                                         &&
                                                         <div className='bg-yellow-normal text-light p-2 rounded-2 me-2 fs-6 fw-bold'>
                                                             Upcoming
                                                         </div>
                                                     }
-                                                    <span className='fw-bold'>{conf.infomation.name}</span>
+                                                    </>
+                                                   }
+                                                    <span className='fw-bold'>{conf.information.name}</span>
                                                 </Stack>
 
                                             </Card.Title>
@@ -140,17 +150,17 @@ const Conference = ({ conferences, width }) => {
                                                     <Image src={TimeIcon} className='me-2' width={18} />
                                                     <label className='conf-data-label'>Conference Date: </label>
                                                     <span className='conf-data'>
-                                                        {conf.organizations[0].start_date}
+                                                        {conf.organizations.length > 0 ? conf.organizations[0].start_date : 'N/A'}
                                                         <>
                                                             <Image src={ArrowIcon} width={20} className='mx-2' />
                                                         </>
-                                                        {conf.organizations[0].end_date}
+                                                        {conf.organizations.length > 0 ? conf.organizations[0].end_date : 'N/A'}
                                                     </span>
                                                 </Card.Text>
                                             </Stack>
                                             <Card.Text className='d-flex align-items-center'>
                                                 <Image src={LocationIcon} className='me-2' width={18} />
-                                                {conf.organizations[0].location}
+                                                {conf.organizations.length > 0? conf.organizations[0].location : 'N/A'}
                                             </Card.Text>
                                         </Card.Body>
 
@@ -175,7 +185,9 @@ const Conference = ({ conferences, width }) => {
                         ))
                     )
                     :
-                    <Loading/>
+                    <>
+                        <Loading  onReload={handleGetList}/>
+                    </>
             }
             <ReactPaginate
                 breakLabel="..."

@@ -7,18 +7,24 @@ import useFilter from '../../hooks/useFilter'
 import useLocalStorage from '../../hooks/useLocalStorage'
 import Filter from '../../components/Filter/Filter'
 import Loading from '../../components/Loading'
+import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
 
 const Followed = () => {
   const { listFollowed, getListFollowedConferences } = useFollow()
-  const { optionsSelected, resultFilter } = useFilter()
+  const { appliedFilterResult, optionsSelected } = useFilter()
   const [displayConferences, setdisplayConferences] = useState([])
   const { user } = useLocalStorage()
   useEffect(()=>{
     getListFollowedConferences()
   },[user])
+  
   useEffect(() => {
-    if (resultFilter.length > 0) {
-      const filterResults = resultFilter.filter(itemFilter => listFollowed.some(itemPosted => itemPosted.id === itemFilter.id));
+    const isAppliedFilter = checkExistValue(optionsSelected).some(value => value === true);
+    if (isAppliedFilter) {
+      console.log('ap dung fileter', )
+      const followedFilter = getUniqueConferences(appliedFilterResult)
+      const filterResults = followedFilter.filter(itemFilter => listFollowed.some(itemPosted => itemPosted.id === itemFilter.id));
+      console.log({followedFilter, listFollowed, filterResults})
       setdisplayConferences(filterResults)
     }
     else {
@@ -42,7 +48,7 @@ const Followed = () => {
           <div style={{ width: "1000px" }}>
           <Filter/>
         </div>
-            <Conference conferences={displayConferences} width={960} />
+            <Conference conferencesProp={displayConferences} width={960} />
           </>
           :
           <p>{`You haven't followed any conferences yet. `}</p>

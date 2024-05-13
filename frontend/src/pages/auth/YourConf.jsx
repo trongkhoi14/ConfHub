@@ -8,27 +8,48 @@ import Conference from '../../components/Conference'
 import useLocalStorage from '../../hooks/useLocalStorage'
 import Filter from '../../components/Filter/Filter'
 import useFilter from '../../hooks/useFilter'
+import SuccessfulModal from '../../components/Modals/SuccessModal'
+import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
+import Loading from '../../components/Loading'
 
 const YourConf = () => {
   const [showAddForm, setShowAddForm] = useState(false)
-  const { resultFilter } = useFilter()
-  const { postedConferences, getPostedConferences} = usePost()
+  const { optionsSelected, appliedFilterResult } = useFilter()
+  const { loading, postedConferences, getPostedConferences} = usePost()
   const [displayConferences, setdisplayConferences] = useState(postedConferences)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [message, setMessage] = useState('')
   const {user} = useLocalStorage()
   useEffect(()=> {
-    getPostedConferences()
+    if(postedConferences){
+
+      getPostedConferences()
+    }
   }, [user])
   
   useEffect(() => {
-    if (resultFilter.length > 0) {
-      const filterResults = resultFilter.filter(itemFilter => postedConferences.some(itemPosted => itemPosted.id === itemFilter.id));
+    console.log({postedConferences})
+    const isAppliedFilter = checkExistValue(optionsSelected).some(value => value === true);
+    if (isAppliedFilter) {
+      console.log('ap dung fileter', )
+      const followedFilter = getUniqueConferences(appliedFilterResult)
+      const filterResults = followedFilter.filter(itemFilter => postedConferences.some(itemPosted => itemPosted.id === itemFilter.id));
+      
       setdisplayConferences(filterResults)
     }
     else {
       setdisplayConferences(postedConferences)
     }
 
-  }, [resultFilter, postedConferences, user])
+  }, [optionsSelected, postedConferences])
+  const handleCheckStatus = (status, messageSuccess) => {    
+    setMessage(messageSuccess)
+    if(status){
+      setShowAddForm(false);
+      setShowSuccess(true)
+    
+    }
+  }
   const handleClose = () => setShowAddForm(false);
   const handleShow = () => setShowAddForm(true);
   return (
@@ -45,13 +66,23 @@ const YourConf = () => {
           Add
         </Button>
       </div>
-      <AddConference show={showAddForm} handleClose={handleClose}/>
+      <AddConference show={showAddForm} handleClose={handleClose} handleCheckStatus={handleCheckStatus}/>
+      {showSuccess && <SuccessfulModal message={message} show={showSuccess} handleClose={()=>setShowSuccess(false)}/>}
     {
       postedConferences && postedConferences.length > 0
         ?
         <>
-          <Filter/>
-          <Conference conferences={displayConferences} width={960} />
+          {
+            loading ?
+            <>
+              <Loading onReload={getPostedConferences}/>
+            </>
+            :
+            <>
+              <Filter/>
+              <Conference conferencesProp={displayConferences} width={960} />
+            </>
+          }
         </>
         :
         <p>No conferences available.</p>

@@ -1,39 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { Accordion, Button, Card, Col, Form } from 'react-bootstrap';
+import { Accordion, Button, Card, Col, Form, Image } from 'react-bootstrap';
 import CustomAccordionDates from './CustomAccordionDates';
-import useAccordionDates from '../hooks/useAccordionDates';
+import useAccordionDates from '../../hooks/useAccordionDates';
 import InputImportantDates from './InputImportantDates';
-import useFormDataInput from '../hooks/useFormDataInput';
+import useFormDataInput from '../../hooks/useFormDataInput';
 
-const AccordionDates = ({formData, onChangeImportantDates, onChangeOrganizations}) => {
-    const { items, addItem, toggleItem, openItemIndex } = useAccordionDates([
-        { id: 1, title: 'Round 1', content: 'Content 1' },
-    ])
-
-    const { dateListByRound, addDateToRound} = useFormDataInput()
-
+import DeleteIcon from './../../assets/imgs/del.png'
+const AccordionDates = ({ items, formData, onChangeImportantDates, onChangeOrganizations, onAddItem, onDeleteItem }) => {
+    const { message, error, addItem, deleteItem, toggleItem, openItemIndex } = useAccordionDates()
+    
+    
     return (
         <Accordion defaultActiveKey="1" className='h-100'>
             {items.map((item, index) => (
-                <Card key={item.id} className='border-0'>
+
+                <Card key={item.id} className='border-0 w-100'>
                     {/* Render CustomToggle cho mỗi item */}
                     {items.length > 1 && (
-                        <CustomAccordionDates
-                            eventKey={item.id}
-                            onClick={() => toggleItem(item.id)}
-                        >
-                            {item.title}
-                        </CustomAccordionDates>
+                        <div className='d-flex align-items-center justify-content-center'>
+                            <CustomAccordionDates
+                                eventKey={item.id}
+                                onClick={() => toggleItem(item.id)}
+                            >
+                                {item.title}
+                            </CustomAccordionDates>
+                            <Button 
+                                className='ms-3 bg-transparent border-0' 
+                                onClick={() => { onDeleteItem(index) }}
+                                title='Delete this round'
+                            >
+                                <Image src={DeleteIcon} width={18} />
+                            </Button>
+                        </div>
+
                     )}
                     <Accordion.Collapse eventKey={item.id} in={openItemIndex === item.id}>
                         <Card.Body>
-                            <InputImportantDates 
+                            <InputImportantDates
                                 formData={formData}
                                 onChange={onChangeImportantDates}
                                 round={openItemIndex}
                             />
                             <Form.Group as={Col} className="mb-3 d-flex align-items-center">
-                                <Form.Label column sm="3"><span className='text-danger'>* </span>Conference date:</Form.Label>
+                                <Form.Label column sm="3">Conference date:</Form.Label>
                                 From
                                 <Form.Control
                                     type="date"
@@ -41,7 +50,7 @@ const AccordionDates = ({formData, onChangeImportantDates, onChangeOrganizations
                                     value={formData.organizations[0]?.start_date || ''}
                                     onChange={onChangeOrganizations}
                                     placeholder="Select conference start date..."
-                                    className="mx-2"
+                                    className="mx-2 border-blue-normal"
                                 />
                                 to
                                 <Form.Control
@@ -50,16 +59,18 @@ const AccordionDates = ({formData, onChangeImportantDates, onChangeOrganizations
                                     value={formData.organizations[0]?.end_date || ''}
                                     onChange={onChangeOrganizations}
                                     placeholder="Select conference start date..."
-                                    className="ms-2"
+                                    className="ms-2 border-blue-normal"
                                 />
                             </Form.Group>
                         </Card.Body>
                     </Accordion.Collapse>
                 </Card>
             ))}
-            
-            <Button onClick={addItem} className='mt-4 w-100 text-color-darker bg-primary-light border-primary-normal'>Add round</Button>
-        </Accordion>
+            {
+                error && <p className='text-warning text-center'>{message}</p>
+            }
+            <Button onClick={onAddItem} className='mt-4 w-100 text-color-darker bg-primary-light border-primary-normal'>Add round</Button>
+        </Accordion>    
     );
 };
 

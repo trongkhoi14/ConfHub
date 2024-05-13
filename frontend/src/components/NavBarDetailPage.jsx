@@ -40,7 +40,7 @@ const NavBarDetailPage = () => {
 
 
   useEffect(() => {
-    if (fetchCount < 5) {
+    if (fetchCount < 1) {
       handleGetOne(id)
       // Tăng giá trị fetchCount sau khi fetch
       setFetchCount(fetchCount + 1);
@@ -53,16 +53,17 @@ const NavBarDetailPage = () => {
           {
             conference ?
               <div>
-                <span className='fs-3 fw-bold word-break mw-50'>{conference.infomation.name}</span>
+                <span className='fs-3 fw-bold word-break mw-50'>{conference.information.name}</span>
                 <div className='d-flex align-items-center my-3 justify-content-center'>
                   <Image width={25} height={25} src={DateIcon} className='me-2' />
                   <span className='fs-5'>
-                    From {conference.organizations[0].start_date} to {conference.organizations[0].end_date}
+                  From {conference.organizations.length >0 ? conference.organizations[0].start_date : 'N/A'} 
+           {` to`} {conference.organizations.length >0 ? conference.organizations[0].end_date : 'N/A'}
                   </span>
                 </div>
                 <div className='d-flex align-items-center my-3 justify-content-center'>
                   <Image width={25} height={28} src={LocationDate} className='me-2' />
-                  <span className='fs-5'>{conference.organizations[0].location}</span>
+                  <span className='fs-5'>{conference.organizations.length >0 ? conference.organizations[0].location : 'N/A'}</span>
                 </div>
               </div>
               :

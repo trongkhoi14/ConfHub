@@ -54,8 +54,8 @@ const sortByUpcoming = (conferences) => {
 
 const sortByName = (conferences) => {
   return conferences.sort((a, b) => {
-    const labelA = a.infomation.name.toLowerCase();
-    const labelB = b.infomation.name.toLowerCase();
+    const labelA = a.information.name.toLowerCase();
+    const labelB = b.information.name.toLowerCase();
 
     if (labelA < labelB) {
       return -1;
@@ -71,7 +71,7 @@ const sortByName = (conferences) => {
 const sortByLatest = (conferences) => {
   return conferences.sort((a, b) => {
     const dateA = new Date(a.createdAt);
-    const dateB = new Date(b.createdAt); 5
+    const dateB = new Date(b.createdAt); 
     // So sánh ngày tháng, sự kiện có ngày mới nhất sẽ được đặt trước
     return dateB - dateA;
   });
@@ -96,7 +96,7 @@ const sortAndFilterConferences = (conferences) => {
       const countA = countMap[JSON.stringify(a)];
       const countB = countMap[JSON.stringify(b)];
       if (countA === countB) {
-        return a.infomation.name.localeCompare(b.infomation.name); // So sánh theo tên nếu số lần xuất hiện bằng nhau
+        return a.information.name.localeCompare(b.information.name); // So sánh theo tên nếu số lần xuất hiện bằng nhau
       }
       return countB - countA; // Sắp xếp giảm dần theo số lần xuất hiện
     });
@@ -111,9 +111,9 @@ const sortAndFilterConferences = (conferences) => {
 };
 
 const sortByFollow = (conferences, followedConferences) => {
-
+  console.log(conferences)
   // Kiểm tra nếu danh sách followedConferences rỗng
-  if (followedConferences.length === 0) {
+  if (followedConferences.length === 0 || conferences === undefined) {
     // Trả về danh sách conferences không được sắp xếp
     return [...conferences];
   }

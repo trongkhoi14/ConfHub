@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Col, Form, Image, Modal, Carousel, CarouselItem } from 'react-bootstrap'
+import { Button, Col, Form, Image, Modal, Carousel, CarouselItem, Accordion, Card } from 'react-bootstrap'
 import AddButtonIcon from './../../assets/imgs/edit.png'
 import ChooseFORs from '../PostConference/ChooseFORs';
 import data from './../Filter/options.json'
 import usePost from '../../hooks/usePost';
 import useAccordionDates from '../../hooks/useAccordionDates';
 import AccordionDates from '../PostConference/AccordionDates';
+import useFormDataInput from '../../hooks/useFormDataInput';
+import StatusModal from './SuccessModal';
 import SuccessfulModal from './SuccessModal';
 import LocationInput from '../PostConference/LocationInput';
+import InputOrganizations from '../PostConference/InputOrganizations';
 
-const AddConference = ({ show, handleClose, handleCheckStatus }) => {
-    const {postConference, getPostedConferences} = usePost()
-    const { items, dateListByRound, mergeDatesByRound, addDateToRound, addItem, deleteItem } = useAccordionDates()
+const UpdateConference = ({ show, handleClose, handleCheckStatus }) => {
+    const { postConference, getPostedConferences } = usePost()
+    const { dateListByRound, mergeDatesByRound, addDateToRound } = useFormDataInput()
     const [page, setPage] = useState(0)
     const [isPosted, setIsPosted] = useState(false)
-
+    
     const [formData, setFormData] = useState({
         conf_name: '',
         acronym: '',
@@ -23,7 +26,6 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
         rank: '',
         fieldsOfResearch: [],
         organizations: [{
-            name: '',
             start_date: '',
             end_date: '',
             type: '',
@@ -43,10 +45,15 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
 
 
     const handleImportantDatesChange = (round, date) => {
-        console.log('paretn', {round, date})
         addDateToRound(round, date)
     }
 
+    useEffect(() => {
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            importantDates: mergeDatesByRound(),
+        }));
+    }, [dateListByRound])
     const [selectedfieldsOfResearch, setSelectedfieldsOfResearch] = useState([]);
 
 
@@ -98,13 +105,6 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
             })),
         }))
     }
-    const handleDatesUpdate = () => {
-        const merged = mergeDatesByRound()
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            importantDates: merged,
-        }));
-    }
 
     const handleClearForm = () => {
 
@@ -124,8 +124,7 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
         handleClearForm()
         setPage(0)
     }
-    const handleFormSubmit = async () => {
-        await handleDatesUpdate()
+    const handleFormSubmit = () => {
         let allValid = true
         for (const field in requiredFields) {
             if (formData[field] === '' || formData[field] === undefined || (field === 'fieldsOfResearch' && formData[field].length === 0)) {
@@ -140,11 +139,11 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
         console.log(formData)
         if (allValid) {
             console.log(formData)
-            const response = await postConference(formData)
-            console.log('status', response)
-            if (response.message.includes("successful")) {
-                handleCheckStatus(true, response.message)
-                getPostedConferences()
+            const response =  postConference(formData)
+            console.log({response})
+            if(response.status){
+
+                handleCheckStatus(response.status, response.message)
             } else {
                 handleCheckStatus(true, response.message)
                 setIsPosted(true)
@@ -188,7 +187,7 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                     <Modal.Title className="text-center w-100 fw-bold text-color-black">Conference Information</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-scrollable-content m-0"
-                    style={{ minHeight: '400px', maxHeight: '80vh' }}>
+                    style={{ minHeight: '460px', maxHeight: '80vh' }}>
 
                     {isPosted && <SuccessfulModal handleCloseForm={handleClose} />}
                     <Form className='px-5'>
@@ -272,7 +271,7 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                                 </Carousel.Item>
                                 <Carousel.Item>
 
-                                    <Form.Group as={Col} className="mb-3 d-flex align-items-center">
+                                <Form.Group as={Col} className="mb-3 d-flex align-items-center">
                                         <Form.Label column sm="3">Organizations type:</Form.Label>
                                         <Form.Select
                                             type="text"
@@ -281,7 +280,7 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                                             onChange={handleorganizationsChange}
 
                                         >
-                                            <option value="">Select organization type...</option>
+                                            <option value="">Select organizations type...</option>
                                             {
                                                 data.type.map((r) => (
                                                     <option value={r.value} key={r.value}>{r.label}</option>
@@ -290,27 +289,14 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                                             }
                                         </Form.Select>
                                     </Form.Group>
-                                    <Form.Group as={Col} className="mb-3 d-flex align-items-center">
-                                        <Form.Label column sm="3">Organizations name:</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="name"
-                                            value={formData.organizations[0]?.name || ''}
-                                            onChange={handleorganizationsChange}
-                                            placeholder='Enter organization name'
-                                        >
-                                        </Form.Control>
-                                    </Form.Group>
-                                    <LocationInput onLocationChange={handleLocationChange} />
+
+                                           <LocationInput onLocationChange={handleLocationChange}/>
                                 </Carousel.Item>
                                 <Carousel.Item>
                                     <AccordionDates
-                                        items={items}
                                         formData={formData}
                                         onChangeImportantDates={handleImportantDatesChange}
                                         onChangeOrganizations={handleorganizationsChange}
-                                        onAddItem={addItem}
-                                        onDeleteItem={deleteItem}
                                     />
 
                                 </Carousel.Item>
@@ -319,7 +305,7 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                                         <Form.Label column sm="3">Call for paper:</Form.Label>
                                         <Form.Control
                                             as="textarea"
-                                            rows={14}
+                                            rows={15}
                                             name="callForPaper"
                                             value={formData.callForPaper}
                                             onChange={handleInputChange}
@@ -357,4 +343,4 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
     )
 }
 
-export default AddConference
+export default UpdateConference

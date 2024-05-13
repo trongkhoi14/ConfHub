@@ -11,7 +11,7 @@ const AdvancedFilter = () => {
                 <Options label={"rank"}/>
             </Col>
             <Col>
-                <span className="fw-bold text-color-black">Field of research</span>
+                <span className="fw-bold text-color-black text-nowrap">Field of research</span>
                 <Options label={"for"}  />
             </Col>
             <Col>

@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom'
 
 import googleIcon from './../../assets/imgs/google.png'
 import useAuth from '../../hooks/useAuth'
+import Loading from '../../components/Loading'
 const Login = () => {
     const {loading, error, handleLogin, handleLogout } = useAuth();
     
@@ -73,7 +74,7 @@ const Login = () => {
                         </ButtonGroup>
                         <div className='d-flex flex-column justify-content-center align-items-center'>
                             {error && <span className='text-danger'>{error}</span>}
-                            {loading && <p>Loading...</p>}
+                            {loading && <Loading/>}
                                 <Button
                                     type='submit'
                                     className='border-0 fw-bold rounded-4 p-2'

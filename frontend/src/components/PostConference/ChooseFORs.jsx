@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select';
-import useConference from '../hooks/useConferences';
-import useFilter from '../hooks/useFilter';
+import useConference from '../../hooks/useConferences';
+import useFilter from '../../hooks/useFilter';
 import { FloatingLabel, Form } from "react-bootstrap"
 
 

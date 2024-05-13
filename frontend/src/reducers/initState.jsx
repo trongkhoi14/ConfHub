@@ -16,7 +16,7 @@ export const initialState = {
   amount: 0,
   filterOptions: [],
   filterResults: [],
-  fetchedResults: {
+  appliedFilterResult: {
     //lưu kết quả đã filter theo từng tiêu chí
     location: [], 
     rank: [], 

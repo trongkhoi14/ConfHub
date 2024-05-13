@@ -12,7 +12,7 @@ import { formatDate } from '../../utils/formatDate';
 import { formatLabel } from '../../utils/formatWord';
 import { useLocation } from 'react-router-dom';
 const DateRangePicker = ({ label }) => {
-  const { sendFilterDate, addKeywords } = useFilter()
+  const { sendFilterDate, addKeywords, getQuantity } = useFilter()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -27,18 +27,21 @@ const DateRangePicker = ({ label }) => {
     setEndDate(date);
   };
 
-  const handleApplyFilter = () => {
-    const keywordFormat = `${formatLabel(label)}: from ${formatDate(startDate)} to ${formatDate(endDate)}`    
-    
-    sendFilterDate(startDate, endDate, label, [keywordFormat])
+  const handleApplyFilter = async () => {
     
     handleToggleClick()
+    const keywordFormat = `${formatLabel(label)}: from ${formatDate(startDate)} to ${formatDate(endDate)}`        
+    const listConference = await sendFilterDate(startDate, endDate, label, [keywordFormat])
+    const quantity = getQuantity(listConference)
+    const keyword = `${keywordFormat} (${quantity})`
+    console.log({keywordFormat, keyword})
+    addKeywords(label, [keyword])
   };
   return (
     <Dropdown className="w-100" show={showDropdown} onHide={() => setShowDropdown(false)}>
       <Dropdown.Toggle 
         onClick={handleToggleClick}
-        className="w-100 d-flex justify-content-between align-items-center bg-white border-1 text-color-medium  border-dark-subtle" 
+        className="w-100 d-flex justify-content-between align-items-center bg-white border-1 text-color-medium border-primary-normal" 
         id="dropdown-autoclose-true">
         <div className='d-flex align-items-center'>
           <Image src={dateIcon} width={18} className="me-2" />

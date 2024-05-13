@@ -92,26 +92,31 @@ const appReducer = (state, action) => {
         case actionTypes.REMOVE_FILTER:
             return {
                 ...state,
+                appliedFilterResult: action.payload.updatedResultsFilter,
                 optionsSelected: action.payload.updateOptionsSelected,
                 loading: false
             }
         case actionTypes.CLEAR_FILTERS:
-            // Cập nhật state với fetchedResults đã xóa hết giá trị
+            // Cập nhật state với appliedFilterResult đã xóa hết giá trị
             return {
                 ...state,
-                resultFilter: [],
-                optionsSelected: action.payload,
+                optionsSelected: action.payload.clearedOptionsSelected,
+                appliedFilterResult: action.payload.clearedConferencesFilter,
                 loading: false
             };
 
 
         case actionTypes.GET_RESULT_AFTER_FILTER:
-            
             return {
                 ...state,
-                loading: false,
-                
-                resultFilter: action.payload
+                appliedFilterResult: {
+                  ...state.appliedFilterResult,
+                  [action.payload.label]: [
+                    ...state.appliedFilterResult[action.payload.label],
+                    ...action.payload.results.map(item => item)
+                  ]
+                },
+                resultFilter: action.payload.results
             };
         case actionTypes.REQUEST_CONFERENCE: 
             return {

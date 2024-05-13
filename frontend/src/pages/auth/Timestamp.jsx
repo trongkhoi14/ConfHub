@@ -1,8 +1,30 @@
 
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Calendar from '../../components/Calendar/Calendar';
+import { useEffect, useState } from 'react';
+import useConference from '../../hooks/useConferences';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import useNote from '../../hooks/useNote';
+import useFollow from '../../hooks/useFollow';
 
 const Timestamp = () => {
+  const {  conferences, handleGetList} = useConference()
+  const { notes, getAllNotes } = useNote()
+  const {listFollowed, getListFollowedConferences} = useFollow()
+  const {user} = useLocalStorage()
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getListFollowedConferences();
+    };
+    if(listFollowed.length ===0){
+
+      fetchData();
+    }
+    
+  }, [user]);
+  
   return (
     <Container
       fluid
@@ -18,7 +40,7 @@ const Timestamp = () => {
       </div>
       <Row>
         <Col xs="9">
-          <Calendar/>
+          <Calendar noteList={notes}/>
         </Col>
         <Col xs="3" className='ps-3'>
           <Row className='align-items-center'>

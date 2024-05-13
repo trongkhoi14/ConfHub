@@ -1,18 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Navbar, Container, Nav, Image, Button, Dropdown,  } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import getNotifications from '../hooks/getNotifications'
-import NotiIcon from './../assets/imgs/noti.png'
+import NotiIcon from './../../assets/imgs/noti.png'
 import AvatarDropdown from './AvatarDropdown'
-import useLocalStorage from '../hooks/useLocalStorage'
-import usePageNavigation from '../hooks/usePageNavigation'
+import useLocalStorage from '../../hooks/useLocalStorage'
+import usePageNavigation from '../../hooks/usePageNavigation'
 
 const Header = () => {
   const {user} = useLocalStorage();
-  const {notifications} = getNotifications()
   const navigate = useNavigate()
   const {goToPreviousPage} = usePageNavigation()
+  const [notifications, setNotifications] = useState([])
   useEffect(()=>{ 
     if (user === null){
       navigate('/home')
@@ -31,7 +30,7 @@ const Header = () => {
     
     >
       <Container fluid className='d-flex justify-content-between shadow-sm px-5'>
-        <Navbar.Brand href="/home" className='my-header-brand'>DATN</Navbar.Brand>
+        <Navbar.Brand href="/home" className='my-header-brand'>ConfHub</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto d-flex align-items-center">

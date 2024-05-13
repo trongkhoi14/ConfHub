@@ -8,6 +8,7 @@ const useFollow = () => {
   const { state, dispatch } = useAppContext()
   const {token, refreshToken} = useToken()
   const {user} = useLocalStorage()
+  
   const getListFollowedConferences = async () => {
     if(user){
       const response = await fetch(`${baseURL}/follow`, {
@@ -26,7 +27,6 @@ const useFollow = () => {
   }
   const followConference = async (id) => {
     if(token){
-      console.log('token', token)
       try {
         const response = await fetch(`${baseURL}/follow`, {
           method: 'POST',
@@ -40,6 +40,7 @@ const useFollow = () => {
         if (!response.ok) {
           throw new Error(response.message);
         }
+        else getListFollowedConferences()
       } catch (error) {
         console.error('Error:', error);
       }
@@ -60,6 +61,7 @@ const useFollow = () => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+      else getListFollowedConferences()
     } catch (error) {
       console.error('Error:', error);
     }

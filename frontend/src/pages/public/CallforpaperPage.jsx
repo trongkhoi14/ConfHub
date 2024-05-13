@@ -16,13 +16,13 @@ const CallforpaperPage = () => {
     }
   }, [fetchCount, conference, handleGetOne, id]);
   return (
-    <div className='px-5 mx-5 pt-4'>
+    <div className='p-5 mx-5 pt-4'>
       <span className='fs-4 fw-bold'>Call for paper</span>
       {
         conference
           ?
           <>
-            <div style={{ textAlign: "justify", textJustify: "inter-word" }}>{conference.infomation.name}</div>
+            <div style={{ textAlign: "justify", textJustify: "inter-word" }}>{conference.information.name}</div>
             <div style={{ textAlign: "justify", textJustify: "inter-word" }}>{conference.callForPaper}</div>
           </>
           :

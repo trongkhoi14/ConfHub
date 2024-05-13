@@ -12,33 +12,18 @@ const useConference = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const handleGetList = async () => {
-    setIsLoading(true);
       try {
         const response = await fetch(`${baseURL}/conference`);
-        const data = await response.json();
-        dispatch(requestConference())
-        //cập nhật các filter
-        if (data !== null) {
-          const allKeys = Object.keys(data);
-  
-          // Sử dụng Array.prototype.filter() để lọc chỉ những key có giá trị là mảng
-          const arrayKeys = allKeys.filter(key => Array.isArray(data[key]));
-  
-          const updateLists = {};
-          arrayKeys.forEach(key => {
-            updateLists[key] = data[key];
-          });
-          
+        const data = await response.json(); 
+        if (!response.ok) {
+          throw new Error(response.message);
+        }
       // Gửi action để cập nhật all conferences
       dispatch(getAllConf(data.data));
-
       //cập nhật state
       setQuantity(data.quantity)
-        }
       } catch (error) {
         setError(error);
-      } finally {
-        setIsLoading(false);
       }
   }
 
@@ -63,7 +48,7 @@ const useConference = () => {
     loading: isLoading,
     error: error,
     handleGetList,
-    handleGetOne
+    handleGetOne,
   }
 }
 

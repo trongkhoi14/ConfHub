@@ -33,10 +33,20 @@ const useLocalStorage = () => {
     setUser(null);
   };
 
+  const updateUserInStorage = (updateData) => {
+    // Tạo một object mới chứa các thông tin cập nhật
+const updatedUser = {
+  ...user, // Giữ nguyên các trường khác không cần cập nhật
+  ...updateData, // Cập nhật thông tin mới
+};
+// Lưu object mới vào localStorage
+localStorage.setItem('user', JSON.stringify(updatedUser));
+  }
   return {
     user,
     saveUserToLocalStorage,
     deleteUserFromLocalStorage,
+    updateUserInStorage
   };
 };
 

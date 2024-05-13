@@ -8,7 +8,6 @@ function SuccessfulModal({ message, show, handleClose }) {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    console.log({ message, show })
     if (show) {
       const timer = setInterval(() => {
         setCountdown(prevCountdown => prevCountdown - 1);

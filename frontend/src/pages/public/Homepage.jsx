@@ -7,12 +7,23 @@ import Conference from '../../components/Conference'
 import Filter from '../../components/Filter/Filter'
 import useFilter from '../../hooks/useFilter'
 import useConference from '../../hooks/useConferences'
+import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
 
 const Homepage = () => {
     const [showSlideShow, setShowSlideShow] = useState(true)
-    const {resultFilter} = useFilter()
-    const {conferences} = useConference()
-   
+    const {appliedFilterResult, optionsSelected} = useFilter()
+    const {conferences, handleGetList} = useConference()
+    const [check, setCheck] = useState(false)
+   useEffect(()=>{
+    const fetchData = async () => {
+      //await handleGetList()
+    }
+    fetchData()
+   }, [])
+   useEffect(()=>{
+    const isAppliedFilter = checkExistValue(optionsSelected).some(value => value === true);
+    setCheck(isAppliedFilter)
+   },[optionsSelected])
   return (
     <div style={{marginTop: "100px"}}>        
         {/*showSlideShow &&
@@ -23,10 +34,10 @@ const Homepage = () => {
           </Stack>
   </Container>*/}
          <Filter/>
-      {resultFilter.length > 0 ? 
-        <Conference conferences={resultFilter} width={1260}/>
+      {check? 
+        <Conference conferencesProp={getUniqueConferences(appliedFilterResult)} width={1260}/>
         :
-        <Conference conferences={conferences} width={1260}/>}
+        <Conference conferencesProp={conferences} width={1260}/>}
     </div>
     
   )

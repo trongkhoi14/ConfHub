@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 
 
-function Loading() {
+function Loading({onReload}) {
     const [showReloadMessage, setShowReloadMessage] = useState(false);
     const [showCount, setShowCount] = useState(0);
   
     useEffect(() => {
       const timer = setTimeout(() => {
         setShowCount(prevCount => prevCount + 1);
-      }, 1000);
+      }, 3000);
   
       return () => {
         clearTimeout(timer);
@@ -17,7 +17,7 @@ function Loading() {
     }, [showCount]);
   
     useEffect(() => {
-      if (showCount >= 20) {
+      if (showCount >= 30) {
         setShowReloadMessage(true);
       }
     }, [showCount]);
@@ -25,7 +25,7 @@ function Loading() {
     const handleReload = () => {
       setShowCount(0);
       setShowReloadMessage(false);
-      window.location.reload()
+      onReload()
     };
   
     return (

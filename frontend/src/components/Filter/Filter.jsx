@@ -14,10 +14,9 @@ import { checkExistValue } from "../../utils/checkFetchedResults";
 import { useLocation } from "react-router-dom";
 
 const Filter = () => {
-  const {sendFilter, addKeywords, clearKeywords, optionsSelected} = useFilter()
+  const {sendFilter, addKeywords, clearKeywords, getQuantity, optionsSelected} = useFilter()
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [searchInput, setSearchInput] = useState("")  
-  const [isClickSearch, setIsClickSearch] = useState(false)
   const location = useLocation();
   const pathname = location.pathname;
   useEffect(()=>{
@@ -25,32 +24,20 @@ const Filter = () => {
   }, [pathname])
 
   useEffect(()=>{
-    setIsClickSearch(false)
   }, [optionsSelected])
-  const [showTooltip, setShowTooltip] = useState(false);
   const tooltipRef = useRef(null);
-  useEffect(() => {
-    // Mỗi khi danh sách thay đổi, hiển thị tooltip
-    if(checkExistValue(optionsSelected).some(value => value === true) ){
-      setShowTooltip(true);
-    // Sau 3 giây, ẩn tooltip
-    const timer = setTimeout(() => {
-      setShowTooltip(false);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-    }
-  }, [optionsSelected]);
+ 
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
-  const handleApplySearch = () => {
+  const handleApplySearch = async () => {
     if(searchInput!==''){
-      addKeywords("search", [searchInput])
+      const listConference = await sendFilter('search', searchInput)
+        const quantity = getQuantity(listConference)        
+        const keyword = `${searchInput} (${quantity})`
+      addKeywords("search", [keyword])
     }
-    setIsClickSearch(true)
-    sendFilter()
   }
   const handleEnterSearch = (e) => {
     if (e.key === 'Enter') {
@@ -62,7 +49,7 @@ const Filter = () => {
     <Container className="bg-white shadow rounded-4 px-5 pb-4 mb-5">
       <div className="d-flex align-items-center mb-2">
         <Image src={filterIcon} width={22} height={22} className="me-2" />
-        <h4 className="m-0">Filter</h4>
+        <h4 className="mt-2">Filter</h4>
       </div>
       <Stack>
         <span className="fw-bold text-color-black">What are you looking for?</span>
@@ -84,25 +71,11 @@ const Filter = () => {
           <Button 
               ref={tooltipRef}
               onClick={handleApplySearch}
-              className={
-                checkExistValue(optionsSelected).some(value => value === true) 
-                ?
-                "bg-primary-light text-primary-normal fw-bold border-0"
-                 : 
-                 "bg-blue-light text-primary-normal fw-bold border-0"
-              }
-              disabled ={ checkExistValue(optionsSelected).some(value => value === true) ? false : true}
-              
+              className="bg-primary-light text-primary-normal fw-bold border-0"
+              disabled ={ searchInput!=='' ? false : true}
+              title="Click here to apply filter"
               >Search 
               </Button>
-              <Overlay 
-      target={tooltipRef.current} 
-      show={showTooltip} 
-      placement="right"
-      
-    >
-      <Tooltip id="button-tooltip">Click to apply filter</Tooltip>
-    </Overlay>
 
         </InputGroup>
       </Stack>
@@ -136,7 +109,7 @@ const Filter = () => {
         className={showAdvancedFilter ? "ms-2 rotate-180" : 'ms-2'}/>
       </Button>
       {showAdvancedFilter && <AdvancedFilter/>}
-      {optionsSelected && <FilterSelected isClickedSearch={isClickSearch}/>}  
+      {optionsSelected && <FilterSelected/>}  
     </Container>
   );
 };

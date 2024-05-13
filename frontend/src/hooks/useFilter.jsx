@@ -6,9 +6,19 @@ import { formatDateFilter } from '../utils/formatDate'
 import { convertToLowerCaseFirstLetter } from '../utils/formatWord'
 import { requestApi } from '../actions/actions'
 import { useEffect } from 'react'
+import useToken from './useToken'
+import { useLocation } from 'react-router-dom'
+import useConference from './useConferences'
+import useFollow from './useFollow'
+import usePost from './usePost'
 
 const useFilter = () => {
   const { state, dispatch } = useAppContext()
+  const { token } = useToken()
+  const {conferences} = useConference()
+  const { listFollowed} = useFollow()
+  const {postedConferences} = usePost()
+  const location = useLocation()  
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       // Xử lý trước khi chuyển trang
@@ -24,7 +34,7 @@ const useFilter = () => {
   }, []);
 
   const getOptionsFilter = async (label, staticData) => {
-    const params = ["source", "for", "acronym"];
+    const params = ["source", "for", "acronym", "rank"];
     if (label === "") {
       for (const param of params) {
         if (param === "acronym") {
@@ -66,7 +76,7 @@ const useFilter = () => {
   }
 
   const sendFilterDate = async (startDate, endDate, label, keywordFormat) => {
-    requestApi()
+    
     const start = formatDateFilter(startDate)
     const end = formatDateFilter(endDate)
     console.log({ keywordFormat, label })
@@ -74,86 +84,96 @@ const useFilter = () => {
     if (label === 'submissionDate') {
       const response = await fetch(`${baseURL}/conference?subStart=${start}&subEnd=${end}`);
       data = await response.json();
+      
     }
     else {
       const response = await fetch(`${baseURL}/conference?confStart=${start}&confEnd=${end}`);
       data = await response.json();
     }
 
-    dispatch(addFilterDateResults(label, keywordFormat));
-    dispatch(getResult(data.data));
+    dispatch(getResult(label, data.data));
+    return data.data
   }
 
 
   const deleteKeyword = (label, keyword) => {
+    console.log(state.appliedFilterResult)
+    const updatedResultsFilter = {
+      ...state.appliedFilterResult,
+      [label]: []
+      }
 
     const updateOptionsSelected = {
       ...state.optionsSelected,
       [label]: state.optionsSelected[label].filter(item => item !== keyword),
     };
-    console.log({ updateOptionsSelected })
+
     // Xóa 1 filter trong danh sách
-    dispatch(removeFilter(updateOptionsSelected));
-    //sendFilter()
+    dispatch(removeFilter(updateOptionsSelected, updatedResultsFilter));
+    
 
   }
   const clearKeywords = () => {
-    if (state.optionsSelected && state.fetchedResults) {
+    if (state.optionsSelected && state.appliedFilterResult) {
       const clearedOptionsSelected = Object.fromEntries(Object.keys(state.optionsSelected).map((key) => [key, []]));
-      dispatch(clearFilters(clearedOptionsSelected))
+      const clearedConferencesFilter = Object.fromEntries(Object.keys(state.appliedFilterResult).map((key) => [key, []]));
+      dispatch(clearFilters(clearedOptionsSelected, clearedConferencesFilter))
+    }
+    //reset all
+  }
+
+  const sendFilter = async (label, keyword) => {
+    const listLabel = ['location', 'rank', 'for', 'source', 'acronym', 'type'];
+    let apiUrl = baseURL;
+
+    if (listLabel.includes(label)) {
+        apiUrl += `/conference?${label}[]=${keyword}`;
+    } else {
+        apiUrl += `/conference?${label}=${keyword}`;
     }
 
-    //reset all
-
-
-  }
-  // Hàm để xây dựng query string từ object chứa các từ khóa
-  const buildParamsString = (params) => {
-    const listLabel = ['location', 'rank', 'for', 'source', 'acronym', 'type']
-    const queryString = Object.keys(params)
-      .filter(key => params[key].length > 0) // Lọc ra các key có mảng giá trị không rỗng
-      .map(key => {
-        // Tạo chuỗi query string từ mảng giá trị
-        const valuesQueryString = params[key].map(
-          value =>
-            listLabel.includes(key) ? `${key}[]=${value}` : `${key}=${value}`
-        )
-          .join('&');
-        return valuesQueryString;
-      })
-      .join('&'); // Nối các chuỗi query string lại với nhau
-
-    return queryString;
-  };
-
-  const sendFilter = () => {
-    const apiUrl = `${baseURL}/conference?${buildParamsString(state.optionsSelected)}`;
-
-    console.log('gui filter', state.optionsSelected)
-    // Thực hiện fetch API với URL đã tạo
-    fetch(apiUrl, {
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    return await fetch(apiUrl, {
+        headers: {
+            'Authorization': `Bearer ${token}`
         }
-        return response.json();
-      })
-      .then(data => {
-        // Xử lý dữ liệu khi nhận được response
-        dispatch(getResult(data.data));
-      })
-      .catch(error => {
-        // Xử lý lỗi nếu có
-        throw new Error('Network response was not ok');
-      });
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Xử lý dữ liệu khi nhận được response
+            dispatch(getResult(label, data.data));
+            return data.data;
+        })
+        .catch(error => {
+            // Xử lý lỗi nếu có
+            console.error('Error sending filter request:', error);
+        });
+};
+
+const getQuantity = (conferenceList) => {
+  let count = 0
+  if(location.pathname==='/followed'){
+    
+    count = conferenceList.filter(obj1 => listFollowed.some(obj2 => obj1.id === obj2.id)).length;
+    
   }
-
-
+  else if(location.pathname==='/yourconferences'){
+    count = conferenceList.filter(obj1 => postedConferences.some(obj2 => obj1.id === obj2.id)).length;
+    
+  }
+  else {
+    count = conferenceList.length
+  }
+  return count
+}
   return {
     optionsSelected: state.optionsSelected,
     filterOptions: state.filterOptions,
-    fetchedResults: state.fetchedResults,
+    appliedFilterResult: state.appliedFilterResult,
     filterOptionsAuth: state.filterOptionsAuth,
     resultFilter: state.resultFilter,
     getOptionsFilter,
@@ -161,7 +181,8 @@ const useFilter = () => {
     sendFilterDate,
     deleteKeyword,
     clearKeywords,
-    sendFilter
+    sendFilter,
+    getQuantity
   }
 }
 

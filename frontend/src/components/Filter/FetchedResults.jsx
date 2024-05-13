@@ -23,7 +23,7 @@ import ArrowIcon from './../../assets/imgs/arrow.png'
 
 const FetchedResults = () => {
   const { loading } = useAuth()
-  const { fetchedResults, optionsSelected } = useFilter()
+  const { appliedFilterResult, optionsSelected } = useFilter()
   const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
 
   const navigate = useNavigate()
@@ -36,12 +36,11 @@ const FetchedResults = () => {
   const pagesVisited = page * usersPerPage;
 
   useEffect(() => {
-    console.log({fetchedResults})
-    const sortedConferenecs = sortConferences('Random', fetchedResults)
+    const sortedConferenecs = sortConferences('Random', appliedFilterResult)
       setDisplayedConferences(sortedConferenecs);
       setcopiedConferences([...sortedConferenecs])
 
-  }, [fetchedResults, currentPage]);
+  }, [appliedFilterResult, currentPage]);
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
@@ -95,7 +94,7 @@ const FetchedResults = () => {
                                 key={conf.id}>
                                 <Stack className='p-0' direction='horizontal'>
                                     <div className='bg-white rounded-4 fw-bolder d-flex align-items-center justify-content-center acronym-container '>
-                                        <span className='fw-bold fs-4'>{conf.infomation.acronym}</span>
+                                        <span className='fw-bold fs-4'>{conf.information.acronym}</span>
                                     </div>
 
                                     <div className=''>
@@ -108,7 +107,7 @@ const FetchedResults = () => {
                                                             Upcoming
                                                         </div>
                                                     }
-                                                    <span className='fw-bold'>{conf.infomation.name}</span>
+                                                    <span className='fw-bold'>{conf.information.name}</span>
                                                 </Stack>
 
                                             </Card.Title>

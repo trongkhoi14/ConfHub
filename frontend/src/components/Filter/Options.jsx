@@ -2,17 +2,22 @@
 import React, { useEffect, useState } from 'react'
 import useFilter from '../../hooks/useFilter'
 
-
-import searchIcon from '../../assets/imgs/search.png'
 import useConference from '../../hooks/useConferences'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import Select from 'react-select'
-import { useLocation } from 'react-router-dom'
 
 import data from './options.json'
 
 const customStyles = {
-   
+    control: (provided, state) => ({
+        ...provided,
+        border: '1px solid #4EB1A4', // Điều chỉnh màu và độ dày của border khi focus
+        borderRadius: '4px', // Điều chỉnh độ cong của góc
+        boxShadow: state.isFocused ? '0 0 0 0.2rem rgba(76, 139, 245, 0.25)' : null, // Hiệu ứng boxShadow khi focus
+        '&:hover': {
+            border: '2px solid #4c8bf5', // Điều chỉnh màu và độ dày của border khi hover
+        },
+    }),
     option: (provided, state) => ({
         ...provided,
         background: state.isFocused ? 'lightgray' : 'white',
@@ -37,16 +42,19 @@ const CustomOption = ({ innerProps, label, isSelected }) => (
 );
 const Options = ({ label }) => {
     const { filterOptions } = useConference()
-    const { getOptionsFilter } = useFilter()
+    const { getOptionsFilter, sendFilter, getQuantity } = useFilter()
     const [options, setOptions] = useState([])
     const { addKeywords } = useFilter()
-    
-    const handleOptionChange = (item) => {
-        const selectedValues = item.map(option => option.label);
-        addKeywords(label, selectedValues)    
-    };
+
+    const handleOptionChange = async (item) => {
+        const listConference = await sendFilter(label, item[0].label)
+        const quantity = getQuantity(listConference)        
+        const keyword = `${item[0].label} (${quantity})`
+        addKeywords(label,[keyword] )
+    }
+
     useEffect(() => {
-        const staticValue = ["location", "rank", "type", "category"]
+        const staticValue = ["location", "type", "category"]
         
         if(staticValue.includes(label)){
         
@@ -75,7 +83,7 @@ const Options = ({ label }) => {
                 value
                 components={{ Option: CustomOption }}
                 onChange={handleOptionChange}
-                closeMenuOnSelect={false}
+                closeMenuOnSelect={true}
                 styles={customStyles}
                 placeholder="All"
                 

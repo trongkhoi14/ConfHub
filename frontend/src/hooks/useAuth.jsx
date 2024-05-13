@@ -11,7 +11,7 @@ import { useState } from 'react';
 const useAuth = () => {
   const { state, dispatch } = useAppContext();
   const { token, savetokenToLocalStorage } = useToken()
-  const { saveUserToLocalStorage, deleteUserFromLocalStorage} = useLocalStorage()
+  const { saveUserToLocalStorage, deleteUserFromLocalStorage, updateUserInStorage} = useLocalStorage()
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState(false)
@@ -99,6 +99,7 @@ const useAuth = () => {
 
 
   const updateProfile = (updateData) => {
+    console.log({updateData})
     fetch(`${baseURL}/user/infomation`, {
       method: 'PUT',
       headers: {
@@ -109,7 +110,7 @@ const useAuth = () => {
     })
       .then(response => {
         if (response.ok) {
-          saveUserToLocalStorage(updateData)
+          updateUserInStorage(updateData)
         }
         return response.json();
       })

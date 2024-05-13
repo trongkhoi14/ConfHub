@@ -1,11 +1,8 @@
 import { Col, Row } from 'react-bootstrap'
-import Comments from '../../components/Comments'
-
 import useConference from '../../hooks/useConferences'
-import { formatDate } from '../../utils/formatDate'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import RedirectButton from '../../components/RedirectButton'
-import { useEffect } from 'react'
+import Feedbacks from '../../components/Feedbacks/Feedbacks'
 const InformationPage = () => {
   const {conference} = useConference()
   const renderFieldOfResearch = (fieldOfResearch) => {
@@ -29,17 +26,18 @@ const InformationPage = () => {
       {conference ? 
       <>
       
-      <div className='fs-5 fw-bold mt-2 ps-3'>{conference.infomation.name}</div>
+      <div className='fs-5 fw-bold mt-2 ps-3'>{conference.information.name}</div>
       <div className='mt-2'>
         <Row className='bg-blue-light py-3 ps-5'>
 
           <Col xs={4}>Location:</Col>
-          <Col className='fw-bold'>{conference.organizations[0].location}</Col>
+          <Col className='fw-bold'>{conference.organizations.length >0 ? conference.organizations[0].location : 'N/A'}</Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Conference date:</Col>
           <Col className='fw-bold'>
-           From {conference.organizations[0].start_date} to {conference.organizations[0].end_date}
+          From {conference.organizations.length >0 ? conference.organizations[0].start_date : 'N/A'} 
+           {` to`} {conference.organizations.length >0 ? conference.organizations[0].end_date : 'N/A'}
           </Col>         
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
@@ -48,30 +46,38 @@ const InformationPage = () => {
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Acronym:</Col>
-          <Col  className='fw-bold'>{conference.infomation.acronym}</Col>
+          <Col  className='fw-bold'>{conference.information.acronym}</Col>
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Source:</Col>
-          <Col className='fw-bold'>{conference.infomation.source}</Col>
+          <Col className='fw-bold'>{conference.information.source}</Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Rank:</Col>
-          <Col className='fw-bold'>{conference.infomation.rank}
+          <Col className='fw-bold'>{conference.information.rank}
           </Col>         
         </Row>
         <Row className='bg-blue-light py-3 ps-5'>
           <Col xs={4}>Type:</Col>
-          <Col className='fw-bold'>{capitalizeFirstLetter(conference.organizations[0].type)}</Col>
+          <Col className='fw-bold'>
+            {
+              conference.organizations.length > 0 
+              ?
+              capitalizeFirstLetter(conference.organizations[0].type)
+              :
+              'N/A'
+            }
+          </Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Rating:</Col>
-          <Col className='fw-bold'>{conference.infomation.rating ? conference.infomation.rating : `N/A`}
+          <Col className='fw-bold'>{conference.information.rating ? conference.information.rating : `N/A`}
           </Col>         
         </Row>
         <Row className='py-3 ps-5 bg-blue-light'>
           <Col xs={4} className='d-flex align-items-center'>Field of research:</Col>
           <Col  className='fw-bold'>
-            {renderFieldOfResearch(conference.infomation.fieldOfResearch)}
+            {renderFieldOfResearch(conference.information.fieldOfResearch)}
           </Col>
         </Row>
       </div>
@@ -79,7 +85,8 @@ const InformationPage = () => {
       :
       <span>Currently no information available on this page.</span>}
       
-      <Comments/>
+      <Feedbacks/>
+      
     </div>
   )
 }

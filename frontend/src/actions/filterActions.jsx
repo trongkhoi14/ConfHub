@@ -16,22 +16,22 @@ export const addFilterDateResults = (label, keyword) => {
   payload: {label, keyword},
 }}
 
-export const removeFilter = (updateOptionsSelected) => {
+export const removeFilter = (updateOptionsSelected, updatedResultsFilter) => {
   return {
     type: actionTypes.REMOVE_FILTER,
-    payload: {updateOptionsSelected},
+    payload: {updateOptionsSelected, updatedResultsFilter},
   }
 }
-export const clearFilters = (clearedOptionsSelected) => {
+export const clearFilters = (clearedOptionsSelected, clearedConferencesFilter) => {
   return {
     type: actionTypes.CLEAR_FILTERS,
-    payload: clearedOptionsSelected
+    payload: {clearedOptionsSelected, clearedConferencesFilter}
   }
 }
 
-export const getResult = (results) => {
+export const getResult = (label, results) => {
   return {
     type: actionTypes.GET_RESULT_AFTER_FILTER,
-    payload: results
+    payload: {label, results}
   }
 }

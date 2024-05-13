@@ -10,8 +10,8 @@ import { findKeyByKeyword, getUniqueConferences,  } from "../../utils/checkFetch
 
 import { useEffect, useState } from 'react';
 
-const FilterSelected = ({isClickedSearch}) => {
-  const { sendFilter, deleteKeyword, clearKeywords, optionsSelected } = useFilter()
+const FilterSelected = () => {
+  const { deleteKeyword, clearKeywords, optionsSelected } = useFilter()
   
   const [keywordsSelected, setKeywordsSelected] = useState(null)
   const [total, setTotal] = useState(0)
@@ -20,7 +20,6 @@ const FilterSelected = ({isClickedSearch}) => {
     const tempList = getUniqueConferences(optionsSelected)
     setKeywordsSelected(tempList)
     setTotal(tempList.length)
-    sendFilter()
   }, [optionsSelected])
   
   const handleDeletekeyword = (keyword) => {
@@ -37,10 +36,9 @@ const FilterSelected = ({isClickedSearch}) => {
           <div className="d-flex flex-wrap border-1 border border-light-subtle p-3 my-3 me-4 rounded-3">
             {keywordsSelected.map((keyword, index) => (
               <Button
-                disabled={!isClickedSearch}
                 onClick={() => handleDeletekeyword(keyword)}
                 key={index}
-                className="fs-6 py-1 px-2 fw-bold border bg-transparent border-secondary rounded-pill d me-3 mb-3  d-flex align-items-center">
+                className="fs-6 text-color-black py-1 px-2 fw-bold border bg-transparent border-secondary rounded-pill d me-3 mb-3  d-flex align-items-center ">
                   
                 {keyword}
                  

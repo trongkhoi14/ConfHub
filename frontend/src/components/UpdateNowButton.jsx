@@ -2,11 +2,9 @@
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 const UpdateNowButton = (path) => {
-    const navigate = useNavigate();
-
     const handleClick = () => {
         // Thay thế URL bằng địa chỉ của trang web mà bạn muốn chuyển hướng đến
-       
+       window.location.reload()
     };
 
     return (
@@ -21,7 +19,7 @@ const UpdateNowButton = (path) => {
             }
         >
             <Button 
-                className='px-4 py-2 fw-bold me-2 bg-brown-normal text-brown-darker border-0 rounded-2'
+                className='px-4 py-2 fw-bold me-3 bg-brown-normal text-brown-darker border-0 rounded-2'
                 onClick={handleClick}
                 >
                 Update Now</Button>

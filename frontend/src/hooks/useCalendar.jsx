@@ -1,43 +1,58 @@
-import { useState, useEffect } from 'react';
 
-export const useCurrentTime = (timeZone) => {
-  const [currentTime, setCurrentTime] = useState('');
+import { formatDate } from '../utils/formatDate';
 
-  useEffect(() => {
-    const updateCurrentTime = () => {
-      const now = new Date();
-      const options = { timeZone, hour12: false };
-      const formatter = new Intl.DateTimeFormat('en-US', options);
-      setCurrentTime(formatter.format(now));
-    };
+const useCalender = () => {
+  function getAllDatesInRange(dateRange) {
+    const [startDateStr, endDateStr] = dateRange.split(' to ');
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+    const dates = [];
+    let currentDate = new Date(startDate);
 
-    // Cập nhật thời gian mỗi giây
-    const intervalId = setInterval(updateCurrentTime, 1000);
+    while (currentDate <= endDate) {
+      
+      const formated = formatDate(currentDate);
+        dates.push(currentDate);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+}
+const getDaysInMonth = (month, year) => {
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const startingDay = firstDayOfMonth.getDay(); // Ngày trong tuần của ngày đầu tiên (0-6)
+  const daysInMonth = [];
 
-    // Clear interval khi component unmount
-    return () => clearInterval(intervalId);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Rỗng để chỉ chạy một lần khi component được mount
+  // Nếu ngày đầu tiên không phải là thứ 2 (Monday), thêm các ngày của tháng trước vào mảng daysInMonth
+  if (startingDay !== 1) {
+    const lastDayOfPreviousMonth = new Date(year, month, 0).getDate();  
+    const daysToAdd = startingDay - 1;
 
-  return currentTime;
+    for (let i = 0; i < daysToAdd; i++) {
+      const previousDay = new Date(year, month - 1, lastDayOfPreviousMonth - i);
+      daysInMonth.unshift(previousDay);
+    }
+  }
+
+  // Thêm ngày của tháng hiện tại
+  for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+    const date = new Date(year, month, i);
+    daysInMonth.push(date);
+  }
+  // Thêm ngày của tháng sau để đảm bảo có đủ 35 ngày
+  const remainingDays = 35 - daysInMonth.length;
+  for (let i = 1; i <= remainingDays; i++) {
+    const nextMonthDate = new Date(year, month + 1, i);
+    daysInMonth.push(nextMonthDate);
+  }
+
+  // Chỉ lấy 35 giá trị
+  return daysInMonth.slice(0, 35);
 };
-
-export const useEventInput = (initialValue = '') => {
-  const [eventInputVisible, setEventInputVisible] = useState(false);
-  const [eventInputValue, setEventInputValue] = useState(initialValue);
-
-  const showEventInput = () => setEventInputVisible(true);
-  const hideEventInput = () => {
-    setEventInputVisible(false);
-    setEventInputValue('');
-  };
-
   return { 
-    eventInputVisible, 
-    eventInputValue, 
-    showEventInput, 
-    hideEventInput, 
-    setEventInputValue 
-    };
+    getAllDatesInRange,
+    getDaysInMonth,
 };
+}
+export default useCalender

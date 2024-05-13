@@ -4,29 +4,30 @@ import useConference from '../../hooks/useConferences'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import ArrowIcon from './../../assets/imgs/arrow.png'
 import useFormDataInput from '../../hooks/useFormDataInput'
+import useAccordionDates from '../../hooks/useAccordionDates'
 const ImportantDatePage = () => {
   const { conference } = useConference()
-  const { separateDatesByRound } = useFormDataInput()
-  const [dates, setDates] = useState([])
+  const { separateDatesByRound } = useAccordionDates()
+  const [dates, setDates] = useState({})
   const displayFields = ['submissionDate', 'notificationDate', 'cameraReady'];
 
   useEffect(() => {
 
     // Tạo một object để chứa các mảng dựa trên giá trị của date_type
 
-    if (conference) {
+    console.log(conference)
+    if (conference && conference.importantDates.length > 0) {
+
       const listDates = separateDatesByRound(conference.importantDates)
 
 
-
-      console.log(listDates)
       setDates(listDates);
 
     }
   }, [conference])
 
   return (
-    <div className='px-5 mx-5 pt-4'>
+    <div className='p-5 mx-5'>
       <span className='fs-4 fw-bold'>Imoprtant dates</span>
       <div className='mt-2'>
         {conference ?
