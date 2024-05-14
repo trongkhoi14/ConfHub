@@ -7,6 +7,6 @@ const notificationController = new NotificationController();
 
 router.get('/', verifyAccessToken, notificationController.getAllNotifications);
 router.get('/:id', verifyAccessToken, notificationController.getNotification);
-router.get('/test', notificationController.test);
+router.delete('/:id', verifyAccessToken, notificationController.deleteNotification);
 
 module.exports = router;

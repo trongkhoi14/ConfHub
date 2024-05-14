@@ -35,7 +35,7 @@ const insertOrganizations = async function (conference, transaction) {
     try {
         const organiztionsArr = conference.organizations.map(element => {
             return {
-                name: element.name,
+                name: !isEmpty(element.name) ? element.name : "location " + (conference.organizations.indexOf(element) + 1),
                 type: element.type,
                 location: element.location,
                 start_date: element.start_date,
@@ -82,7 +82,7 @@ const updateOrganizations = async function (conference, transaction) {
 
             if (!isExisted) {
                 const newOrganization = await model.organizationModel.create({
-                    name: element.name,
+                    name: !isEmpty(element.name) ? element.name : "location " + (conference.organizations.indexOf(element) + 1),
                     type: element.type,
                     location: element.location,
                     start_date: element.start_date,
@@ -110,28 +110,30 @@ const updateOrganizations = async function (conference, transaction) {
                 }
 
             } else if (isExisted) {
-                const newOrganization = await model.organizationModel.create({
-                    name: element.name,
-                    type: element.type,
-                    location: element.location,
-                    start_date: element.start_date,
-                    end_date: element.end_date,
-                    CallForPaperCfpId: conference.cfp_id
-                }, { transaction: transaction });
-
-                await isExisted.update(
-                    { status: newOrganization.org_id },
-                    { where: { org_id: isExisted.org_id } },
-                    { transaction: transaction }
-                );
-
-                await model.organizationModel.destroy({ where: { status: isExisted.org_id } }, { transaction: transaction });
-                const oldNotes = await model.calenderNoteModel.findAll({ where: { OrganizationOrgId: isExisted.org_id } });
-                for (const oldNote of oldNotes) {
-                    await oldNote.update({
-                        date_value: [newOrganization.start_date, newOrganization.end_date].join(" to "),
-                        OrganizationOrgId: newOrganization.org_id
+                if (isExisted.type !== element.type || isExisted.location !== element.location || isExisted.start_date !== element.start_date || isExisted.end_date !== element.end_date) {
+                    const newOrganization = await model.organizationModel.create({
+                        name: !isEmpty(element.name) ? element.name : "location " + (conference.organizations.indexOf(element) + 1),
+                        type: element.type,
+                        location: element.location,
+                        start_date: element.start_date,
+                        end_date: element.end_date,
+                        CallForPaperCfpId: conference.cfp_id
                     }, { transaction: transaction });
+
+                    await isExisted.update(
+                        { status: newOrganization.org_id },
+                        { where: { org_id: isExisted.org_id } },
+                        { transaction: transaction }
+                    );
+
+                    await model.organizationModel.destroy({ where: { status: isExisted.org_id } }, { transaction: transaction });
+                    const oldNotes = await model.calenderNoteModel.findAll({ where: { OrganizationOrgId: isExisted.org_id } });
+                    for (const oldNote of oldNotes) {
+                        await oldNote.update({
+                            date_value: [newOrganization.start_date, newOrganization.end_date].join(" to "),
+                            OrganizationOrgId: newOrganization.org_id
+                        }, { transaction: transaction });
+                    }
                 }
             }
         }

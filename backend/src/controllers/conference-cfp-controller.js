@@ -12,8 +12,12 @@ class ConferenceCFPController {
             const filterConditions = await input.getFilterConditions(req);
             const conferences = await query.CallForPaperQuery.selectAllCallForPapers(filterConditions);
             return res.status(status.OK).json({
-                quantity: conferences.length,
-                data: conferences
+                maxRecords: conferences.maxRecords,
+                maxPages: conferences.maxPages,
+                size: conferences.size,
+                currentPage: conferences.currentPage,
+                count: conferences.count,
+                data: conferences.data
             });
 
         } catch (err) {

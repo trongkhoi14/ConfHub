@@ -5,16 +5,26 @@ require('dotenv').config();
 
 const selectAllPosts = async function (filterConditions) {
     try {
-        const postedConferenceIDs = await model.postModel.findAll({
+        const postedConferenceIDs = await model.postModel.findAndCountAll({
             attributes: ['CallForPaperCfpId'],
             where: { UserId: filterConditions.userID },
             limit: filterConditions.size,
             offset: filterConditions.offset
         });
 
-        return await Promise.all(postedConferenceIDs.map(async (id) => {
+        const postedConferences = await Promise.all(postedConferenceIDs.rows.map(async (id) => {
             return await CallForPaperQuery.selectCallForPaper(id.CallForPaperCfpId);
         }));
+
+        const maxRecords = postedConferenceIDs.count
+        return {
+            maxRecords: maxRecords,
+            maxPages: Math.ceil(maxRecords / filterConditions.size),
+            size: filterConditions.size,
+            currentPage: filterConditions.page,
+            count: postedConferences.length,
+            data: postedConferences
+        }
 
     } catch (error) {
         throw (error);

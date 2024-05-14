@@ -105,25 +105,27 @@ const updateDates = async function (conference, transaction) {
                 }
 
             } else if (isExisted) {
-                const newDate = await model.importantDateModel.create({
-                    date_type: element.date_type,
-                    date_value: element.date_value,
-                    CallForPaperCfpId: conference.cfp_id
-                }, { transaction: transaction });
-
-                await isExisted.update(
-                    { status: newDate.date_id },
-                    { where: { date_id: isExisted.date_id } },
-                    { transaction: transaction }
-                );
-
-                await model.importantDateModel.destroy({ where: { status: isExisted.date_id } }, { transaction: transaction });
-                const oldNotes = await model.calenderNoteModel.findAll({ where: { ImportantDateDateId: isExisted.date_id } });
-                for (const oldNote of oldNotes) {
-                    await oldNote.update({
-                        date_value: newDate.date_value,
-                        ImportantDateDateId: newDate.date_id
+                if (isExisted.date_type !== element.date_type || isExisted.date_value !== element.date_value) {
+                    const newDate = await model.importantDateModel.create({
+                        date_type: element.date_type,
+                        date_value: element.date_value,
+                        CallForPaperCfpId: conference.cfp_id
                     }, { transaction: transaction });
+
+                    await isExisted.update(
+                        { status: newDate.date_id },
+                        { where: { date_id: isExisted.date_id } },
+                        { transaction: transaction }
+                    );
+
+                    await model.importantDateModel.destroy({ where: { status: isExisted.date_id } }, { transaction: transaction });
+                    const oldNotes = await model.calenderNoteModel.findAll({ where: { ImportantDateDateId: isExisted.date_id } });
+                    for (const oldNote of oldNotes) {
+                        await oldNote.update({
+                            date_value: newDate.date_value,
+                            ImportantDateDateId: newDate.date_id
+                        }, { transaction: transaction });
+                    }
                 }
             }
         }

@@ -2,10 +2,7 @@ const { DataTypes, Model } = require('sequelize');
 const sequelize = require('./../config/database');
 
 class Notification extends Model {
-    constructor(payload) {
-        this.title = payload.title
-        this.message = payload.message
-    }
+
 }
 
 Notification.init({
@@ -26,8 +23,7 @@ Notification.init({
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     stime: {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+        type: DataTypes.DATE
     },
     status: {
         type: DataTypes.BOOLEAN,

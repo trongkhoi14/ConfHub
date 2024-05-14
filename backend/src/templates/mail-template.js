@@ -1,4 +1,3 @@
-const { formatDate } = require('../utils/date-handler');
 const { RandomNumber } = require('../utils/number-handler');
 require('dotenv').config();
 
@@ -7,10 +6,8 @@ const setMessage = function (payload) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an upcoming event that is scheduled to take place soon:</p>
-                <ul>
-                <li>${payload.confName}</li>
-                <li>${payload.date}</li>
-                </ul>
+                <p>Conference: <b>${payload.confName}</b></p>
+                <p>Detail: <b>${payload.detail}</b></p>
                 <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
@@ -18,10 +15,8 @@ const setMessage = function (payload) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an updated event from a conference you are following:</p>
-                <ul>
-                <li>${payload.confName}</li>
-                <li>${payload.date}</li>
-                </ul>
+                <p>Conference: <b>${payload.confName}</b></p>
+                <p>Detail: <b>${payload.detail}</b></p>
                 <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
@@ -29,10 +24,8 @@ const setMessage = function (payload) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an cancelled event of one of your followed conference:</p>
-                <ul>
-                <li>${payload.confName}</li>
-                <li>${payload.date}</li>
-                </ul>
+                <p>Conference: <b>${payload.confName}</b></p>
+                <p>Detail: <b>${payload.detail}</b></p>
                 <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
@@ -40,8 +33,8 @@ const setMessage = function (payload) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an cancelled conference that you are following:</p>
-                <p>${payload.conference}</p>
-                <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
+                <p>${payload.confName}</p>
+                <p>From now on, you will no longer find any information about this conference on ConferenceHub. Sorry for this inconvenience.</p>
                 `
     }
 }

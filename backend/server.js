@@ -7,6 +7,8 @@ const { dataSeeding } = require('./src/seeders/data-seeding');
 const { notFound, errorHandler } = require('./src/middlewares/errorHandling');
 const { rateLimiter } = require('./src/utils/rate-limiter');
 const { infoLogger } = require('./src/utils/logger');
+const NotificationController = require('./src/controllers/notification-controller');
+var cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
@@ -39,8 +41,14 @@ router(app);
 app.use(notFound);
 app.use(errorHandler);
 
-// schedule crawl data
+// send upcoming notification
+cron.schedule("0 */12 * * *", async () => {
+	console.log("[" + new Date() + "] Sending email notifications...");
+	NotificationController.sendUpcoming();
+}, {
+	timezone: "Asia/Ho_Chi_Minh"
+});
 
 app.listen(port, () => {
-  console.log(`Server was running on port ${port}`);
-})
+	console.log(`Server was running on port ${port}`);
+});

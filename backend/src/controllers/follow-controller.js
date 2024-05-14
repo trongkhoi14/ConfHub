@@ -11,20 +11,26 @@ class followController {
     getFollowedConferences = asyncHandler(async (req, res, next) => {
         try {
             const filterConditions = await input.getFilterConditions(req);
-            const followedConferenceIDs = await model.followModel.findAll({
+            const followedConferenceIDs = await model.followModel.findAndCountAll({
                 where: { UserId: filterConditions.userID },
                 limit: filterConditions.size,
                 offset: filterConditions.offset
             });
-            const followedConferences = await Promise.all(followedConferenceIDs.map(async (id) => {
+            const followedConferences = await Promise.all(followedConferenceIDs.rows.map(async (id) => {
                 const conference = await query.CallForPaperQuery.selectCallForPaper(id.CallForPaperCfpId);
                 return {
                     followId: id.tid,
                     callForPaper: conference
                 }
             }));
+
+            const maxRecords = followedConferenceIDs.count
             return res.status(status.OK).json({
-                quantity: followedConferences.length,
+                maxRecords: maxRecords,
+                maxPages: Math.ceil(maxRecords / filterConditions.size),
+                size: filterConditions.size,
+                currentPage: filterConditions.page,
+                count: followedConferences.length,
                 data: followedConferences
             });
         } catch (err) {

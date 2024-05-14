@@ -10,11 +10,15 @@ class postController {
     getAllPosts = asyncHandler(async (req, res, next) => {
         try {
             const filterConditions = await input.getFilterConditions(req);
-            const postedConferences = await query.PostQuery.selectAllPosts(filterConditions);
+            const posts = await query.PostQuery.selectAllPosts(filterConditions);
 
             return res.status(status.OK).json({
-                quantity: postedConferences.length,
-                data: postedConferences,
+                maxRecords: posts.maxRecords,
+                maxPages: posts.maxPages,
+                size: posts.size,
+                currentPage: posts.currentPage,
+                count: posts.count,
+                data: posts.data
             });
         } catch (err) {
             next(err);
@@ -81,7 +85,7 @@ class postController {
 
             await query.PostQuery.insertPost(conference);
             return res.status(status.OK).json({
-                message: "Add new post successfully."
+                message: "Add new post with no natural key successfully."
             });
 
         } catch (err) {
