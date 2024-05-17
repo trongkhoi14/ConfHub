@@ -10,7 +10,7 @@ const CustomAccordionDates = ({ children, eventKey, onClick }) => {
       return (
         <Button
           type="button"
-          className='bg-blue-light border border-1 w-100 text-start'
+          className='bg-blue-light border border-1 w-100 text-start text-primary-emphasis'
           onClick={decoratedOnClick}
         >
           {children}

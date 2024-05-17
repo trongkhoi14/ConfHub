@@ -23,12 +23,21 @@ export function formatDateFilter(date) {
 }
 
 export function getDateValue(date_type, list) {
-  const foundDate = list.find(date => date.date_type.includes(date_type));
-  if (foundDate) {
-    return foundDate.date_value;
-  } else {
-    return "NaN";
-  }
+  const filteredDates = list
+    .filter(
+      (date) =>
+        date.date_type.toLowerCase().includes(date_type) &&
+        date.status.toLowerCase() === 'new'
+    )
+    .map((date) => ({
+      ...date,
+      date_value: new Date(date.date_value),
+    }))
+    .sort((a, b) => a.date_value - b.date_value);
+const result = filteredDates.length > 0 ? filteredDates[0].date_value : 'N/A';
+
+  // Lấy giá trị ngày gần nhất (nếu có)
+  return formatDate(result)
 }
 
 

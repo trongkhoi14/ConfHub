@@ -29,3 +29,6 @@ export const ADD_FILTER = 'ADD_FILTER';
 export const REMOVE_FILTER = 'REMOVE_FILTER';
 export const CLEAR_FILTERS = 'CLEAR_FILTERS';
 export const GET_RESULT_AFTER_FILTER = 'GET_RESULT_AFTER_FILTER';
+
+
+export const GET_NOTES = 'GET_NOTES'

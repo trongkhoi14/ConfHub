@@ -8,6 +8,7 @@ import useLocalStorage from '../../hooks/useLocalStorage'
 import Filter from '../../components/Filter/Filter'
 import Loading from '../../components/Loading'
 import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
+import ResultFilter from '../../components/Filter/ResultFilter'
 
 const Followed = () => {
   const { listFollowed, getListFollowedConferences } = useFollow()
@@ -48,7 +49,7 @@ const Followed = () => {
           <div style={{ width: "1000px" }}>
           <Filter/>
         </div>
-            <Conference conferencesProp={displayConferences} width={960} />
+            <ResultFilter conferencesProp={displayConferences} width={960} />
           </>
           :
           <p>{`You haven't followed any conferences yet. `}</p>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Col } from 'react-bootstrap';
 import data from './../Filter/options.json'
-const LocationInput = ({ onLocationChange }) => {
+const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) => {
     
     const [formData, setFormData] = useState({
         numberStreet: '',
@@ -12,15 +12,19 @@ const LocationInput = ({ onLocationChange }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
         setFormData(prevState => ({
             ...prevState,
             [name]: value
         }));
-        const { numberStreet, stateProvince, city, country } = formData;
-        
-        const location = `${numberStreet}, ${stateProvince}, ${city}, ${country}`;
-        onLocationChange(location);
     };
+
+    useEffect(() => {
+        const { numberStreet, stateProvince, city, country } = formData;
+        const locationArray = [numberStreet, stateProvince, city, country].filter(Boolean);
+        const location = locationArray.join(", ");
+        onLocationChange(location);
+    }, [formData]);
 
     return (
         <>

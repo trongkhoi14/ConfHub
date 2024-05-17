@@ -22,6 +22,7 @@ const getUniqueConferences = (list) => {
     const newlist = Object.values(list);
     const mergedList = [].concat(...newlist);
     const uniqueValues = Array.from(new Set(mergedList.map(JSON.stringify))).map(JSON.parse);
+    const count = uniqueValues.length
     return uniqueValues
   }
   else return []

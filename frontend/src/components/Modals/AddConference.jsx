@@ -9,12 +9,15 @@ import AccordionDates from '../PostConference/AccordionDates';
 import SuccessfulModal from './SuccessModal';
 import LocationInput from '../PostConference/LocationInput';
 
-const AddConference = ({ show, handleClose, handleCheckStatus }) => {
+const AddConference = ({ show, handleClose, handleCheckStatus, onReloadList }) => {
     const {postConference, getPostedConferences} = usePost()
     const { items, dateListByRound, mergeDatesByRound, addDateToRound, addItem, deleteItem } = useAccordionDates()
     const [page, setPage] = useState(0)
     const [isPosted, setIsPosted] = useState(false)
-
+    const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState(false)
+    const [error, setError] = useState(false)
+    const [statusPost, setstatusPost] =useState(false)
     const [formData, setFormData] = useState({
         conf_name: '',
         acronym: '',
@@ -100,10 +103,12 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
     }
     const handleDatesUpdate = () => {
         const merged = mergeDatesByRound()
+        console.log({merged})
         setFormData(prevFormData => ({
             ...prevFormData,
             importantDates: merged,
         }));
+        return merged
     }
 
     const handleClearForm = () => {
@@ -125,7 +130,8 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
         setPage(0)
     }
     const handleFormSubmit = async () => {
-        await handleDatesUpdate()
+        const importants = await handleDatesUpdate()
+        console.log({importants})
         let allValid = true
         for (const field in requiredFields) {
             if (formData[field] === '' || formData[field] === undefined || (field === 'fieldsOfResearch' && formData[field].length === 0)) {
@@ -137,36 +143,25 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                 requiredFields[field] = true
             }
         }
-        console.log(formData)
         if (allValid) {
-            console.log(formData)
-            const response = await postConference(formData)
-            console.log('status', response)
-            if (response.message.includes("successful")) {
-                handleCheckStatus(true, response.message)
-                getPostedConferences()
+            setLoading(true)
+            setIsPosted(true)
+            
+            const {status, message} = await postConference(formData)            
+            setLoading(false)
+            console.log({status, formData})
+            setMessage(message)
+            setstatusPost(status)
+            if (status) {
+                handleCheckStatus(true, message)
+                onReloadList()                
+                handleCloseForm()
             } else {
-                handleCheckStatus(true, response.message)
-                setIsPosted(true)
-                setFormData({
-                    conf_name: '',
-                    acronym: '',
-                    callForPaper: '',
-                    link: '',
-                    rank: '',
-                    fieldsOfResearch: [],
-                    organizations: [{
-                        start_date: '',
-                        end_date: '',
-                        type: '',
-                        location: '',
-                    }],
-                    importantDates: [],
-                });
-                //handleCloseForm()
+                setError(true)
+                }
+              
             }
 
-        }
         else {
             setRequiredFields(requiredFields)
             setPage(0)
@@ -190,7 +185,7 @@ const AddConference = ({ show, handleClose, handleCheckStatus }) => {
                 <Modal.Body className="modal-scrollable-content m-0"
                     style={{ minHeight: '400px', maxHeight: '80vh' }}>
 
-                    {isPosted && <SuccessfulModal handleCloseForm={handleClose} />}
+                    {isPosted && statusPost && <SuccessfulModal handleCloseForm={handleClose} message={message}/>}
                     <Form className='px-5'>
                         <div className="modal-scrollable-body">
                             <Carousel activeIndex={page} onSelect={handleSelect} controls={false} interval={null} indicators={false}>

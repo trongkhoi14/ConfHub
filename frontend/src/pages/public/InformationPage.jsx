@@ -31,7 +31,15 @@ const InformationPage = () => {
         <Row className='bg-blue-light py-3 ps-5'>
 
           <Col xs={4}>Location:</Col>
-          <Col className='fw-bold'>{conference.organizations.length >0 ? conference.organizations[0].location : 'N/A'}</Col>
+          <Col className='fw-bold'>
+          {conference.organizations.length > 0 ? (
+        // Nếu location không null, hiển thị giá trị của nó
+        <>{conference.organizations[0].location || 'Updating...'}</>
+      ) : (
+        // Nếu location null, hiển thị 'updating'
+        <>Updating</>
+      )}
+          </Col>
         </Row>
         <Row className='py-3 ps-5'>
           <Col xs={4}>Conference date:</Col>

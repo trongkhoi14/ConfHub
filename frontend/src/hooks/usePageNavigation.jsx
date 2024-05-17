@@ -12,7 +12,7 @@ const usePageNavigation = () => {
     };
 
     // Xử lý trước khi làm mới trang
-    const handleBeforeUnloadEvent = (event) => {
+    const handleBeforeUnloadEvent = () => {
       
       handleBeforeUnload();
       

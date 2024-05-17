@@ -11,6 +11,7 @@ import useFilter from '../../hooks/useFilter'
 import SuccessfulModal from '../../components/Modals/SuccessModal'
 import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
 import Loading from '../../components/Loading'
+import ResultFilter from '../../components/Filter/ResultFilter'
 
 const YourConf = () => {
   const [showAddForm, setShowAddForm] = useState(false)
@@ -66,7 +67,7 @@ const YourConf = () => {
           Add
         </Button>
       </div>
-      <AddConference show={showAddForm} handleClose={handleClose} handleCheckStatus={handleCheckStatus}/>
+      <AddConference show={showAddForm} handleClose={handleClose} handleCheckStatus={handleCheckStatus} onReloadList={getPostedConferences}/>
       {showSuccess && <SuccessfulModal message={message} show={showSuccess} handleClose={()=>setShowSuccess(false)}/>}
     {
       postedConferences && postedConferences.length > 0
@@ -80,7 +81,7 @@ const YourConf = () => {
             :
             <>
               <Filter/>
-              <Conference conferencesProp={displayConferences} width={960} />
+              <ResultFilter conferencesProp={displayConferences} width={960} />
             </>
           }
         </>

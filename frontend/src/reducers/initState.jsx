@@ -69,5 +69,8 @@ export const initialState = {
     category: [],
   },
   
+
+  //notes
+  notes: []
 };
 

@@ -7,7 +7,9 @@ import useLocalStorage from './useLocalStorage'
 import { useState } from 'react'
 import useConference from './useConferences'
 import useFollow from './useFollow'
+import { getNotes } from '../actions/noteAction'
 const useNote = () => {
+  const {state, dispatch} = useAppContext()
   const { listFollowed } = useFollow()
   const { user } = useLocalStorage()
   const { token } = useToken()
@@ -29,9 +31,19 @@ const useNote = () => {
       if (conferenceType.toLowerCase().includes('conference')) {
         return 'conference-event';
       }
-    return '';
+    return 'note-event';
   };
-  
+  const toCamelCase = (str) => {
+    return str
+        .toLowerCase()
+        .split('-')
+        .map((word, index) => 
+            index === 0 
+            ? word 
+            : word.charAt(0).toUpperCase() + word.slice(1)
+        )
+        .join('');
+};
   const extractDataByOrgId = (conferencesList, notesList) => {
     const extractedData = [];
 
@@ -41,19 +53,21 @@ const useNote = () => {
             conf_id: null,
             note: null,
             date_id: null,
-            date_value: null,
+            start_date: null,
+            end_date: null,
             date_type: null,
-            subStyle: null
+            subStyle: null,
         };
-
         if (note.ImportantDateDateId) {
             for (const conference of conferencesList) {
+              
                 for (const importantDate of conference.importantDates) {
                     if (importantDate.date_id === note.ImportantDateDateId) {
                         extractedItem.note = conference.information.name;
                         extractedItem.conf_id = conference.id
-                        extractedItem.date_type = importantDate.date_type;
-                        extractedItem.date_value = importantDate.date_value;
+                        extractedItem.date_type = toCamelCase(importantDate.date_type);
+                        extractedItem.end_date = importantDate.date_value;
+                        extractedItem.start_date = importantDate.date_value;
                         extractedItem.subStyle = getSubStyle(importantDate.date_type)
                         
                     }
@@ -63,25 +77,33 @@ const useNote = () => {
             for (const conference of conferencesList) {
                 for (const organization of conference.organizations) {
                     if (organization.org_id === note.OrganizationOrgId) {
-                        extractedItem.date_type = 'conference-date';
-                        extractedItem.date_value = `${organization.start_date} to ${organization.end_date}`;
+                        extractedItem.date_type = 'Conference date';
+                        extractedItem.start_date = organization.start_date;
+                        extractedItem.end_date = organization.end_date;
                         extractedItem.conf_id = conference.id;
                         extractedItem.note = conference.information.name;
                         extractedItem.date_id = organization.org_id;
-                        extractedItem.subStyle = getSubStyle('conference')
+                        extractedItem.subStyle = 'conference-event'
                     }
                 }
             }
         } else {
-            extractedItem.date_type = 'note-event';
-            extractedItem.date_value = note.date_value;
+            extractedItem.date_type = 'Your note';
+            extractedItem.start_date = note.date_value;
+            extractedItem.end_date = note.date_value;
             extractedItem.note = note.note;
             extractedItem.subStyle = 'note-event';
         }
-
-        // Cập nhật subStyle
-
-        extractedData.push(extractedItem);
+        // Kiểm tra xem đã tồn tại object có các thuộc tính giống với object mới không
+        const isDuplicate = extractedData.some(item => (
+          item.date_type === extractedItem.date_type &&
+          item.conf_id === extractedItem.conf_id &&
+          item.start_date === extractedItem.start_date
+        ));
+        if (!isDuplicate) {
+          extractedData.push(extractedItem);
+        }
+        
     }
     
     return extractedData
@@ -105,17 +127,18 @@ const useNote = () => {
         const newDataByOrgId = extractDataByOrgId(listFollowed, data.data);
         console.log({newDataByOrgId})
         setNotes(newDataByOrgId)
-        
-      setLoading(false)
-      console.log('loading', loading)
+        dispatch(getNotes(newDataByOrgId))
+        setLoading(false)
+        console.log('loading', loading)
       }
       
   }
 
 
   const updateNote = async (id, note) => {
+    setLoading(true)
     const updateData = {
-      note: note[id]
+      note: note
     }
     if(user){
       const response = await fetch(`${baseURL}/note/${id}`, {
@@ -127,13 +150,13 @@ const useNote = () => {
         },
         body: JSON.stringify(updateData)
       });
+      const data = await response.json();    
       if (!response.ok) {
         throw new Error(response.message);
       }
       else {
-
-        const data = await response.json();    
-        return data
+        const message = data.message
+        return {status: true, message}
       }
     }
   }
@@ -156,13 +179,14 @@ const useNote = () => {
           throw new Error(response.message);
         }
         else {
-
-          const data = await response.json();    
-          return data
+          const data = await response.json();   
+          const message = data.message
+          return {status: true, message}
         }
       }
   }
   const deleteNote = async (id) => {
+    setLoading(true)
     if(user){
         const response = await fetch(`${baseURL}/note/${id}`, {
           method: 'DELETE',
@@ -170,18 +194,19 @@ const useNote = () => {
             'Authorization': `Bearer ${token}`
           },
         });
+        
+        const data = await response.json();  
         if (!response.ok) {
           throw new Error(response.message);
         }
         else {
-
-          const data = await response.json();    
-          return data
+          const message = data.message
+          return {status: true, message}
         }
       }
   }
     return {
-        notes: notes,
+        notes: state.notes,
         loading,
         getAllNotes,
         updateNote,

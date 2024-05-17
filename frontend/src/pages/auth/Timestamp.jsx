@@ -1,29 +1,30 @@
 
 import { Col, Container, Form, Row } from 'react-bootstrap';
-import Calendar from '../../components/Calendar/Calendar';
-import { useEffect, useState } from 'react';
-import useConference from '../../hooks/useConferences';
+import { useEffect} from 'react';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import useNote from '../../hooks/useNote';
 import useFollow from '../../hooks/useFollow';
+import EventCalendar from '../../components/Calendar/EventCalendar';
+import { useLocation } from 'react-router-dom';
 
 const Timestamp = () => {
-  const {  conferences, handleGetList} = useConference()
-  const { notes, getAllNotes } = useNote()
+  const {pathname} = useLocation()
+  const { notes, getAllNotes} = useNote()
   const {listFollowed, getListFollowedConferences} = useFollow()
   const {user} = useLocalStorage()
-
 
   useEffect(() => {
     const fetchData = async () => {
       await getListFollowedConferences();
+      await getAllNotes()
     };
-    if(listFollowed.length ===0){
+    console.log({listFollowed, notes})
+    if(listFollowed.length ===0 || notes.length === 0){
 
       fetchData();
     }
     
-  }, [user]);
+  }, [user, listFollowed]);
   
   return (
     <Container
@@ -36,11 +37,12 @@ const Timestamp = () => {
           type="switch"
           id="custom-switch"
           label="Automatically add conference events to the schedule"
+          value={true}
         />
       </div>
       <Row>
         <Col xs="9">
-          <Calendar noteList={notes}/>
+          <EventCalendar notes={notes}/>
         </Col>
         <Col xs="3" className='ps-3'>
           <Row className='align-items-center'>

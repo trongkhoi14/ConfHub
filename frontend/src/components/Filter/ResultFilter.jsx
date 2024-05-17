@@ -2,30 +2,29 @@ import { useEffect, useState } from 'react'
 import { Container, Card, Button, Image, Stack } from 'react-bootstrap'
 import ReactPaginate from 'react-paginate'
 
-import UnfollowIcon from './../assets/imgs/unfollow.png'
-import FollowIcon from './../assets/imgs/follow.png'
-import TimeIcon from './../assets/imgs/time.png'
-import LocationIcon from './../assets/imgs/location.png'
-import { useLocation, useNavigate } from 'react-router-dom'
-import useConference from '../hooks/useConferences'
-import useAuth from '../hooks/useAuth'
-import useFollow from '../hooks/useFollow'
-import { isObjectInList } from '../utils/checkExistInList'
+import UnfollowIcon from './../../assets/imgs/unfollow.png'
+import FollowIcon from './../../assets/imgs/follow.png'
+import TimeIcon from './../../assets/imgs/time.png'
+import LocationIcon from './../../assets/imgs/location.png'
+import { useNavigate } from 'react-router-dom'
+import useConference from '../../hooks/useConferences'
+import useFollow from '../../hooks/useFollow'
+import { isObjectInList } from '../../utils/checkExistInList'
 
-import useFilter from '../hooks/useFilter'
-import { DropdownSort } from './DropdownSort'
-import { isUpcoming, sortByFollow, sortConferences } from '../utils/sortConferences'
+import useFilter from '../../hooks/useFilter'
+import { DropdownSort } from './../DropdownSort'
+import { isUpcoming, sortByFollow, sortConferences } from '../../utils/sortConferences'
 
-import ArrowIcon from './../assets/imgs/arrow.png'
-import Loading from './Loading'
-import { getDateValue } from '../utils/formatDate'
-import useLocalStorage from '../hooks/useLocalStorage'
+import ArrowIcon from './../../assets/imgs/arrow.png'
+import Loading from './../Loading'
+import { getDateValue } from '../../utils/formatDate'
+import useLocalStorage from '../../hooks/useLocalStorage'
 
-const Conference = ({ conferencesProp, width }) => {
-    const {user} = useLocalStorage()
+const ResultFilter = ({ conferencesProp, width }) => {
     const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
     const { resultFilter, appliedFilterResult, optionsSelected, getOptionsFilter } = useFilter()
-    const { total, handleGetList } = useConference()
+    const {handleGetList} = useConference()
+    const {user} = useLocalStorage()
     const navigate = useNavigate()
     const [page, setPage] = useState(0)
     const [fetchCount, setFetchCount] = useState(0);
@@ -33,42 +32,34 @@ const Conference = ({ conferencesProp, width }) => {
     const [copiedConferences, setcopiedConferences] = useState([])
     const [displayConferences, setDisplayedConferences] = useState([])
     const [loading, setLoading] = useState(false)
+    const usersPerPage = 7;
+    const pagesVisited = page * usersPerPage;
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true)
+            getListFollowedConferences()
+            setLoading(false)
+            getOptionsFilter("", [])
+            
+            if(conferencesProp.length ===0 || !conferencesProp){
+                await handleGetList()
+            }
 
-    const fetchData = async () => {
-        setLoading(true)
-        getListFollowedConferences()
-        setLoading(false)
-        getOptionsFilter("", [])
-
-        if (conferencesProp.length === 0 || !conferencesProp) {
-            await handleGetList(page + 1)
         }
-
-    }
-
-    useEffect(() => {
-        console.log({ page })
-        handleGetList(page + 1)
-
-    }, [page])
-
-    useEffect(() => {
-
 
         if (fetchCount < 1) {
             fetchData()
             setFetchCount(fetchCount + 1);
         }
         setLoading(false)
-
-
+        
+        
         const sortedByFollow = sortByFollow(conferencesProp, listFollowed)
         setDisplayedConferences([...sortedByFollow])
         setcopiedConferences([...sortedByFollow])
     }, [fetchCount, conferencesProp, page, optionsSelected, listFollowed, resultFilter]);
-
+    
     const handlePageClick = (event) => {
-        console.log({ event })
         setPage(event.selected)
         // Cuộn lên đầu danh sách khi chuyển trang
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -110,16 +101,14 @@ const Conference = ({ conferencesProp, width }) => {
         }
 
     };
-
     const getLengthString = (string) => string.length
-
     return (
         <Container className='d-flex flex-column align-items-center p-0'>
 
             <div className="mb-3 px-4 d-flex align-items-center justify-content-between w-100">
                 <div className="h5 fw-bold">
                     Conferences
-                    <span className='fw-normal'> ({total}) </span>
+                    <span className='fw-normal'> ({displayConferences.length}) </span>
                 </div>
                 <DropdownSort
                     options={["Random", "Upcoming", "Name A > Z", "Latest"]}
@@ -132,6 +121,7 @@ const Conference = ({ conferencesProp, width }) => {
                     ?
 
                     (displayConferences
+                        .slice(pagesVisited, pagesVisited + usersPerPage)
                         .map(conf => (
                             <Card
                                 className='my-conf-card'
@@ -226,16 +216,16 @@ const Conference = ({ conferencesProp, width }) => {
                     )
                     :
                     <>
-                        <Loading onReload={handleGetList} />
+                        <Loading  onReload={handleGetList}/>
                     </>
             }
             <ReactPaginate
                 breakLabel="..."
                 nextLabel=">"
                 onPageChange={handlePageClick}
-                pageRangeDisplayed={4}
+                pageRangeDisplayed={3}
                 marginPagesDisplayed={1}
-                pageCount={Math.ceil(total / 10)}
+                pageCount={Math.ceil(displayConferences.length / usersPerPage)}
                 previousLabel="<"
                 renderOnZeroPageCount={null}
                 containerClassName="justify-content-center pagination"
@@ -254,4 +244,4 @@ const Conference = ({ conferencesProp, width }) => {
     )
 }
 
-export default Conference
+export default ResultFilter

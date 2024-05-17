@@ -42,10 +42,12 @@ const usePost = () => {
           },
           body: JSON.stringify( conference ),
         });
-  
+        const data = response.json()        
+        const message = data.message
         if (response.ok) {
-          return response.json()
+          return {status: true, message}
         }
+        else return {status: false, message}
       } catch (error) {
         throw new Error('Network response was not ok');
       }

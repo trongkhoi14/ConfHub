@@ -27,13 +27,14 @@ const AllFeedbackOfConf = () => {
         getAllFeedbacks()
     },[])
     useEffect(()=>{        
-        const handleGetFeedbacks = async (id) => {
-            const response = await getAllFeedbacks(id)
+        const handleGetFeedbacks = async () => {
+            
+            const idinpathname = await getIdFromPathname(pathname)
+            const response = await getAllFeedbacks(idinpathname)
             console.log({response})
             setDisplayfeedback(response.rows)
         }   
-        const idinpathname = getIdFromPathname(pathname)
-        handleGetFeedbacks(idinpathname)
+        handleGetFeedbacks()
     },[pathname, user])
     const options = [
         { value: 'ratingAscending', label: 'Rating Ascending' },

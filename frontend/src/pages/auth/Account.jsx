@@ -59,7 +59,6 @@ const Account = () => {
     // Gửi formData đến API tại đây
     updateProfile(formData)
     setIsUpdated(false)
-    window.location.reload()
   };
   return (
     <Container

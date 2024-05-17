@@ -5,7 +5,7 @@ import { baseURL } from './api/baseApi'
 import { formatDateFilter } from '../utils/formatDate'
 import { convertToLowerCaseFirstLetter } from '../utils/formatWord'
 import { requestApi } from '../actions/actions'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useToken from './useToken'
 import { useLocation } from 'react-router-dom'
 import useConference from './useConferences'
@@ -18,6 +18,7 @@ const useFilter = () => {
   const {conferences} = useConference()
   const { listFollowed} = useFollow()
   const {postedConferences} = usePost()
+  const [total, setTotal] = useState(0)
   const location = useLocation()  
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -35,10 +36,12 @@ const useFilter = () => {
 
   const getOptionsFilter = async (label, staticData) => {
     const params = ["source", "for", "acronym", "rank"];
+    const options = state.filterOptions
     if (label === "") {
       for (const param of params) {
         if (param === "acronym") {
           try {
+            
             const response = await fetch(`${baseURL}/conf/${param}`);
             const data = await response.json();
             // Gửi action để cập nhật dữ liệu cho label hiện tại
@@ -60,6 +63,7 @@ const useFilter = () => {
             console.error(`Error fetching data for ${param}:`, error);
           }
         }
+       
       }
     }
     else {
@@ -131,12 +135,16 @@ const useFilter = () => {
     } else {
         apiUrl += `/conference?${label}=${keyword}`;
     }
+    const headers = {};
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
 
     return await fetch(apiUrl, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    })
+      method: 'GET',
+      headers: headers,
+      })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -146,6 +154,7 @@ const useFilter = () => {
         .then(data => {
             // Xử lý dữ liệu khi nhận được response
             dispatch(getResult(label, data.data));
+            setTotal(data.maxRecods)
             return data.data;
         })
         .catch(error => {
@@ -176,6 +185,7 @@ const getQuantity = (conferenceList) => {
     appliedFilterResult: state.appliedFilterResult,
     filterOptionsAuth: state.filterOptionsAuth,
     resultFilter: state.resultFilter,
+    total,
     getOptionsFilter,
     addKeywords,
     sendFilterDate,

@@ -5,7 +5,7 @@ import usePost from '../../hooks/usePost';
 
 function SuccessfulModal({ message, show, handleClose }) {
 
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(2);
 
   useEffect(() => {
     if (show) {
@@ -13,11 +13,11 @@ function SuccessfulModal({ message, show, handleClose }) {
         setCountdown(prevCountdown => prevCountdown - 1);
       }, 1000);
 
-      // Đóng modal sau 5 giây
+      // Đóng modal sau 3 giây
       setTimeout(() => {
         handleClose()
-        setCountdown(5); // Reset thời gian đếm ngược
-      }, 5000);
+        setCountdown(2); // Reset thời gian đếm ngược
+      }, 2000);
 
       // Hủy bỏ timer khi component unmount
       return () => {
@@ -27,7 +27,7 @@ function SuccessfulModal({ message, show, handleClose }) {
   }, []);
 
   const handleCloseSuccessModal = () => {
-    setCountdown(5); // Reset thời gian đếm ngược
+    setCountdown(2); // Reset thời gian đếm ngược
   };
 
   return (
@@ -36,9 +36,6 @@ function SuccessfulModal({ message, show, handleClose }) {
         <Modal.Header closeButton>
           <Modal.Title className='text-success text-center w-100'>Success</Modal.Title>
         </Modal.Header>
-        <Modal.Body className='text-success'>
-          {message}
-        </Modal.Body>
         <Modal.Footer>
 
           {show && <p>Auto closing in {countdown} seconds</p>}

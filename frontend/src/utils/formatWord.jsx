@@ -1,6 +1,16 @@
-const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+const capitalizeFirstLetter = (string) => {
+  if(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  else return 'N/I'
+}
+
 const convertToLowerCaseFirstLetter = (str) => {
-  return str.replace(/\b\w/g, (match) => match.toLowerCase());
+  if(str){
+
+    return str.replace(/\b\w/g, (match) => match.toLowerCase());
+  }
+  else return 'N/I'
 }
 const formatLabel = (label) => {
     // Chuyển đổi 'submissionDate' thành 'Submission Date'

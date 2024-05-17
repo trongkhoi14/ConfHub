@@ -145,6 +145,11 @@ const appReducer = (state, action) => {
                 ...state,
                 listFollowed: state.listFollowed.filter(item => item.id !== action.payload.id),
             };
+        case actionTypes.GET_NOTES:
+            return {
+                ...state,
+                notes: action.payload,
+            };
         default:
             return state;
     }
