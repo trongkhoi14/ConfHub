@@ -1,14 +1,15 @@
 const model = require('../models');
 const query = require('../utils/queries.js');
 const { status } = require('../constants/index.js');
-const { sendUpcomingNotification } = require('../utils/notification-handler.js');
+const { sendNotifications, selectUpcomingEvents } = require('../services/notification-services.js');
 const asyncHandler = require('express-async-handler');
 require('dotenv').config();
 
 class NotificationController {
-    static sendUpcoming = asyncHandler(async (req, res, next) => {
+    static sendUpcomingNotification = asyncHandler(async (req, res, next) => {
         try {
-            await sendUpcomingNotification();
+            const events = await selectUpcomingEvents();
+            await sendNotifications(events);
         } catch (err) {
             throw (err);
         }
@@ -31,6 +32,10 @@ class NotificationController {
         try {
             const notiID = req.params?.id;
             const notification = await query.NotificationQuery.selectNotification(notiID);
+            if (!notification.read_status) {
+                notification.read_status = true;
+                await notification.save();
+            }
             return res.status(status.OK).json({
                 data: notification
             });

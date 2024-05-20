@@ -1,12 +1,23 @@
+const { getIO, users } = require('../config/socket');
 const model = require('../models');
-const { selectCallForPaper } = require('./cfp-queries');
-const { insertNotification } = require('./notification-queries');
+const { selectCallForPaper } = require('../utils/cfp-queries');
+const { insertNotification } = require('../utils/notification-queries');
 const template = require('../templates');
 const emailService = require('../services/mail-services.js');
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { formatDate } = require('../utils/date-handler');
 require('dotenv').config();
+
+const sendNotificationToUser = (userID, message) => {
+    const socketID = users.get(userID);
+    if (socketID) {
+        const io = getIO();
+        io.to(socketID).emit('notification', message);
+    } else {
+        console.log(`User ${userID} is not connected`);
+    }
+};
 
 const selectUpcomingEvents = async function () {
     const currentDate = new Date();
@@ -28,7 +39,7 @@ const selectUpcomingEvents = async function () {
                 title: process.env.TITLE_UPCOMING_EVENT,
                 cfp_id: date.CallForPaperCfpId,
                 confName: conference.information.name + ' - ' + conference.information.acronym,
-                detail: date.date_type + ': ' + formatDate(date.date_value)
+                detail: '[UPCOMING] ' + date.date_type + ': "' + formatDate(date.date_value) + '"'
             });
         }
     };
@@ -47,15 +58,15 @@ const selectUpcomingEvents = async function () {
                 title: process.env.TITLE_UPCOMING_EVENT,
                 cfp_id: org.CallForPaperCfpId,
                 confName: conference.information.name + ' - ' + conference.information.acronym,
-                detail: 'To be held from ' + formatDate(org.start_date) + ' to ' + formatDate(org.end_date)
-            })
+                detail: org.end_date ? '[UPCOMING] Conference start from "' + formatDate(org.start_date) + ' to ' + formatDate(org.end_date) + '"'
+                    : '[UPCOMING] Conference start from "' + formatDate(org.start_date) + '"'
+            });
         }
     };
     return upcomingEvents;
 };
 
-const sendUpcomingNotification = async function () {
-    const events = await selectUpcomingEvents();
+const sendNotifications = async function (events) {
     for (const event of events) {
         const follows = await model.followModel.findAll({
             where: {
@@ -63,7 +74,7 @@ const sendUpcomingNotification = async function () {
             },
             include: [{ model: model.userModel }],
         });
-
+        console.log(event)
         const message = template.notification.createNotification(event).message;
 
         for (const follow of follows) {
@@ -72,8 +83,14 @@ const sendUpcomingNotification = async function () {
                 message: message,
                 FollowTid: follow.tid
             }
-            const [instance, created] = await insertNotification(notification);
 
+            // send notification
+            const [instance, created] = await insertNotification(notification);
+            if (created) {
+                sendNotificationToUser(follow.UserId, notification);
+            }
+
+            // send mail
             if (!instance.stime) {
                 const mail = {
                     title: event.title,
@@ -83,7 +100,6 @@ const sendUpcomingNotification = async function () {
                 }
                 await emailService.sendingEmail(mail);
                 instance.stime = new Date();
-                instance.status = true;
                 instance.save();
             }
         }
@@ -92,5 +108,7 @@ const sendUpcomingNotification = async function () {
 }
 
 module.exports = {
-    sendUpcomingNotification
-}
+    sendNotificationToUser,
+    selectUpcomingEvents,
+    sendNotifications
+};

@@ -6,6 +6,7 @@ const ImportantDatesQuery = require("./important-date-queries");
 const OrganizationQuery = require("./organization-queries");
 const sequelize = require('../config/database.js');
 const { Op } = require('sequelize');
+const { sendNotifications } = require('../services/notification-services.js');
 require('dotenv').config();
 
 const selectAllCallForPapers = async function (filterConditions) {
@@ -150,8 +151,11 @@ const updateCallForPaper = async function (conference, transaction) {
 
         await model.cfpForModel.destroy({ where: { CallForPaperCfpId: conference.cfp_id } }, { transaction: transaction });
         await FieldOfResearchQuery.insertFieldsOfResearch(conference, transaction)
-        await OrganizationQuery.updateOrganizations(conference, transaction);
-        await ImportantDatesQuery.updateDates(conference, transaction);
+        const notifications1 = await OrganizationQuery.updateOrganizations(conference, transaction);
+        const notifications2 = await ImportantDatesQuery.updateDates(conference, transaction);
+
+        const notifications = [...notifications1, ...notifications2];
+        await sendNotifications(notifications);
 
         return true;
 

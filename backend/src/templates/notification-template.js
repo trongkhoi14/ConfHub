@@ -1,30 +1,32 @@
+require('dotenv').config();
+
 const createNotification = function (payload) {
-    if (payload.title = process.env.TITLE_UPCOMING_EVENT) {
+    if (payload.title === process.env.TITLE_UPCOMING_EVENT) {
         return {
             title: payload.title,
             message:
-                `Dear Sir/Madam, We would like to inform you about an upcoming event that is scheduled to take place soon: ${payload.confName} - ${payload.detail}. Please be prepared to join this event and don't forget to mark your calendar!`
+                `The conference ${payload.confName} that you are followed has an upcoming event. ${payload.detail}.`
         };
     }
-    else if (payload.title = process.env.TITLE_NEW_UPDATED_EVENT) {
+    else if (payload.title === process.env.TITLE_NEW_UPDATED_EVENT) {
         return {
             title: payload.title,
             message:
-                `Dear Sir/Madam, We would like to inform you about an updated event from a conference you are following: ${payload.confName} - ${payload.detail}. Please be prepared to join this event and don't forget to mark your calendar!`
+                `The conference ${payload.confName} that you are followed has new updated. ${payload.detail}.`
         };
     }
-    else if (payload.title = process.env.TITLE_CANCELLED_EVENT) {
+    else if (payload.title === process.env.TITLE_CANCELLED_EVENT) {
         return {
             title: payload.title,
             message:
-                `Dear Sir/Madam, We would like to inform you about an cancelled event of one of your followed conference: ${payload.confName} - ${payload.detail}. Please be prepared to join this event and don't forget to mark your calendar!`
+                `The conference ${payload.confName} that you are followed has cancelled an event. ${payload.detail}.`
         };
     }
-    else if (payload.title = process.env.TITLE_CANCELLED_CONFERENCE) {
+    else if (payload.title === process.env.TITLE_CANCELLED_CONFERENCE) {
         return {
             title: payload.title,
             message:
-                `Dear Sir/Madam, We would like to inform you about an cancelled conference that you are following: ${payload.confName}. From now on, you will no longer find any information about this conference on ConferenceHub. Sorry for this inconvenience.`
+                `The conference ${payload.confName} that you are followed has been deleted from ConferenceHub.`
         };
     }
 }

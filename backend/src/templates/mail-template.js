@@ -2,7 +2,7 @@ const { RandomNumber } = require('../utils/number-handler');
 require('dotenv').config();
 
 const setMessage = function (payload) {
-    if (payload.title = process.env.TITLE_UPCOMING_EVENT) {
+    if (payload.title === process.env.TITLE_UPCOMING_EVENT) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an upcoming event that is scheduled to take place soon:</p>
@@ -11,7 +11,7 @@ const setMessage = function (payload) {
                 <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
-    else if (payload.title = process.env.TITLE_NEW_UPDATED_EVENT) {
+    else if (payload.title === process.env.TITLE_NEW_UPDATED_EVENT) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an updated event from a conference you are following:</p>
@@ -20,7 +20,7 @@ const setMessage = function (payload) {
                 <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
-    else if (payload.title = process.env.TITLE_CANCELLED_EVENT) {
+    else if (payload.title === process.env.TITLE_CANCELLED_EVENT) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an cancelled event of one of your followed conference:</p>
@@ -29,7 +29,7 @@ const setMessage = function (payload) {
                 <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
-    else if (payload.title = process.env.TITLE_CANCELLED_CONFERENCE) {
+    else if (payload.title === process.env.TITLE_CANCELLED_CONFERENCE) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an cancelled conference that you are following:</p>

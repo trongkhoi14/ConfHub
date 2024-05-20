@@ -61,7 +61,7 @@ calenderNoteModel.belongsTo(followModel);
 userModel.hasMany(settingModel, { onDelete: 'CASCADE' });
 settingModel.belongsTo(userModel);
 
-followModel.hasMany(notificationModel, { onDelete: 'CASCADE' });
+followModel.hasMany(notificationModel);
 notificationModel.belongsTo(followModel);
 
 module.exports = {

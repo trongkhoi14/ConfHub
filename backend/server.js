@@ -8,6 +8,8 @@ const { notFound, errorHandler } = require('./src/middlewares/errorHandling');
 const { rateLimiter } = require('./src/utils/rate-limiter');
 const { infoLogger } = require('./src/utils/logger');
 const NotificationController = require('./src/controllers/notification-controller');
+const http = require('http');
+const { initSocket, users } = require('./src/config/socket');
 var cron = require('node-cron');
 require('dotenv').config();
 
@@ -41,14 +43,40 @@ router(app);
 app.use(notFound);
 app.use(errorHandler);
 
+// Create HTTP server and integrate with Socket.IO
+const server = http.createServer(app);
+const io = initSocket(server);
+
+io.on('connection', (socket) => {
+	const userID = socket.handshake.headers['user-id'];
+
+	if (userID) {
+		users.set(userID, socket.id);
+		console.log(`User ${userID} registered with socket ID ${socket.id}`);
+	} else {
+		console.log('No user ID found in headers');
+	}
+
+	socket.on('disconnect', () => {
+		console.log('User disconnected');
+		for (let [userID, socketID] of users) {
+			if (socketID === socket.id) {
+				users.delete(userID);
+				break;
+			}
+		}
+	});
+});
+
 // send upcoming notification
+// cron.schedule('*/1 * * * *', () => {
 cron.schedule("0 */12 * * *", async () => {
-	console.log("[" + new Date() + "] Sending email notifications...");
-	NotificationController.sendUpcoming();
+	console.log("[" + new Date() + "] Sending upcoming notifications emails.");
+	NotificationController.sendUpcomingNotification();
 }, {
 	timezone: "Asia/Ho_Chi_Minh"
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
 	console.log(`Server was running on port ${port}`);
 });

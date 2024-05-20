@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const { isEmpty } = require('../utils/input-handler.js');
 const moment = require('moment');
 const SettingQuery = require('./setting-queries.js');
+const { formatDate } = require('../utils/date-handler');
 require('dotenv').config();
 
 const selectConferenceDates = async function (cfpID, option) {
@@ -50,6 +51,16 @@ const insertDates = async function (conference, transaction) {
 
 const updateDates = async function (conference, transaction) {
     try {
+        let notifications = [];
+        const conferenceDetail = await model.callForPaperModel.findOne({
+            where: {
+                cfp_id: conference.cfp_id
+            },
+            include: [{
+                model: model.conferenceModel
+            }]
+        });
+
         const currentDates = await model.importantDateModel.findAll({
             where: {
                 status: "new",
@@ -67,7 +78,23 @@ const updateDates = async function (conference, transaction) {
                     CallForPaperCfpId: conference.cfp_id
                 }
             });
-            if (isExisted) deleteDateByID(isExisted.date_id);
+            if (isExisted) {
+                deleteDateByID(isExisted.date_id);
+                await model.importantDateModel.destroy({
+                    where: {
+                        date_type: isExisted.date_type,
+                        status: "old",
+                        CallForPaperCfpId: conference.cfp_id
+                    }
+                });
+                // [#hc]
+                notifications.push({
+                    title: process.env.TITLE_CANCELLED_EVENT,
+                    cfp_id: conference.cfp_id,
+                    confName: conferenceDetail.Conference.conf_name,
+                    detail: '[DELETE] ' + isExisted.date_type + ': "' + formatDate(isExisted.date_value) + '"'
+                });
+            }
         }
 
         for (const element of conference.importantDates) {
@@ -103,22 +130,35 @@ const updateDates = async function (conference, transaction) {
                         }
                     }
                 }
+                // [#hc]
+                notifications.push({
+                    title: process.env.TITLE_NEW_UPDATED_EVENT,
+                    cfp_id: conference.cfp_id,
+                    confName: conferenceDetail.Conference.conf_name,
+                    detail: '[NEW] ' + newDate.date_type + ': "' + formatDate(newDate.date_value) + '"'
+                });
 
             } else if (isExisted) {
-                if (isExisted.date_type !== element.date_type || isExisted.date_value !== element.date_value) {
+                if (isExisted.date_value !== element.date_value) {
                     const newDate = await model.importantDateModel.create({
                         date_type: element.date_type,
                         date_value: element.date_value,
                         CallForPaperCfpId: conference.cfp_id
                     }, { transaction: transaction });
 
+                    await model.importantDateModel.destroy({
+                        where: {
+                            date_type: isExisted.date_type,
+                            status: "old",
+                            CallForPaperCfpId: conference.cfp_id
+                        }
+                    }, { transaction: transaction });
+
                     await isExisted.update(
-                        { status: newDate.date_id },
-                        { where: { date_id: isExisted.date_id } },
+                        { status: "old" },
                         { transaction: transaction }
                     );
 
-                    await model.importantDateModel.destroy({ where: { status: isExisted.date_id } }, { transaction: transaction });
                     const oldNotes = await model.calenderNoteModel.findAll({ where: { ImportantDateDateId: isExisted.date_id } });
                     for (const oldNote of oldNotes) {
                         await oldNote.update({
@@ -126,10 +166,17 @@ const updateDates = async function (conference, transaction) {
                             ImportantDateDateId: newDate.date_id
                         }, { transaction: transaction });
                     }
+                    // [#hc]
+                    notifications.push({
+                        title: process.env.TITLE_NEW_UPDATED_EVENT,
+                        cfp_id: conference.cfp_id,
+                        confName: conferenceDetail.Conference.conf_name,
+                        detail: '[UPDATED] ' + newDate.date_type + ' is changed from "' + formatDate(isExisted.date_value) + '" to "' + formatDate(newDate.date_value) + '"'
+                    });
                 }
             }
         }
-        return true;
+        return notifications;
 
     } catch (error) {
         throw (error);

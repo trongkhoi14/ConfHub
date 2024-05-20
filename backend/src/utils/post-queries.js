@@ -9,7 +9,10 @@ const selectAllPosts = async function (filterConditions) {
             attributes: ['CallForPaperCfpId'],
             where: { UserId: filterConditions.userID },
             limit: filterConditions.size,
-            offset: filterConditions.offset
+            offset: filterConditions.offset,
+            order: [
+                ['post_time', 'DESC']
+            ]
         });
 
         const postedConferences = await Promise.all(postedConferenceIDs.rows.map(async (id) => {

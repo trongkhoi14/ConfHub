@@ -23,9 +23,10 @@ Notification.init({
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     stime: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        allowNull: true
     },
-    status: {
+    read_status: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     }

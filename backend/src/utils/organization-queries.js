@@ -2,6 +2,7 @@ const model = require('../models/index.js');
 const { isEmpty } = require('../utils/input-handler.js');
 const moment = require('moment');
 const SettingQuery = require('./setting-queries.js');
+const { formatDate } = require('../utils/date-handler');
 require('dotenv').config();
 
 const selectConferenceOrganizations = async function (cfpID, option) {
@@ -52,6 +53,16 @@ const insertOrganizations = async function (conference, transaction) {
 
 const updateOrganizations = async function (conference, transaction) {
     try {
+        let notifications = [];
+        const conferenceDetail = await model.callForPaperModel.findOne({
+            where: {
+                cfp_id: conference.cfp_id
+            },
+            include: [{
+                model: model.conferenceModel
+            }]
+        });
+
         const currentOrgs = await model.organizationModel.findAll({
             where: {
                 status: "new",
@@ -69,13 +80,31 @@ const updateOrganizations = async function (conference, transaction) {
                     CallForPaperCfpId: conference.cfp_id
                 }
             });
-            if (isExisted) deleteOrganizationByID(isExisted.org_id);
+            if (isExisted) {
+                deleteOrganizationByID(isExisted.org_id);
+                await model.organizationModel.destroy({
+                    where: {
+                        name: isExisted.name,
+                        status: "old",
+                        CallForPaperCfpId: conference.cfp_id
+                    }
+                });
+
+                // [#hc]
+                notifications.push({
+                    title: process.env.TITLE_CANCELLED_EVENT,
+                    cfp_id: conference.cfp_id,
+                    confName: conferenceDetail.Conference.conf_name,
+                    detail: isExisted.end_date ? '[DELETE] Conference start from ' + formatDate(isExisted.start_date) + ' to ' + formatDate(isExisted.end_date)
+                        : '[DELETE] Conference start from ' + formatDate(isExisted.start_date)
+                });
+            }
         }
 
         for (const element of conference.organizations) {
             const isExisted = await model.organizationModel.findOne({
                 where: {
-                    name: element.name,
+                    name: element.name || "no location to find",
                     CallForPaperCfpId: conference.cfp_id
                 }
             });
@@ -108,6 +137,14 @@ const updateOrganizations = async function (conference, transaction) {
                         }
                     }
                 }
+                // [#hc]
+                notifications.push({
+                    title: process.env.TITLE_NEW_UPDATED_EVENT,
+                    cfp_id: conference.cfp_id,
+                    confName: conferenceDetail.Conference.conf_name,
+                    detail: newOrganization.end_date ? '[NEW] Conference start from "' + formatDate(newOrganization.start_date) + ' to ' + formatDate(newOrganization.end_date) + '"'
+                        : '[NEW] Conference start from "' + formatDate(newOrganization.start_date) + '"'
+                });
 
             } else if (isExisted) {
                 if (isExisted.type !== element.type || isExisted.location !== element.location || isExisted.start_date !== element.start_date || isExisted.end_date !== element.end_date) {
@@ -120,13 +157,19 @@ const updateOrganizations = async function (conference, transaction) {
                         CallForPaperCfpId: conference.cfp_id
                     }, { transaction: transaction });
 
+                    await model.organizationModel.destroy({
+                        where: {
+                            name: isExisted.name,
+                            status: "old",
+                            CallForPaperCfpId: conference.cfp_id
+                        }
+                    }, { transaction: transaction });
+
                     await isExisted.update(
-                        { status: newOrganization.org_id },
-                        { where: { org_id: isExisted.org_id } },
+                        { status: "old" },
                         { transaction: transaction }
                     );
 
-                    await model.organizationModel.destroy({ where: { status: isExisted.org_id } }, { transaction: transaction });
                     const oldNotes = await model.calenderNoteModel.findAll({ where: { OrganizationOrgId: isExisted.org_id } });
                     for (const oldNote of oldNotes) {
                         await oldNote.update({
@@ -134,10 +177,20 @@ const updateOrganizations = async function (conference, transaction) {
                             OrganizationOrgId: newOrganization.org_id
                         }, { transaction: transaction });
                     }
+
+                    // [#hc]
+                    notifications.push({
+                        title: process.env.TITLE_NEW_UPDATED_EVENT,
+                        cfp_id: conference.cfp_id,
+                        confName: conferenceDetail.Conference.conf_name,
+                        detail: isExisted.end_date ?
+                            '[UPDATED] Conference start from "' + formatDate(newOrganization.start_date) + ' to ' + formatDate(newOrganization.end_date) + '", location: "' + newOrganization.location + '", type: "' + newOrganization.type + '"'
+                            : '[UPDATED] Conference start from "' + formatDate(newOrganization.start_date) + '", location: "' + newOrganization.location + '", type: "' + newOrganization.type + '"'
+                    });
                 }
             }
         }
-        return true;
+        return notifications;
 
     } catch (error) {
         throw (error);

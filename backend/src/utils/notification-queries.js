@@ -8,7 +8,10 @@ const selectAllNotifications = async function (userID) {
             where: {
                 UserId: userID
             }
-        }]
+        }],
+        order: [
+            ['ctime', 'DESC']
+        ]
     });
 }
 
