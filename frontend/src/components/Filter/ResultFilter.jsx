@@ -11,7 +11,7 @@ import useConference from '../../hooks/useConferences'
 import useFollow from '../../hooks/useFollow'
 import { isObjectInList } from '../../utils/checkExistInList'
 
-import useFilter from '../../hooks/useFilter'
+import useSearch from '../../hooks/useSearch'
 import { DropdownSort } from './../DropdownSort'
 import { isUpcoming, sortByFollow, sortConferences } from '../../utils/sortConferences'
 
@@ -22,7 +22,7 @@ import useLocalStorage from '../../hooks/useLocalStorage'
 
 const ResultFilter = ({ conferencesProp, width }) => {
     const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
-    const { resultFilter, appliedFilterResult, optionsSelected, getOptionsFilter } = useFilter()
+    const { resultFilter, appliedFilterResult, optionsSelected, getOptionsFilter } = useSearch()
     const {handleGetList} = useConference()
     const {user} = useLocalStorage()
     const navigate = useNavigate()

@@ -1,4 +1,6 @@
 export function formatDate(inputString) {
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
   const date = new Date(inputString);
 
   // Lấy thông tin ngày, tháng, năm

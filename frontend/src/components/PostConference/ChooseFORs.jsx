@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Select from 'react-select';
 import useConference from '../../hooks/useConferences';
-import useFilter from '../../hooks/useFilter';
+import useSearch from '../../hooks/useSearch';
 import { FloatingLabel, Form } from "react-bootstrap"
 
 
 const ChooseFORs = ({ selectedOptions, onChange, requiredFields }) => {
   const { filterOptions } = useConference()
-  const { getOptionsFilter } = useFilter()
+  const { getOptionsFilter } = useSearch()
   const [options, setOptions] = useState([]);
 
   const [inputValue, setInputValue] = useState('');

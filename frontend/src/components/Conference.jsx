@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Container, Card, Button, Image, Stack } from 'react-bootstrap'
+import { Container, Card, Button, Image, Stack, Row, Col } from 'react-bootstrap'
 import ReactPaginate from 'react-paginate'
 
 import UnfollowIcon from './../assets/imgs/unfollow.png'
@@ -12,7 +12,7 @@ import useAuth from '../hooks/useAuth'
 import useFollow from '../hooks/useFollow'
 import { isObjectInList } from '../utils/checkExistInList'
 
-import useFilter from '../hooks/useFilter'
+import useSearch from '../hooks/useSearch'
 import { DropdownSort } from './DropdownSort'
 import { isUpcoming, sortByFollow, sortConferences } from '../utils/sortConferences'
 
@@ -20,84 +20,44 @@ import ArrowIcon from './../assets/imgs/arrow.png'
 import Loading from './Loading'
 import { getDateValue } from '../utils/formatDate'
 import useLocalStorage from '../hooks/useLocalStorage'
+import Filter from './Filter/Filter'
+import { checkExistValue, getUniqueConferences } from '../utils/checkFetchedResults'
 
-const Conference = ({ conferencesProp, width }) => {
+const Conference = ({ conferencesProp, loading, totalPages, onReload, totalConferences }) => {
     const {user} = useLocalStorage()
     const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
-    const { resultFilter, appliedFilterResult, optionsSelected, getOptionsFilter } = useFilter()
-    const { total, handleGetList } = useConference()
+    const {total, optionsSelected} = useSearch()
+
     const navigate = useNavigate()
     const [page, setPage] = useState(0)
-    const [fetchCount, setFetchCount] = useState(0);
     const [selectOptionSort, setSelectOptionSort] = useState('')
     const [copiedConferences, setcopiedConferences] = useState([])
     const [displayConferences, setDisplayedConferences] = useState([])
-    const [loading, setLoading] = useState(false)
+    
+    const itemsPerPage = 7;
+    const pagesVisited = page * itemsPerPage;
+    
+    useEffect(()=>{
+        setPage(0)
+    },[conferencesProp])
 
-    const fetchData = async () => {
-        setLoading(true)
-        getListFollowedConferences()
-        setLoading(false)
-        getOptionsFilter("", [])
-
-        if (conferencesProp.length === 0 || !conferencesProp) {
-            await handleGetList(page + 1)
-        }
-
-    }
-
-    useEffect(() => {
-        console.log({ page })
-        handleGetList(page + 1)
-
-    }, [page])
-
-    useEffect(() => {
-
-
-        if (fetchCount < 1) {
-            fetchData()
-            setFetchCount(fetchCount + 1);
-        }
-        setLoading(false)
-
-
-        const sortedByFollow = sortByFollow(conferencesProp, listFollowed)
-        setDisplayedConferences([...sortedByFollow])
-        setcopiedConferences([...sortedByFollow])
-    }, [fetchCount, conferencesProp, page, optionsSelected, listFollowed, resultFilter]);
-
+   
     const handlePageClick = (event) => {
-        console.log({ event })
         setPage(event.selected)
         // Cuộn lên đầu danh sách khi chuyển trang
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const element = document.getElementById('conferences-render');
+        if (element) {
+          window.scrollTo({
+            top: element.offsetTop,
+            behavior: 'smooth'
+          });
+        }
     };
 
     const chooseConf = (id) => {
-        navigate(`/detail/information/${id}`)
+        navigate(`/detailed-information/${id}`)
     }
 
-    const handleFollow = (id) => {
-        console.log({user})
-        if(user){
-
-            followConference(id)
-            getListFollowedConferences()
-    
-        }
-        else navigate('/login')
-    }
-
-    const handleUnfollow = (id) => {
-        console.log({user})
-        if(user){
-
-            unfollowConference(id)
-            getListFollowedConferences()
-        }
-        else navigate('/login')
-    }
 
     const handleDropdownSelect = (value) => {
         setSelectOptionSort(value);
@@ -113,29 +73,50 @@ const Conference = ({ conferencesProp, width }) => {
 
     const getLengthString = (string) => string.length
 
+
+    if(loading){
+        return (
+            <Container className='d-flex flex-column align-items-center p-0'>
+                <Loading onReload={onReload}/>
+            </Container>
+        )
+    }
     return (
         <Container className='d-flex flex-column align-items-center p-0'>
 
             <div className="mb-3 px-4 d-flex align-items-center justify-content-between w-100">
-                <div className="h5 fw-bold">
+                <div className="h5 fw-bold" id='conferences-render'>
                     Conferences
-                    <span className='fw-normal'> ({total}) </span>
+                    <span className='fw-normal'> ({totalConferences}) </span>
                 </div>
-                <DropdownSort
+              <div className='d-flex'>
+              {
+                checkExistValue(optionsSelected).some(value => value === true)
+                &&
+                <Filter/>
+            }
+            
+            <DropdownSort
                     options={["Random", "Upcoming", "Name A > Z", "Latest"]}
                     onSelect={handleDropdownSelect}
                 />
+              </div>
             </div>
 
+          <Row>
+           
+            <Col>
             {
-                displayConferences && displayConferences.length > 0
+                conferencesProp && conferencesProp.length > 0
                     ?
-
-                    (displayConferences
-                        .map(conf => (
+                    <>
+                    {
+                    conferencesProp
+                        .slice(pagesVisited, pagesVisited + itemsPerPage)
+                        .map((conf) => (
                             <Card
                                 className='my-conf-card'
-                                style={{ width: `${width}px` }}
+                                style={{ }}
                                 id={conf.id}
                                 key={conf.id}>
                                 <Stack className='p-0' direction='horizontal'>
@@ -207,12 +188,12 @@ const Conference = ({ conferencesProp, width }) => {
                                         {
                                             isObjectInList(conf.id, listFollowed)
                                                 ?
-                                                <Button className='icon-follow' onClick={() => handleUnfollow(conf.id)} title='Unfollow'>
+                                                <Button className='icon-follow' onClick={() => unfollowConference(conf.id)} title='Unfollow'>
                                                     <Image src={FollowIcon} className='me-2' width={18} />
                                                     <span>Unfollow</span>
                                                 </Button>
                                                 :
-                                                <Button className='icon-follow' onClick={() => handleFollow(conf.id)}>
+                                                <Button className='icon-follow' onClick={() => followConference(conf.id)}>
                                                     <Image src={UnfollowIcon} className='me-2 ' width={18} />
                                                     <span>Follow</span>
                                                 </Button>
@@ -223,10 +204,11 @@ const Conference = ({ conferencesProp, width }) => {
                                 </Stack>
                             </Card>
                         ))
-                    )
+                    }
+                    </>
                     :
                     <>
-                        <Loading onReload={handleGetList} />
+                       <p>No conferences available</p>
                     </>
             }
             <ReactPaginate
@@ -235,7 +217,7 @@ const Conference = ({ conferencesProp, width }) => {
                 onPageChange={handlePageClick}
                 pageRangeDisplayed={4}
                 marginPagesDisplayed={1}
-                pageCount={Math.ceil(total / 10)}
+                pageCount={totalPages}
                 previousLabel="<"
                 renderOnZeroPageCount={null}
                 containerClassName="justify-content-center pagination"
@@ -250,6 +232,8 @@ const Conference = ({ conferencesProp, width }) => {
                 activeClassName="active"
                 disabledClassName="disabled"
             />
+            </Col>
+          </Row>
         </Container>
     )
 }

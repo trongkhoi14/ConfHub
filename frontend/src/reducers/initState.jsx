@@ -24,7 +24,7 @@ export const initialState = {
     source: [],
     acronym: [],
     type: [],
-    date: [],
+    conferenceDate: [],
     submissionDate: [],
     search: [],
     impactfactor: [],
@@ -39,7 +39,7 @@ export const initialState = {
     source: [], 
     acronym: [], 
     type: [],
-    date: [],
+    conferenceDate: [],
     submissionDate: [],
     search: [],
     impactfactor: [],
@@ -47,7 +47,8 @@ export const initialState = {
     category: [],
   },
 
-  keywordFilter: [],//filter
+  optionFilter: [],
+  resultKeywordFilter: [],
   resultFilter: [],
 
   

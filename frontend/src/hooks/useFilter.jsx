@@ -1,198 +1,86 @@
+import React, { useEffect, useState } from 'react'
+import { getUniqueConferences } from '../utils/checkFetchedResults'
+import useSearch from './useSearch'
 import { useAppContext } from '../context/authContext'
-import { addFilter, clearFilters, getResult, getoptionsSelected, removeFilter, addFilterDateResults } from '../actions/filterActions'
-
-import { baseURL } from './api/baseApi'
-import { formatDateFilter } from '../utils/formatDate'
-import { convertToLowerCaseFirstLetter } from '../utils/formatWord'
-import { requestApi } from '../actions/actions'
-import { useEffect, useState } from 'react'
-import useToken from './useToken'
-import { useLocation } from 'react-router-dom'
-import useConference from './useConferences'
-import useFollow from './useFollow'
-import usePost from './usePost'
+import { inputOptionFilterKeyword, selectOptionFilterKeyword } from '../actions/filterActions'
 
 const useFilter = () => {
   const { state, dispatch } = useAppContext()
-  const { token } = useToken()
-  const {conferences} = useConference()
-  const { listFollowed} = useFollow()
-  const {postedConferences} = usePost()
-  const [total, setTotal] = useState(0)
-  const location = useLocation()  
+  const { optionsSelected } = useSearch()
+  const [optionsFilter, setOptionsFilter] = useState([])
+  const [selectOptionFilter, setSelectOptionFilter] = useState([])
+  const [inputFilter, setInputFilter] = useState('')
+
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      // Xử lý trước khi chuyển trang
-      clearFilters()
-      return event.returnValue = ''; // Hiển thị thông báo trên trình duyệt
-    };
+    let transformedOptions = []
+    const uniqueValues = getUniqueConferences(optionsSelected)
+    transformedOptions = uniqueValues.map((item, index) => ({
+      value: index + 1,
+      label: item,
+      isSelected: selectOptionFilter.some(option => option.label === item)
+    }));
+    setOptionsFilter(transformedOptions)
+    setSelectOptionFilter(transformedOptions)
+    dispatch(selectOptionFilterKeyword(transformedOptions))
+  }, [optionsSelected])
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
+  const handleChangeOptions = (selectedOptions) => {
+    console.log({ selectOptionFilter })
+    setSelectOptionFilter(selectedOptions);
+    dispatch(selectOptionFilterKeyword(selectedOptions))
+  };
 
-  const getOptionsFilter = async (label, staticData) => {
-    const params = ["source", "for", "acronym", "rank"];
-    const options = state.filterOptions
-    if (label === "") {
-      for (const param of params) {
-        if (param === "acronym") {
-          try {
-            
-            const response = await fetch(`${baseURL}/conf/${param}`);
-            const data = await response.json();
-            // Gửi action để cập nhật dữ liệu cho label hiện tại
-            dispatch(getoptionsSelected({ [param]: data.data }));
+  const handleInputFilterChange = (e) => {
+    setInputFilter(e.target.value)
+  }
 
-          } catch (error) {
-            console.error(`Error fetching data for ${param}:`, error);
-          }
-        }
-        else {
+  const searchInput = (keyword) => {
+    console.log({ keyword })
+    const dataFilter = sessionStorage.getItem('dataFilters');
+    const data = JSON.parse(dataFilter)
+    if (dataFilter) {
+      const result = [];
 
-          try {
-            const response = await fetch(`${baseURL}/${param}`);
-            const data = await response.json();
-            // Gửi action để cập nhật dữ liệu cho label hiện tại
-            dispatch(getoptionsSelected({ [param]: data.data }));
-
-          } catch (error) {
-            console.error(`Error fetching data for ${param}:`, error);
-          }
-        }
-       
+    // Duyệt qua từng danh sách object trong data
+    for (const category in data) {
+      const filteredObjects = data[category].filter(obj => searchInObject(obj, keyword));
+      if (filteredObjects.length > 0) {
+        console.log({filteredObjects})
+        result.push(...filteredObjects);
       }
     }
-    else {
-      const options = staticData.map(item => item.label);
-      dispatch(getoptionsSelected({ [label]: options }))
+      dispatch(inputOptionFilterKeyword(result))
 
+      console.log({ data, keyword, result })
+    }
+    return []
+  }
+
+  const searchInObject = (obj, keyword) => {
+    keyword = keyword.toLowerCase();
+    if (typeof obj === 'string') {
+      return obj.toLowerCase().includes(keyword);
     }
 
-  }
-  const addKeywords = (label, keywords) => {
-    if (!state.optionsSelected[label].includes(keywords[0])) {
-      dispatch(addFilter(label, keywords))
-    }
-  }
-
-  const sendFilterDate = async (startDate, endDate, label, keywordFormat) => {
-    
-    const start = formatDateFilter(startDate)
-    const end = formatDateFilter(endDate)
-    console.log({ keywordFormat, label })
-    let data = []
-    if (label === 'submissionDate') {
-      const response = await fetch(`${baseURL}/conference?subStart=${start}&subEnd=${end}`);
-      data = await response.json();
-      
-    }
-    else {
-      const response = await fetch(`${baseURL}/conference?confStart=${start}&confEnd=${end}`);
-      data = await response.json();
+    if (Array.isArray(obj)) {
+      return obj.some(item => searchInObject(item, keyword));
     }
 
-    dispatch(getResult(label, data.data));
-    return data.data
-  }
-
-
-  const deleteKeyword = (label, keyword) => {
-    console.log(state.appliedFilterResult)
-    const updatedResultsFilter = {
-      ...state.appliedFilterResult,
-      [label]: []
-      }
-
-    const updateOptionsSelected = {
-      ...state.optionsSelected,
-      [label]: state.optionsSelected[label].filter(item => item !== keyword),
-    };
-
-    // Xóa 1 filter trong danh sách
-    dispatch(removeFilter(updateOptionsSelected, updatedResultsFilter));
-    
-
-  }
-  const clearKeywords = () => {
-    if (state.optionsSelected && state.appliedFilterResult) {
-      const clearedOptionsSelected = Object.fromEntries(Object.keys(state.optionsSelected).map((key) => [key, []]));
-      const clearedConferencesFilter = Object.fromEntries(Object.keys(state.appliedFilterResult).map((key) => [key, []]));
-      dispatch(clearFilters(clearedOptionsSelected, clearedConferencesFilter))
-    }
-    //reset all
-  }
-
-  const sendFilter = async (label, keyword) => {
-    const listLabel = ['location', 'rank', 'for', 'source', 'acronym', 'type'];
-    let apiUrl = baseURL;
-
-    if (listLabel.includes(label)) {
-        apiUrl += `/conference?${label}[]=${keyword}`;
-    } else {
-        apiUrl += `/conference?${label}=${keyword}`;
-    }
-    const headers = {};
-
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+    if (typeof obj === 'object' && obj !== null) {
+      return Object.values(obj).some(value => searchInObject(value, keyword));
     }
 
-    return await fetch(apiUrl, {
-      method: 'GET',
-      headers: headers,
-      })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Xử lý dữ liệu khi nhận được response
-            dispatch(getResult(label, data.data));
-            setTotal(data.maxRecods)
-            return data.data;
-        })
-        .catch(error => {
-            // Xử lý lỗi nếu có
-            console.error('Error sending filter request:', error);
-        });
-};
-
-const getQuantity = (conferenceList) => {
-  let count = 0
-  if(location.pathname==='/followed'){
-    
-    count = conferenceList.filter(obj1 => listFollowed.some(obj2 => obj1.id === obj2.id)).length;
-    
+    return false;
   }
-  else if(location.pathname==='/yourconferences'){
-    count = conferenceList.filter(obj1 => postedConferences.some(obj2 => obj1.id === obj2.id)).length;
-    
-  }
-  else {
-    count = conferenceList.length
-  }
-  return count
-}
   return {
-    optionsSelected: state.optionsSelected,
-    filterOptions: state.filterOptions,
-    appliedFilterResult: state.appliedFilterResult,
-    filterOptionsAuth: state.filterOptionsAuth,
-    resultFilter: state.resultFilter,
-    total,
-    getOptionsFilter,
-    addKeywords,
-    sendFilterDate,
-    deleteKeyword,
-    clearKeywords,
-    sendFilter,
-    getQuantity
+    optionsFilter,
+    selectOptionFilter: state.optionFilter,
+    inputFilter,
+    resultInputFilter: state.resultKeywordFilter,
+    handleChangeOptions,
+    handleInputFilterChange,
+    searchInput,
   }
 }
 

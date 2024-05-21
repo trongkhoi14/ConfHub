@@ -44,5 +44,28 @@ const filterCommonConferences = (filteredList, authList) => {
   );
 };
 
+const mergeConferencesByKeyword = (dataFilter, keywordList) => {
+  //console.log({dataFilter, keywordList})
+  const extractedLists = [];
+    // Duyệt qua từng cặp key-value trong object
+    for (const [key, value] of Object.entries(dataFilter)) {
+        // Kiểm tra xem key có chứa một trong các keyword không
+        for (const keyword of keywordList) {
+          // Kiểm tra xem key có xuất hiện trong từ khóa không
+          if (keyword.label.includes(key)) {
+              // Nếu có, thêm từ khóa vào danh sách kết quả
+              extractedLists.push(...value);
+          }
+        }
+    }
+    const uniqueVal = Array.from(new Set(extractedLists.map(JSON.stringify))).map(JSON.parse);
+    return uniqueVal;
+};
 
-export { checkExistValue, getUniqueConferences, findKeyByKeyword, filterCommonConferences };
+
+export {
+   checkExistValue, 
+  getUniqueConferences, 
+  findKeyByKeyword, 
+  filterCommonConferences,
+  mergeConferencesByKeyword };

@@ -1,12 +1,13 @@
 //lấy dữ liệu từ danh sách để đưa vào dropdown
 import React, { useEffect, useState } from 'react'
-import useFilter from '../../hooks/useFilter'
+import useSearch from '../../hooks/useSearch'
 
 import useConference from '../../hooks/useConferences'
 import { capitalizeFirstLetter } from '../../utils/formatWord'
 import Select from 'react-select'
 
 import data from './options.json'
+
 
 const customStyles = {
     control: (provided, state) => ({
@@ -40,17 +41,17 @@ const CustomOption = ({ innerProps, label, isSelected }) => (
         <label style={{ fontWeight: isSelected ? 'bold' : 'normal' }} className='fs-6'>{label}</label>
     </div>
 );
-const Options = ({ label }) => {
+const Options = ({ label, onApply }) => {
     const { filterOptions } = useConference()
-    const { getOptionsFilter, sendFilter, getQuantity } = useFilter()
+    const { total, setTotal, getOptionsFilter, sendFilter, handleCountAllConf } = useSearch()
     const [options, setOptions] = useState([])
-    const { addKeywords } = useFilter()
-
+    const { addKeywords } = useSearch()
     const handleOptionChange = async (item) => {
-        const listConference = await sendFilter(label, item[0].label)
-        const quantity = getQuantity(listConference)        
-        const keyword = `${item[0].label} (${quantity})`
-        addKeywords(label,[keyword] )
+        
+        onApply(label, item[0].label)
+        const maxRecords = await sendFilter(label, item[0].label)
+        const keyword = `${item[0].label} (${maxRecords})`
+        addKeywords(label,[keyword])
     }
 
     useEffect(() => {

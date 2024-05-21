@@ -7,8 +7,8 @@ import LocationDate from './../assets/imgs/location_white.png'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { getIdFromPathname } from '../utils/getID'
 import useConference from '../hooks/useConferences'
-import UpdateNowButton from './UpdateNowButton'
-import FollowButton from './FollowButton'
+import UpdateNowButton from './InformationPage/UpdateNowButton'
+import FollowButton from './InformationPage/FollowButton'
 
 const NavBarDetailPage = () => {
   const { conference, handleGetOne } = useConference()

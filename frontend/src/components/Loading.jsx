@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
 import Spinner from 'react-bootstrap/Spinner';
 
 
@@ -32,8 +33,7 @@ function Loading({onReload}) {
       <div>
         {showReloadMessage ? (
           <div>
-            Loading for 10 seconds. Please reload.
-            <button onClick={handleReload}>Reload</button>
+            <Button className='bg-transparent border-0' onClick={handleReload}>Reload</Button>
           </div>
         ) : (
             <Spinner animation="border" />

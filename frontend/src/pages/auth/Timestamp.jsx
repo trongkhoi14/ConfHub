@@ -6,6 +6,7 @@ import useNote from '../../hooks/useNote';
 import useFollow from '../../hooks/useFollow';
 import EventCalendar from '../../components/Calendar/EventCalendar';
 import { useLocation } from 'react-router-dom';
+import UpcomingNote from '../../components/Calendar/UpcomingNote';
 
 const Timestamp = () => {
   const {pathname} = useLocation()
@@ -29,7 +30,7 @@ const Timestamp = () => {
   return (
     <Container
       fluid
-      className='pt-5 overflow-hidden' style={{marginLeft: "350px", marginTop: "60px" }}>
+      className='py-5 overflow-hidden' style={{marginLeft: "360px", marginTop: "60px" }}>
       <div className='d-flex justify-content-between align-items-center'>
         <h4 className='mb-3'>Schedule</h4>
         <Form.Check // prettier-ignore
@@ -41,30 +42,38 @@ const Timestamp = () => {
         />
       </div>
       <Row>
-        <Col xs="9">
+
+      <UpcomingNote/>
+      </Row>
+      <Row className='mt-5'>
+        <Col xs="9">          
           <EventCalendar notes={notes}/>
         </Col>
-        <Col xs="3" className='ps-3'>
-          <Row className='align-items-center'>
-            <div className="bg-red-normal me-2 my-1 f6" style={{width: "40px", height: "20px"}}></div>
-            Submission date
-          </Row>
-          <Row className='align-items-center'>
-            <div className="bg-blue-normal me-2 my-1" style={{width: "40px", height: "20px"}}></div>
-            Notification date
-          </Row>
-          <Row className='align-items-center'>
-            <div className="bg-brown-normal me-2 my-1" style={{width: "40px", height: "20px"}}></div>
-            Camera ready date
-          </Row>
-          <Row className='align-items-center'>
-            <div className="bg-yellow-normal me-2 my-1" style={{width: "40px", height: "20px"}}></div>
-            Conference date
-          </Row>
-          <Row className='align-items-center'>
-            <div className="bg-primary-normal me-2 my-1" style={{width: "40px", height: "20px"}}></div>
-            Your note
-          </Row>
+        <Col xs="3" className='ps-3'>          
+          <div className='ms-1 mt-3'>
+            <h5>Conference note details</h5>
+            <Row className='align-items-center'>
+              <div className="bg-red-normal me-2 my-2 fs-6 rounded-1" style={{width: "20px", height: "20px"}}></div>
+              Submission date
+            </Row>
+            <Row className='align-items-center'>
+              <div className="bg-blue-normal me-2 my-2 rounded-1" style={{width: "20px", height: "20px"}}></div>
+              Notification date
+            </Row>
+            <Row className='align-items-center'>
+              <div className="bg-teal-normal me-2 my-2 rounded-1" style={{width: "20px", height: "20px"}}></div>
+              Camera ready date
+            </Row>
+            <Row className='align-items-center'>
+              <div className="bg-yellow-normal me-2 my-2 rounded-1" style={{width: "20px", height: "20px"}}></div>
+              Conference date
+            </Row>
+            <Row className='align-items-center'>
+              <div className="bg-skyblue-normal me-2 my-2 rounded-1" style={{width: "20px", height: "20px"}}></div>
+              Your note
+            </Row>
+          </div> 
+
         </Col>
       </Row>
     </Container>

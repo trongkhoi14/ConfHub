@@ -8,7 +8,7 @@ const appReducer = (state, action) => {
                 loading: true,
                 error: null,
             };
-            case actionTypes.ERROR_MESSAGE:
+        case actionTypes.ERROR_MESSAGE:
             return {
                 ...state,
                 loading: false,
@@ -68,9 +68,9 @@ const appReducer = (state, action) => {
                 ...state,
                 filterOptions: { ...state.filterOptions, ...action.payload }
             };
-        case actionTypes.ADD_FILTER:  
+        case actionTypes.ADD_FILTER:
             return {
-                ...state,  
+                ...state,
                 loading: false,
                 optionsSelected: {
                     ...state.optionsSelected,
@@ -78,11 +78,11 @@ const appReducer = (state, action) => {
                         ...(state.optionsSelected[action.payload.label] || []), // Nếu mảng không tồn tại, tạo một mảng mới
                         ...action.payload.keywords, // Thêm giá trị mới vào mảng
                     ],
-                },              
+                },
             };
         case actionTypes.ADD_FILTER_DATE:
             return {
-                ...state,                
+                ...state,
                 loading: false,
                 optionsSelected: {
                     ...state.optionsSelected,
@@ -110,15 +110,26 @@ const appReducer = (state, action) => {
             return {
                 ...state,
                 appliedFilterResult: {
-                  ...state.appliedFilterResult,
-                  [action.payload.label]: [
-                    ...state.appliedFilterResult[action.payload.label],
-                    ...action.payload.results.map(item => item)
-                  ]
+                    ...state.appliedFilterResult,
+                    [action.payload.label]: [
+                        ...state.appliedFilterResult[action.payload.label],
+                        ...action.payload.results.map(item => item)
+                    ]
                 },
                 resultFilter: action.payload.results
             };
-        case actionTypes.REQUEST_CONFERENCE: 
+
+        case actionTypes.SELECT_OPTION_FILTER:
+            return {
+                ...state,
+                optionFilter: action.payload
+            }
+        case actionTypes.INPUT_OPTION_FILTER:
+            return {
+                ...state,
+                resultKeywordFilter: action.payload
+            }
+        case actionTypes.REQUEST_CONFERENCE:
             return {
                 ...state,
                 loading: true,
@@ -128,7 +139,7 @@ const appReducer = (state, action) => {
         case actionTypes.GET_ALL_CONFERENCES:
             return {
                 ...state,
-                conferences: action.payload
+                conferences: [...state.conferences, ...action.payload],
             };
         case actionTypes.GET_ONE_CONFERENCE:
             return {
@@ -138,7 +149,7 @@ const appReducer = (state, action) => {
         case actionTypes.FOLLOW:
             return {
                 ...state,
-                listFollowed: action.payload,
+                listFollowed: [...state.listFollowed, ...action.payload],
             };
         case actionTypes.UNFOLLOW:
             return {

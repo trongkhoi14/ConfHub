@@ -1,11 +1,9 @@
 
 import { useAppContext } from '../context/authContext'
-import { getFollowedConferenceAction } from '../actions/followAction'
 import { baseURL } from './api/baseApi'
 import useToken from './useToken'
 import useLocalStorage from './useLocalStorage'
 import { useState } from 'react'
-import useConference from './useConferences'
 import useFollow from './useFollow'
 import { getNotes } from '../actions/noteAction'
 const useNote = () => {
@@ -13,7 +11,6 @@ const useNote = () => {
   const { listFollowed } = useFollow()
   const { user } = useLocalStorage()
   const { token } = useToken()
-  const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(false)
   const getSubStyle = (conferenceType) => {
     if (conferenceType.toLowerCase().includes('submission')) {
@@ -56,6 +53,7 @@ const useNote = () => {
             start_date: null,
             end_date: null,
             date_type: null,
+            location: null,
             subStyle: null,
         };
         if (note.ImportantDateDateId) {
@@ -84,11 +82,12 @@ const useNote = () => {
                         extractedItem.note = conference.information.name;
                         extractedItem.date_id = organization.org_id;
                         extractedItem.subStyle = 'conference-event'
+                        extractedItem.location = organization.location
                     }
                 }
             }
         } else {
-            extractedItem.date_type = 'Your note';
+            extractedItem.date_type = 'Personal note';
             extractedItem.start_date = note.date_value;
             extractedItem.end_date = note.date_value;
             extractedItem.note = note.note;
@@ -126,10 +125,8 @@ const useNote = () => {
         // Sử dụng hàm này để lấy thông tin từ danh sách dựa trên OrganizationOrgId
         const newDataByOrgId = extractDataByOrgId(listFollowed, data.data);
         console.log({newDataByOrgId})
-        setNotes(newDataByOrgId)
         dispatch(getNotes(newDataByOrgId))
         setLoading(false)
-        console.log('loading', loading)
       }
       
   }

@@ -11,7 +11,7 @@ import TimeIcon from './../../assets/imgs/time.png'
 import LocationIcon from './../../assets/imgs/location.png'
 
 
-import useFilter from '../../hooks/useFilter'
+import useSearch from '../../hooks/useSearch'
 import useConference from '../../hooks/useConferences'
 import { getUniqueConferences } from '../../utils/checkFetchedResults'
 import useFollow from '../../hooks/useFollow'
@@ -23,7 +23,7 @@ import ArrowIcon from './../../assets/imgs/arrow.png'
 
 const FetchedResults = () => {
   const { loading } = useAuth()
-  const { appliedFilterResult, optionsSelected } = useFilter()
+  const { appliedFilterResult, optionsSelected } = useSearch()
   const { listFollowed, followConference, unfollowConference, getListFollowedConferences } = useFollow()
 
   const navigate = useNavigate()

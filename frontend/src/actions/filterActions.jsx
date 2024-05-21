@@ -35,3 +35,17 @@ export const getResult = (label, results) => {
     payload: {label, results}
   }
 }
+
+export const selectOptionFilterKeyword = (options) => {
+  return {
+    type: actionTypes.SELECT_OPTION_FILTER,
+    payload: options
+  }
+}
+
+export const inputOptionFilterKeyword = (result) => {
+  return {
+    type: actionTypes.INPUT_OPTION_FILTER,
+    payload: result
+  }
+}

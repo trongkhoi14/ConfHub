@@ -4,29 +4,31 @@ import { Button, Image } from 'react-bootstrap'
 
 import deleteIcon from "../../assets/imgs/del.png";
 import RedDeleteIcon from "../../assets/imgs/redDel.png";
-import useFilter from "../../hooks/useFilter";
+import useSearch from "../../hooks/useSearch";
 import useConference from "../../hooks/useConferences";
 import { findKeyByKeyword, getUniqueConferences,  } from "../../utils/checkFetchedResults";
 
 import { useEffect, useState } from 'react';
 
-const FilterSelected = () => {
-  const { deleteKeyword, clearKeywords, optionsSelected } = useFilter()
+const FilterSelected = ({onDelete, onClearAll}) => {
+  const { deleteKeyword, clearKeywords, optionsSelected } = useSearch()
   
   const [keywordsSelected, setKeywordsSelected] = useState(null)
   const [total, setTotal] = useState(0)
   
   useEffect(()=>{
-    const tempList = getUniqueConferences(optionsSelected)
-    setKeywordsSelected(tempList)
-    setTotal(tempList.length)
+    const uniqueValues = getUniqueConferences(optionsSelected)
+    setKeywordsSelected(uniqueValues)
+    setTotal(uniqueValues.length)
   }, [optionsSelected])
   
   const handleDeletekeyword = (keyword) => {
     deleteKeyword(findKeyByKeyword(optionsSelected, keyword),keyword)
+    onDelete(keyword)
   }
   const handleClearKeyword = () => {
     clearKeywords()
+    onClearAll()
   }
   return (
     <>

@@ -5,14 +5,13 @@ import { Dropdown, Image, ButtonGroup, Button, Row, Col } from 'react-bootstrap'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import useFilter from '../../hooks/useFilter';
+import useSearch from '../../hooks/useSearch';
 
 import dateIcon from '../../assets/imgs/conf_date_light.png'
 import { formatDate } from '../../utils/formatDate';
 import { formatLabel } from '../../utils/formatWord';
-import { useLocation } from 'react-router-dom';
-const DateRangePicker = ({ label }) => {
-  const { sendFilterDate, addKeywords, getQuantity } = useFilter()
+const DateRangePicker = ({ label, onApply }) => {
+  const { sendFilterDate, addKeywords } = useSearch()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -31,11 +30,11 @@ const DateRangePicker = ({ label }) => {
     
     handleToggleClick()
     const keywordFormat = `${formatLabel(label)}: from ${formatDate(startDate)} to ${formatDate(endDate)}`        
-    const listConference = await sendFilterDate(startDate, endDate, label, [keywordFormat])
-    const quantity = getQuantity(listConference)
+    const quantity = await sendFilterDate(startDate, endDate, label, [keywordFormat])
     const keyword = `${keywordFormat} (${quantity})`
     console.log({keywordFormat, keyword})
     addKeywords(label, [keyword])
+    onApply(label, keyword)
   };
   return (
     <Dropdown className="w-100" show={showDropdown} onHide={() => setShowDropdown(false)}>

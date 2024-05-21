@@ -6,16 +6,17 @@ import AddConference from '../../components/Modals/AddConference'
 import usePost from '../../hooks/usePost'
 import Conference from '../../components/Conference'
 import useLocalStorage from '../../hooks/useLocalStorage'
-import Filter from '../../components/Filter/Filter'
-import useFilter from '../../hooks/useFilter'
+
 import SuccessfulModal from '../../components/Modals/SuccessModal'
 import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
 import Loading from '../../components/Loading'
 import ResultFilter from '../../components/Filter/ResultFilter'
+import Search from '../../components/Filter/Search'
+import useSearch from '../../hooks/useSearch'
 
 const YourConf = () => {
   const [showAddForm, setShowAddForm] = useState(false)
-  const { optionsSelected, appliedFilterResult } = useFilter()
+  const { optionsSelected, appliedFilterResult } = useSearch()
   const { loading, postedConferences, getPostedConferences} = usePost()
   const [displayConferences, setdisplayConferences] = useState(postedConferences)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -80,7 +81,7 @@ const YourConf = () => {
             </>
             :
             <>
-              <Filter/>
+              <Search/>
               <ResultFilter conferencesProp={displayConferences} width={960} />
             </>
           }

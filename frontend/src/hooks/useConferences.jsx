@@ -1,33 +1,59 @@
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { useAppContext } from "../context/authContext"
 
 import { baseURL } from "./api/baseApi"
 import { getAllConf, getOneConf, requestConference } from "../actions/confAction"
-
+import moment from "moment"
 
 const useConference = () => {
   const { state, dispatch } = useAppContext()
   const [quantity, setQuantity] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [total, setTotal] = useState(0)
-  const handleGetList = async (page) => {
-    console.log('hook', page)
-      try {
-        const response = await fetch(`${baseURL}/conference?page=${page}&size=7`);
-        const data = await response.json(); 
-        if (!response.ok) {
-          throw new Error(response.message);
-        }
-      // Gửi action để cập nhật all conferences
-      dispatch(getAllConf(data.data));
-      //cập nhật state
-      setTotal(data.maxRecords)
-      setQuantity(data.quantity)
-      } catch (error) {
-        setError(error);
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalConferences, setTotalConferences] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  const fetchData = useCallback(async (page) => {
+    try {
+      const response = await fetch(`${baseURL}/conference?page=${page}&size=7`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+      const data = await response.json();
+      dispatch(getAllConf(data.data));
+      return data
+    } catch (error) {
+      setError(error);
+    }
+  }, [dispatch]);
+  
+  const handleGetList = async () => {
+    setLoading(true)
+    try {
+      if(state.conferences.length === 0){
+        const firstPageData = await fetchData(1);                
+        const totalPages = firstPageData.maxPages; // Lấy số lượng trang từ dữ liệu đầu tiên
+        const totalConf = firstPageData.maxRecords
+        console.log({totalPages, totalConf})
+        const total = firstPageData.maxPages; // Lấy số lượng trang từ dữ liệu đầu tiên
+        setTotalConferences(totalConf)
+        setTotalPages(total)
+        dispatch(getAllConf(firstPageData.data));
+
+        // Fetch remaining pages asynchronously
+        for (let i = 2; i <= totalPages; i++) {
+            const pageData = await fetchData(i);
+            dispatch(getAllConf(pageData.data));
+        }
+      }
+
+      setLoading(false);
+  } catch (error) {
+      setError(error);
+      setLoading(false);
+  }
   }
 
   const handleGetOne = async (id) => {
@@ -37,23 +63,64 @@ const useConference = () => {
       const data = await response.json();
       //Gửi action để cập nhật state
       dispatch(getOneConf(data.data));
-      setTotal(data.maxRecords)
-      
     } catch (error) {
+
       console.error('Error fetching data:', error);
     }
   }
 
+  const getConferenceDate = (organizations) => {
+    if(organizations.length > 0) {
+
+    // Khởi tạo biến để lưu trữ ngày bắt đầu và kết thúc
+    let startDate = null;
+    let endDate = null;
+    
+    // Lặp qua danh sách organizations để tìm ngày bắt đầu và kết thúc với status là "new"
+    organizations.forEach(org => {
+      if (org.status === "new") {
+        startDate = org.start_date;
+        endDate = org.end_date;
+      }
+    });
+    const formattedDateStartDate = moment(startDate).format('dddd, MM/DD/YYYY');
+    const formattedDateEndDate = moment(endDate).format('dddd, MM/DD/YYYY');
+    
+    // Xác định dateRange dựa trên giá trị của startDate và endDate
+    let dateRange = 'N/A';
+    if (startDate) {
+      if (endDate) {
+        dateRange = `From ${formattedDateStartDate} to ${formattedDateEndDate}`;
+      } else {
+        dateRange = `${formattedDateStartDate}`;
+      }
+    }
+    return dateRange
+    }
+    else return ''
+  }
+
+  const getLocation = (organizations) => {
+   // Sử dụng find để tìm đối tượng đầu tiên có status là "new" và location khác null
+  const newOrg = organizations.find(org => org.status === "new" && org.location !== null);
+  
+  // Nếu tìm thấy đối tượng thỏa mãn, trả về location của nó, ngược lại trả về null
+  return newOrg ? newOrg.location : '';
+  }
+  
   return {
     conferences: state.conferences,
     conference: state.conference,
     quantity: quantity,
     filterOptions: state.filterOptions,
-    loading: isLoading,
+    loading,
     error: error,
-    total,
+    totalPages,
+    totalConferences,
     handleGetList,
     handleGetOne,
+    getConferenceDate,
+    getLocation
   }
 }
 

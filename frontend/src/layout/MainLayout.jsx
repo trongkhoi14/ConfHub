@@ -19,7 +19,7 @@ const MainLayout = () => {
               <Header/>
             
         }
-        {location.pathname.includes("/detail")&&<NavBarDetailPage/>}
+        {location.pathname.includes("/detail/")&&<NavBarDetailPage/>}
         <Outlet/>
 
     </>

@@ -13,9 +13,9 @@ import YourConf from '../pages/auth/YourConf'
 import Timestamp from '../pages/auth/Timestamp'
 import Notifications from '../pages/auth/Notifications'
 import { AuthLayout } from '../layout/AuthLayout'
-import InformationPage from '../pages/public/InformationPage'
-import ImportantDatePage from '../pages/public/ImportantDatePage'
-import CallforpaperPage from '../pages/public/CallforpaperPage'
+import InformationPage from '../components/InformationPage/InformationPage'
+import ImportantDatePage from '../components/InformationPage/ImportantDatePage'
+import CallforpaperPage from '../components/InformationPage/CallforpaperPage'
 import Setting from '../pages/auth/Setting'
 import Dashboard from '../pages/admin/Dashboard'
 import Users from '../pages/admin/Users'
@@ -23,6 +23,7 @@ import { AdminLayout } from '../layout/AdminLayout'
 import AdminAccount from '../pages/admin/AdminAccount'
 import CallforPapers from '../pages/admin/CallforPapers'
 import UserDetail from '../pages/admin/UserDetail'
+import DetailedInformationPage from '../pages/public/DetailedInformationPage'
 
 const authPage = [
   { path: 'account', element: <Account /> },
@@ -49,6 +50,7 @@ const RoutesApp = () => {
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
       <Route path="/detail/information/:id" element={<InformationPage />} />
+      <Route path="/detailed-information/:id" element={<DetailedInformationPage />} />
       <Route path="/detail/importantdates/:id" element={<ImportantDatePage />} />
       <Route path="/detail/callforpaper/:id" element={<CallforpaperPage />} />
 

@@ -1,6 +1,6 @@
 //lấy dữ liệu từ danh sách để đưa vào dropdown
 import React, { useEffect, useState } from 'react'
-import useFilter from '../../hooks/useFilter'
+import useSearch from '../../hooks/useSearch'
 import { Dropdown, Form, InputGroup, Image, ButtonGroup, Button } from 'react-bootstrap'
 
 import searchIcon from '../../assets/imgs/search.png'
@@ -47,7 +47,7 @@ const CustomOption = ({ innerProps, label, isSelected }) => (
 const DropdownOptions = ({ label, placeholder }) => {
     const { filterOptions } = useConference()
     const [tranformOptions, setTranformOptions] = useState([])
-    const { addKeywords, sendFilter } = useFilter()
+    const { addKeywords, sendFilter } = useSearch()
     const [statename, setStateName] = useState('')
     const location = useLocation();
     const pathname = location.pathname;

@@ -22,8 +22,7 @@ const CallforpaperPage = () => {
         conference
           ?
           <>
-            <div style={{ textAlign: "justify", textJustify: "inter-word" }}>{conference.information.name}</div>
-            <div style={{ textAlign: "justify", textJustify: "inter-word" }}>{conference.callForPaper}</div>
+           
           </>
           :
           <span>Please refresh page.</span>

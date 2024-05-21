@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react'
 import { Container, } from 'react-bootstrap'
 import Conference from './../../components/Conference'
 import useFollow from '../../hooks/useFollow'
-import useFilter from '../../hooks/useFilter'
+import useSearch from '../../hooks/useSearch'
 
 import useLocalStorage from '../../hooks/useLocalStorage'
-import Filter from '../../components/Filter/Filter'
 import Loading from '../../components/Loading'
 import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
 import ResultFilter from '../../components/Filter/ResultFilter'
+import Search from '../../components/Filter/Search'
 
 const Followed = () => {
   const { listFollowed, getListFollowedConferences } = useFollow()
-  const { appliedFilterResult, optionsSelected } = useFilter()
+  const { appliedFilterResult, optionsSelected } = useSearch()
   const [displayConferences, setdisplayConferences] = useState([])
   const { user } = useLocalStorage()
   useEffect(()=>{
@@ -47,7 +47,7 @@ const Followed = () => {
           ?
           <>
           <div style={{ width: "1000px" }}>
-          <Filter/>
+          <Search/>
         </div>
             <ResultFilter conferencesProp={displayConferences} width={960} />
           </>

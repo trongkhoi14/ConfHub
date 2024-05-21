@@ -28,12 +28,10 @@ function EventCalendar() {
     const [showDetailModal, setShowDetailModal] = useState(false)
     const [detailNote, setDetailNote] = useState(null)
     useEffect(() => {
-        console.log('chay di', {notes, listFollowed})
         if (notes.length === 0) {
-            console.log('not?', {notes, listFollowed})
             getAllNotes()
         }
-        if(notes.length === 0){
+        if(listFollowed.length === 0){
             getListFollowedConferences()
         }
     }, [notes]);
@@ -69,9 +67,12 @@ function EventCalendar() {
     const renderEventContent = (event) => {
         return (
             <div
-                className={`event-cell text-color-black text-start ms-1 fs-7 m-0 ${event.subStyle}`}
+                className={`event-cell text-color-black text-start mx-2 fs-7 m-0 d-flex flex-column ${event.subStyle}`}
                 onClick={handleDateClick}>
-                {event.event.note}
+                <span className='fw-semibold'>
+                   {`Date type: ${event.event.date_type}`}
+                </span>
+                <span className=''>{event.event.note}</span>
             </div>
         );
     };

@@ -1,7 +1,7 @@
 import Reac, { useEffect, useState } from 'react'
 import { Dropdown, InputGroup, Form, ButtonGroup, Button, Image } from 'react-bootstrap'
 
-import useFilter from '../../hooks/useFilter'
+import useSearch from '../../hooks/useSearch'
 
 import starIcon from '../../assets/imgs/star.png'
 import unstarIcon from '../../assets/imgs/unstar.png'
@@ -52,8 +52,8 @@ const CustomOption = ({ innerProps, label, isSelected }) => {
   );
 }
 
-const StarDropdown = ({ label }) => {
-  const { filterOptions, addKeywords, sendFilter, getQuantity } = useFilter()
+const StarDropdown = ({ label, onApply }) => {
+  const { filterOptions, addKeywords, sendFilter, getQuantity } = useSearch()
   const [tranformOptions, setTranformOptions] = useState([])
 
   useEffect(() => {
@@ -71,11 +71,11 @@ const StarDropdown = ({ label }) => {
 
     const rating = item[0].value
     const formatKeyword = `Rating from ${rating}*`
-    const listConference = await sendFilter(label, rating)
-    const quantity = getQuantity(listConference)
+    const quantity = await sendFilter(label, rating)
     const keyword = `${formatKeyword} (${quantity})`
     addKeywords(label,[keyword] )
-
+    let strRating = `${rating}`
+    onApply(label, strRating)
   };
   return (
     <div>
