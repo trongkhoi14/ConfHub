@@ -13,8 +13,7 @@ const sendNotificationToUser = (userID, message) => {
     const socketID = users.get(userID);
     if (socketID) {
         const io = getIO();
-        const myNamespace = io.of('/confhub');
-        myNamespace.to(socketID).emit('notification', message);
+        io.to(socketID).emit('notification', message);
     } else {
         console.log(`User ${userID} is not connected`);
     }
