@@ -7,7 +7,8 @@ const initSocket = (server) => {
     io = new Server(server, {
         cors: {
             origin: '*',
-        }
+        },
+        path: '/'
     });
     return io;
 };
