@@ -46,8 +46,9 @@ app.use(errorHandler);
 // Create HTTP server and integrate with Socket.IO
 const server = http.createServer(app);
 const io = initSocket(server);
+const myNamespace = io.of('/confhub');
 
-io.on('connection', (socket) => {
+myNamespace.on('connection', (socket) => {
 	const userID = socket.handshake.query['user-id'];
 
 	if (userID) {
