@@ -8,7 +8,7 @@ const initSocket = (server) => {
         cors: {
             origin: '*',
         },
-        path: '/',
+        path: '/socket.io',
         transports: ['websocket', 'polling']
     });
     return io;
