@@ -47,7 +47,7 @@ app.use(errorHandler);
 const server = http.createServer(app);
 const io = initSocket(server);
 
-io.on('connection', (socket) => {
+io.of('/').on('connection', (socket) => {
 	const userID = socket.handshake.query['user-id'];
 
 	if (userID) {
