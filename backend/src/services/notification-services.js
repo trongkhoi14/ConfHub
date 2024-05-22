@@ -74,7 +74,7 @@ const sendNotifications = async function (events) {
             },
             include: [{ model: model.userModel }],
         });
-        console.log(event)
+
         const message = template.notification.createNotification(event).message;
 
         for (const follow of follows) {
@@ -91,17 +91,17 @@ const sendNotifications = async function (events) {
             }
 
             // send mail
-            if (!instance.stime) {
-                const mail = {
-                    title: event.title,
-                    confName: event.confName,
-                    detail: event.detail,
-                    uEmail: follow.User.email
-                }
-                await emailService.sendingEmail(mail);
-                instance.stime = new Date();
-                instance.save();
-            }
+            // if (!instance.stime) {
+            //     const mail = {
+            //         title: event.title,
+            //         confName: event.confName,
+            //         detail: event.detail,
+            //         uEmail: follow.User.email
+            //     }
+            //     await emailService.sendingEmail(mail);
+            //     instance.stime = new Date();
+            //     instance.save();
+            // }
         }
     }
     console.log("[" + new Date() + "] Finished sending emails.");
