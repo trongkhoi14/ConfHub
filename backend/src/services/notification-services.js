@@ -98,7 +98,7 @@ const sendNotifications = async function (events) {
             //         detail: event.detail,
             //         uEmail: follow.User.email
             //     }
-            //     await emailService.sendingEmail(mail);
+            //     emailService.sendingEmail(mail);
             //     instance.stime = new Date();
             //     instance.save();
             // }
