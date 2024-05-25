@@ -15,7 +15,7 @@ const CallForPaper = sequelize.define('CallForPaper', {
     },
     status: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true
+        defaultValue: false
     },
     rating: {
         type: DataTypes.DOUBLE
