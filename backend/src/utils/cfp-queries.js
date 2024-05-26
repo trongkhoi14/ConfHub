@@ -117,6 +117,7 @@ const insertCallForPaper = async function (conference, transaction) {
             rank: conference.rank,
             owner: conference.owner,
             nkey: conference.nkey,
+            status: conference.status || false,
             ConferenceConfId: conf.conf_id,
             SourceSrcId: src.src_id
         }, { transaction: transaction });

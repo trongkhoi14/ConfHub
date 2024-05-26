@@ -33,8 +33,9 @@ class postController {
             let conference = input.getConferenceObject(req);
             conference.userID = userID;
             conference.owner = user.role;
+            conference.status = false;
 
-            const excludes = ['cfp_id', 'organizations', 'importantDates', 'nkey']
+            const excludes = ['cfp_id', 'organizations', 'importantDates', 'nkey', 'status']
             if (input.containsEmptyValue(conference, excludes)) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
@@ -57,8 +58,9 @@ class postController {
         try {
             let conference = input.getConferenceObject(req);
             conference.owner = "crawler";
+            conference.status = true;
 
-            const excludes = ['cfp_id', 'callForPaper', 'organizations', 'importantDates', 'nkey'];
+            const excludes = ['cfp_id', 'callForPaper', 'organizations', 'importantDates', 'nkey', 'status'];
             if (input.containsEmptyValue(conference, excludes)) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,
