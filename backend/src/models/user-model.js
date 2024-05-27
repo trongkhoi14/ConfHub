@@ -69,7 +69,7 @@ User.init({
     },
     license: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false
+        defaultValue: true
     },
     refreshToken: {
         type: DataTypes.TEXT,
