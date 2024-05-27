@@ -5,10 +5,10 @@ const { verifyAccessToken, checkUserLicense } = require('../middlewares/verifyTo
 const router = express.Router();
 const postController = new PostController();
 
-router.get('/', verifyAccessToken, checkUserLicense, postController.getAllPosts);
-router.post('/', verifyAccessToken, checkUserLicense, postController.addPost);
-router.put('/:id', verifyAccessToken, checkUserLicense, postController.updatePost);
-router.delete('/:id', verifyAccessToken, checkUserLicense, postController.deletePost);
+router.get('/', verifyAccessToken, postController.getAllPosts);
+router.post('/', verifyAccessToken, postController.addPost);
+router.put('/:id', verifyAccessToken, postController.updatePost);
+router.delete('/:id', verifyAccessToken, postController.deletePost);
 router.post('/etl', postController.etlPost);
 
 module.exports = router;
