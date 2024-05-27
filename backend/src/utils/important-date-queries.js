@@ -101,6 +101,7 @@ const updateDates = async function (conference, transaction) {
             const isExisted = await model.importantDateModel.findOne({
                 where: {
                     date_type: element.date_type,
+                    status: "new",
                     CallForPaperCfpId: conference.cfp_id
                 }
             });

@@ -105,6 +105,7 @@ const updateOrganizations = async function (conference, transaction) {
             const isExisted = await model.organizationModel.findOne({
                 where: {
                     name: element.name || "no location to find",
+                    status: "new",
                     CallForPaperCfpId: conference.cfp_id
                 }
             });
