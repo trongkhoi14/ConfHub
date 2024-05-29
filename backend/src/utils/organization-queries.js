@@ -82,13 +82,6 @@ const updateOrganizations = async function (conference, transaction) {
             });
             if (isExisted) {
                 deleteOrganizationByID(isExisted.org_id);
-                await model.organizationModel.destroy({
-                    where: {
-                        name: isExisted.name,
-                        status: "old",
-                        CallForPaperCfpId: conference.cfp_id
-                    }
-                });
 
                 // [#hc]
                 notifications.push({
@@ -202,8 +195,7 @@ const deleteOrganizationByID = async function (orgID, transaction) {
     try {
         const organization = await model.organizationModel.findByPk(orgID);
         if (organization && organization.status === "new") {
-            await model.organizationModel.destroy({ where: { status: organization.org_id } }, { transaction: transaction });
-            return await model.organizationModel.destroy({ where: { org_id: organization.org_id } }, { transaction: transaction });
+            return await model.organizationModel.destroy({ where: { name: organization.name } }, { transaction: transaction });
         } else if (organization) {
             return await model.organizationModel.destroy({ where: { org_id: organization.org_id } }, { transaction: transaction });
         }

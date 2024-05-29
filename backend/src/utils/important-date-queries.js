@@ -80,13 +80,7 @@ const updateDates = async function (conference, transaction) {
             });
             if (isExisted) {
                 deleteDateByID(isExisted.date_id);
-                await model.importantDateModel.destroy({
-                    where: {
-                        date_type: isExisted.date_type,
-                        status: "old",
-                        CallForPaperCfpId: conference.cfp_id
-                    }
-                });
+
                 // [#hc]
                 notifications.push({
                     title: process.env.TITLE_CANCELLED_EVENT,
@@ -188,8 +182,7 @@ const deleteDateByID = async function (dateID, transaction) {
     try {
         const date = await model.importantDateModel.findByPk(dateID);
         if (date && date.status === "new") {
-            await model.importantDateModel.destroy({ where: { status: date.date_id } }, { transaction: transaction });
-            return await model.importantDateModel.destroy({ where: { date_id: date.date_id } }, { transaction: transaction });
+            return await model.importantDateModel.destroy({ where: { date_type: date.date_type } }, { transaction: transaction });
         } else if (date) {
             return await model.importantDateModel.destroy({ where: { date_id: date.date_id } }, { transaction: transaction });
         }
