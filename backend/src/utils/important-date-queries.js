@@ -190,7 +190,7 @@ const deleteDateByID = async function (dateID, transaction) {
         if (date && date.status === "new") {
             await model.importantDateModel.destroy({ where: { status: date.date_id } }, { transaction: transaction });
             return await model.importantDateModel.destroy({ where: { date_id: date.date_id } }, { transaction: transaction });
-        } else {
+        } else if (date) {
             return await model.importantDateModel.destroy({ where: { date_id: date.date_id } }, { transaction: transaction });
         }
 

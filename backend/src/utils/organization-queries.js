@@ -204,7 +204,7 @@ const deleteOrganizationByID = async function (orgID, transaction) {
         if (organization && organization.status === "new") {
             await model.organizationModel.destroy({ where: { status: organization.org_id } }, { transaction: transaction });
             return await model.organizationModel.destroy({ where: { org_id: organization.org_id } }, { transaction: transaction });
-        } else {
+        } else if (organization) {
             return await model.organizationModel.destroy({ where: { org_id: organization.org_id } }, { transaction: transaction });
         }
 
