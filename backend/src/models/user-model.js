@@ -59,12 +59,12 @@ User.init({
     },
     role: {
         type: DataTypes.TEXT,
-        validate: {
-            isIn: {
-                args: [['user', 'admin']],
-                msg: 'Error: Invalid value.'
-            }
-        },
+        // validate: {
+        //     isIn: {
+        //         args: [['user', 'admin']],
+        //         msg: 'Error: Invalid value.'
+        //     }
+        // },
         defaultValue: 'user'
     },
     license: {

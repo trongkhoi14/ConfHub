@@ -13,12 +13,12 @@ const Organization = sequelize.define('Organization', {
     },
     type: {
         type: DataTypes.TEXT,
-        validate: {
-            isIn: {
-                args: [['online', 'offline', 'hybrid']],
-                msg: 'Error: invalid value'
-            }
-        }
+        // validate: {
+        //     isIn: {
+        //         args: [['online', 'offline', 'hybrid']],
+        //         msg: 'Error: invalid value'
+        //     }
+        // }
     },
     location: {
         type: DataTypes.TEXT

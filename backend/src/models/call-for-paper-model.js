@@ -25,10 +25,10 @@ const CallForPaper = sequelize.define('CallForPaper', {
     },
     owner: {
         type: DataTypes.TEXT,
-        isIn: {
-            args: [['admin', 'user', 'crawler']],
-            msg: 'Error: Invalid value.'
-        },
+        // isIn: {
+        //     args: [['admin', 'user', 'crawler']],
+        //     msg: 'Error: Invalid value.'
+        // },
         defaultValue: "crawler"
     },
     nkey: {
