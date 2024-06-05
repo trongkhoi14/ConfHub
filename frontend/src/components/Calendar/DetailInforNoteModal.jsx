@@ -1,22 +1,19 @@
-import React from 'react'
+
 import { useState } from 'react'
-import { Form, Row } from 'react-bootstrap'
+import { Form } from 'react-bootstrap'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import { Modal } from 'react-bootstrap'
-import useNote from '../../hooks/useNote'
-import { FormGroup } from 'react-bootstrap'
 import DeleteModal from '../Modals/DeleteModal'
 import Loading from '../Loading'
 import { useEffect } from 'react'
 import moment from 'moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendar, faLocation, faLocationPin } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faLocationPin } from '@fortawesome/free-solid-svg-icons'
 
-const DetailInforNoteModal = ({ show, onClose, note, onDelete, onUpdate, onReloadList, onBack }) => {
+const DetailInforNoteModal = ({ show, onClose, note, onDelete, onUpdate, onReloadList }) => {
 
     const [isUpdate, setIsUpdate] = useState(false)
     const [warning, setWarning] = useState('')
-    const [isInput, setIsInput] = useState(false)
     const [inputvalue, setInputValue] = useState('');
     const [autoClose, setAutoCLose] = useState(3)
     const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -153,11 +150,11 @@ const DetailInforNoteModal = ({ show, onClose, note, onDelete, onUpdate, onReloa
                         <>
                             
                                 <span className="text-color-black fw-semibold">
-                                    {moment(note.start_date).format('ddd, MM/DD/YYYY')}
+                                    {moment(note.start_date).format('ddd, YYYY/MM/DD')}
                                 </span>
                                 <span>{` to `}</span>
                                 <span className="text-color-black fw-semibold">
-                                    {moment(note.end_date).format('ddd, MM/DD/YYYY')}
+                                    {moment(note.end_date).format('ddd, YYYY/MM/DD')}
                                 </span>
                         </>
                         :
@@ -166,7 +163,7 @@ const DetailInforNoteModal = ({ show, onClose, note, onDelete, onUpdate, onReloa
                                 note.start_date !== null
                                 &&
                                     <span className="text-color-black fw-semibold">
-                                        {moment(note.start_date).format('dddd, MM/DD/YYYY')}
+                                        {moment(note.start_date).format('dddd, YYYY/MM/DD')}
                                     </span>
                             }
                         </>

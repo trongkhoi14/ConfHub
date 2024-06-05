@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import useFormDataInput from '../../hooks/useFormDataInput';
 import daysToWeeks from 'date-fns/fp/daysToWeeks';
 
 const InputImportantDates = ({ formData, onChange, round }) => {
 
   const [dates, setDates] = useState([
-    { date_type: 'Submission date', date_value: '' },
-    { date_type: 'Camera ready', date_value: '' },
-    { date_type: 'Registration date', date_value: '' },
-    { date_type: 'Notification date', date_value: '' },
+  
   ]);
 
   const handleDateChange = (index, e) => {
@@ -28,19 +25,23 @@ const InputImportantDates = ({ formData, onChange, round }) => {
   return (
     <>
       {dates.map((date, index) => (
-        <Form.Group as={Col} key={index} className="mb-3 d-flex align-items-center">
-          <Form.Label column sm="3">
-            {date.date_type}:
-          </Form.Label>
-          <Form.Control
-            placeholder="Select date..."
-            type="date"
-            name={date.date_type}
-            value={date.date_value}
-            onChange={(e) => handleDateChange(index, e)}
-            className='border-blue-normal'
-          />
-        </Form.Group>
+        <Form.Group as={Row} key={index} className='my-3 d-flex w-100'>
+
+        <Col sm='6'>
+          <Form.Label>Date type:</Form.Label>
+          <Form.Control type="text" value={date.date_type} onChange={(e) => handleDateChange(index, 'date_type', e.target.value)} placeholder='Submission date, Notification date...' />
+        </Col>
+        <Col >
+
+          <Form.Label>Date:</Form.Label>
+          <Form.Control type="date" value={date.date_value} onChange={(e) => handleDateChange(index, 'date_value', e.target.value)} />
+        </Col>
+        <Col sm="1" className='d-flex align-items-end'>
+          <Button variant="danger" onClick={() => removeDate(index)} className='bg-transparent border-0' title='Delete this date'>
+            <FontAwesomeIcon icon={faCircleXmark} className='text-danger' />
+          </Button>
+        </Col>
+      </Form.Group>
       ))}
     </>
   );

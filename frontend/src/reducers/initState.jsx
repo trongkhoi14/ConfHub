@@ -1,5 +1,6 @@
 export const initialState = {
   user: null,
+  isLogin: false,
   loading: false,
   error: null,
   
@@ -46,12 +47,18 @@ export const initialState = {
     rating: [],
     category: [],
   },
+priorityKeywords: {},
+
+
 
   optionFilter: [],
   resultKeywordFilter: [],
   resultFilter: [],
+  inputFilter: '',
+  actionWithKeyword:'',
 
-  
+
+
   listFollowed: [],
   //filter in auth page
   filterAuth: [],
@@ -70,6 +77,8 @@ export const initialState = {
     category: [],
   },
   
+  //postedConf
+  postedConferences: [],
 
   //notes
   notes: []

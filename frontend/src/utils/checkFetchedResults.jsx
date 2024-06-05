@@ -2,7 +2,6 @@
 
 const checkExistValue = (list) => {
   if (typeof list !== 'object' || list === null) {
-    console.log('khong phai object', list)
     return [];
   }
   
@@ -37,7 +36,6 @@ const findKeyByKeyword = (optionsSelected, keyword) => {
 };
 
 const filterCommonConferences = (filteredList, authList) => {
-  console.log({filteredList, authList})
   if(!filteredList) return authList
   return filteredList.filter(conf1 => 
     authList.some(conf2 => conf1.id === conf2.id)
@@ -45,7 +43,6 @@ const filterCommonConferences = (filteredList, authList) => {
 };
 
 const mergeConferencesByKeyword = (dataFilter, keywordList) => {
-  //console.log({dataFilter, keywordList})
   const extractedLists = [];
     // Duyệt qua từng cặp key-value trong object
     for (const [key, value] of Object.entries(dataFilter)) {

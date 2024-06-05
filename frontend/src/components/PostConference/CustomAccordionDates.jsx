@@ -4,7 +4,6 @@ import { Button, useAccordionButton } from 'react-bootstrap';
 const CustomAccordionDates = ({ children, eventKey, onClick }) => {
     const decoratedOnClick = () => {
         onClick();
-        console.log('totally custom!');
       };
     
       return (

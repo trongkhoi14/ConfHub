@@ -6,8 +6,7 @@ import { FloatingLabel, Form } from "react-bootstrap"
 
 
 const ChooseFORs = ({ selectedOptions, onChange, requiredFields }) => {
-  const { filterOptions } = useConference()
-  const { getOptionsFilter } = useSearch()
+  const { filterOptions, getOptionsFilter } = useSearch()
   const [options, setOptions] = useState([]);
 
   const [inputValue, setInputValue] = useState('');
@@ -20,12 +19,12 @@ const ChooseFORs = ({ selectedOptions, onChange, requiredFields }) => {
       }));
       setOptions(originalOptions)
     }
-  }, [])
+  }, [filterOptions])
 
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
-      border: (requiredFields['fieldsOfResearch'] === false) ? '1px solid red' : state.isFocused ? '2px solid #4c8bf5' : '1px solid #155D68', // Điều chỉnh màu và độ dày của border khi focus và không focus
+      
       borderRadius: '4px', // Điều chỉnh độ cong của góc
       boxShadow: state.isFocused ? '0 0 0 0.1rem rgba(76, 139, 245, 0.25)' : null, // Hiệu ứng boxShadow khi focus
       '&:hover': {

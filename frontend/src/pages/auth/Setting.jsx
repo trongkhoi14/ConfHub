@@ -25,7 +25,6 @@ const Setting = () => {
       }
     }
 
-    console.log({ settings, res })
   }, [user])
 
   useEffect(() => {
@@ -33,7 +32,6 @@ const Setting = () => {
   }, [])
 
   const handleChangeSelect = (e) => {
-    console.log(e.target.name, e.target.value)
     updateSetting(e.target.name, true, e.target.value)
     setSelectedOption(e.target.value);
   };

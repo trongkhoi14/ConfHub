@@ -14,18 +14,11 @@ const appReducer = (state, action) => {
                 loading: false,
                 error: action.payload,
             };
-        case actionTypes.LOGIN_REQUEST:
-            return {
-                ...state,
-                loading: true,
-                error: null,
-            };
         case actionTypes.LOGIN_SUCCESS:
             return {
                 ...state,
                 user: action.payload,
-                loading: false,
-                error: null,
+                isLogin: true,
             };
         case actionTypes.LOGIN_FAILURE:
             return {
@@ -37,8 +30,7 @@ const appReducer = (state, action) => {
             return {
                 ...state,
                 user: null,
-                loading: false,
-                error: null,
+                isLogin: false
             };
         case actionTypes.REGISTRATION_REQUEST:
             return {
@@ -94,7 +86,8 @@ const appReducer = (state, action) => {
                 ...state,
                 appliedFilterResult: action.payload.updatedResultsFilter,
                 optionsSelected: action.payload.updateOptionsSelected,
-                loading: false
+                loading: false,
+                actionWithKeyword: 'delete'
             }
         case actionTypes.CLEAR_FILTERS:
             // Cập nhật state với appliedFilterResult đã xóa hết giá trị
@@ -104,8 +97,22 @@ const appReducer = (state, action) => {
                 appliedFilterResult: action.payload.clearedConferencesFilter,
                 loading: false
             };
+        case actionTypes.SET_PRIORITY_KEYWORD:
+            return {
+                ...state,
+                priorityKeywords: action.payload,
+            }; 
 
-
+        case actionTypes.SET_SEARCH_RESULT:
+            return {
+                ...state,
+                resultFilter: action.payload,
+            };
+        case actionTypes.SEARCH_KEYWORD:
+            return {
+                ...state,
+                resultFilter: [...state.resultFilter, ...action.payload],
+            };
         case actionTypes.GET_RESULT_AFTER_FILTER:
             return {
                 ...state,
@@ -116,7 +123,6 @@ const appReducer = (state, action) => {
                         ...action.payload.results.map(item => item)
                     ]
                 },
-                resultFilter: action.payload.results
             };
 
         case actionTypes.SELECT_OPTION_FILTER:
@@ -127,8 +133,13 @@ const appReducer = (state, action) => {
         case actionTypes.INPUT_OPTION_FILTER:
             return {
                 ...state,
-                resultKeywordFilter: action.payload
-            }
+                resultKeywordFilter: action.payload,
+            };
+        case actionTypes.SET_INPUT_OPTION_FILTER:
+            return {
+                ...state,
+                inputFilter: action.payload,
+            };
         case actionTypes.REQUEST_CONFERENCE:
             return {
                 ...state,
@@ -149,17 +160,29 @@ const appReducer = (state, action) => {
         case actionTypes.FOLLOW:
             return {
                 ...state,
-                listFollowed: [...state.listFollowed, ...action.payload],
+                listFollowed: action.payload,
             };
+
         case actionTypes.UNFOLLOW:
             return {
                 ...state,
                 listFollowed: state.listFollowed.filter(item => item.id !== action.payload.id),
             };
+
+        case actionTypes.GET_POSTED_CONFERENCES:
+            return {
+                ...state,
+                postedConferences: action.payload,
+            };
         case actionTypes.GET_NOTES:
             return {
                 ...state,
                 notes: action.payload,
+            };
+        case actionTypes.GET_NOTIFICATIONS:
+            return {
+                ...state,
+                notifications: action.payload,
             };
         default:
             return state;

@@ -1,59 +1,105 @@
 import { useEffect, useState } from 'react'
 import { Container, } from 'react-bootstrap'
-import Conference from './../../components/Conference'
+import Conference from '../../components/Conference/Conference'
 import useFollow from '../../hooks/useFollow'
 import useSearch from '../../hooks/useSearch'
 
 import useLocalStorage from '../../hooks/useLocalStorage'
 import Loading from '../../components/Loading'
-import { checkExistValue, getUniqueConferences } from '../../utils/checkFetchedResults'
-import ResultFilter from '../../components/Filter/ResultFilter'
-import Search from '../../components/Filter/Search'
+
+
+import useFilter from '../../hooks/useFilter'
+import Filter from '../../components/Filter/Filter'
+import { checkExistValue } from '../../utils/checkFetchedResults'
+import useSessionStorage from '../../hooks/useSessionStorage'
 
 const Followed = () => {
-  const { listFollowed, getListFollowedConferences } = useFollow()
-  const { appliedFilterResult, optionsSelected } = useSearch()
-  const [displayConferences, setdisplayConferences] = useState([])
+  const { loading: loadingFollow, listFollowed, getListFollowedConferences } = useFollow()
+  const { getOptionsFilter, optionsSelected } = useSearch()
+  const {getDataListInStorage} = useSessionStorage()
   const { user } = useLocalStorage()
-  useEffect(()=>{
-    getListFollowedConferences()
-  },[user])
+
+  const { filterConferences } = useFilter()
   
+  
+  const [displayConferences, setDisplayConferences] = useState(listFollowed)
+  const [totalConferences, setTotalConferences] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   useEffect(() => {
-    const isAppliedFilter = checkExistValue(optionsSelected).some(value => value === true);
-    if (isAppliedFilter) {
-      console.log('ap dung fileter', )
-      const followedFilter = getUniqueConferences(appliedFilterResult)
-      const filterResults = followedFilter.filter(itemFilter => listFollowed.some(itemPosted => itemPosted.id === itemFilter.id));
-      console.log({followedFilter, listFollowed, filterResults})
-      setdisplayConferences(filterResults)
+    
+    getOptionsFilter("", [])
+    getListFollowedConferences()
+  }, [])
+
+  useEffect(() => {
+    if (!listFollowed) {
+      getListFollowedConferences()
+    }
+  }, [user])
+  useEffect(()=>{
+    const isApliedFilter = checkExistValue(optionsSelected).some(value => value === true);
+    
+    if(isApliedFilter){
+
+      const filterResult = filterConferences(listFollowed, optionsSelected)
+      setDisplayConferences(filterResult)
+      setTotalConferences(filterResult.length)
+      setTotalPages(Math.ceil(filterResult.length / 7))
+      
     }
     else {
-      setdisplayConferences(listFollowed)
+      const totalConfLS = getDataListInStorage('totalConfFollow')
+      const totalPagesLS = getDataListInStorage('totalPagesFollow')
+      setTotalConferences(totalConfLS)
+      setTotalPages(Math.ceil(totalPagesLS))
+      setDisplayConferences(listFollowed)
     }
-
+    // Tạo query string 
+    const queryString  = Object.entries(optionsSelected)
+    .filter(([, values]) => values.length > 0)
+    .map(([key, values]) => `${key}=${values.join(',')}`)
+    .join('&');
+     // Lấy phần hash của URL nếu có
+     const { hash, pathname } = window.location;
+     const newUrl = queryString ? `${pathname}${hash}?${queryString}` : `${pathname}${hash}`;
+     
+     // Cập nhật URL
+     window.history.pushState({}, '', newUrl);
   }, [optionsSelected, listFollowed])
-
- 
   return (
-    <Container  
+    <Container
       fluid
       className='py-5 ' style={{ marginLeft: "350px", marginTop: "60px" }}>
       <h4 className=''>Followed Conference</h4>
       <h6>{`Review the list of events you previously saved. Pay attention to the time so you don't miss it.`}</h6>
 
       {
-        listFollowed && listFollowed.length > 0
-          ?
+        !loadingFollow ?
           <>
-          <div style={{ width: "1000px" }}>
-          <Search/>
-        </div>
-            <ResultFilter conferencesProp={displayConferences} width={960} />
+            {
+              listFollowed && listFollowed.length > 0
+                ?
+                <>
+                 <Filter/>
+
+                  <Conference 
+                    conferencesProp={displayConferences} 
+                    onReloadPage={getListFollowedConferences} 
+                    totalPages={totalPages} 
+                    totalConferences={totalConferences} 
+                    loading={loadingFollow} />
+                </>
+                :
+                <p>{`You haven't followed any conferences yet. `}</p>
+            }
           </>
           :
-          <p>{`You haven't followed any conferences yet. `}</p>
+          <div className='mt-5'>
+            <Loading onReload={getListFollowedConferences} />
+          </div>
       }
+
 
     </Container>
   )

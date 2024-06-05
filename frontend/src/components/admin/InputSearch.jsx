@@ -13,7 +13,6 @@ function InputSearch() {
   const handleEnterKeyPress = (event) => {
     if (event.key === 'Enter') {
       // Xử lý khi nhấn phím Enter
-      console.log('Đã nhập từ khóa:', keyword);
     }
   };
 

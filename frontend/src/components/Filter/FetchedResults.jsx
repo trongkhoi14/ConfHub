@@ -46,7 +46,6 @@ const FetchedResults = () => {
     setCurrentPage(selected);
   };
   const handleFollow = (id) => {
-    console.log(id)
     followConference(id)
     getListFollowedConferences()
   }
@@ -60,7 +59,6 @@ const FetchedResults = () => {
     navigate(`/detail/information/${id}`)
   }
   const handleDropdownSelect = (value) => {
-    console.log(value)
     if (value === "Random") {
       sortConferences(value, displayedConferences)
       setDisplayedConferences([...copiedConferences])

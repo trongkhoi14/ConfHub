@@ -5,92 +5,114 @@ import { baseURL } from './api/baseApi'
 import useToken from './useToken'
 import useLocalStorage from './useLocalStorage'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useSessionStorage from './useSessionStorage'
+import useAuth from './useAuth'
 const useFollow = () => {
   const { state, dispatch } = useAppContext()
-  const {token, refreshToken} = useToken()
-  const {user} = useLocalStorage()
+  const { token } = useToken()
+  const {updateDataListInStorage} = useSessionStorage()
+  const { user } = useLocalStorage()
+  const {setIsExpired} = useAuth()
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const navigate = useNavigate()
 
+  const updateNewList = (newConferences) => {
+    // Tạo một bản sao của state.postedConferences để thực hiện các thay đổi mà không ảnh hưởng đến state gốc
+    const updatedConferences = [...state.postedConferences];
 
+    // Lặp qua danh sách hội nghị mới
+    newConferences.forEach(newConference => {
+      // Kiểm tra xem hội nghị đã tồn tại trong danh sách hay chưa
+      const existingConferenceIndex = updatedConferences.findIndex(conference => conference.id === newConference.id);
 
-  useEffect(() => {
-    setLoading(true);
-    try {
-        const fetchPage = async (page) => {
-          const response = await fetch(`${baseURL}/follow?page=${page}&size=7`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        };
+      if (existingConferenceIndex !== -1) {
+        // Nếu hội nghị đã tồn tại, thay thế bằng hội nghị mới
+        updatedConferences[existingConferenceIndex] = newConference;
+      } else {
+        // Nếu hội nghị chưa tồn tại, thêm mới vào danh sách
+        updatedConferences.push(newConference);
+      }
+    });
 
-        const fetchAllPages = async () => {
-            try {
-                const firstPageData = await fetchPage(1);
-                const extractData = firstPageData.data.map(item => item.callForPaper);
-                dispatch(getFollowedConferenceAction(extractData));
-
-                // Fetch remaining pages asynchronously
-                for (let i = 2; i <= firstPageData.maxPages; i++) {
-                    const pageData = await fetchPage(i);
-                    const extractData = pageData.data.map(item => item.callForPaper);
-                    dispatch(getFollowedConferenceAction(extractData));
-                }
-
-                setLoading(false);
-            } catch (error) {
-                setError(error);
-                setLoading(false);
-            }
-        };
-
-        if (user) {
-            fetchAllPages();
-        }
-    } catch (error) {
-        setError(error);
-        setLoading(false);
+    return newConferences
+  }
+  const fetchPage = async (page) => {
+    let storedToken = JSON.parse(localStorage.getItem('token'));
+    const tokenHeader = token ? token : storedToken
+    const response = await fetch(`${baseURL}/follow?page=${page}&size=7`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${tokenHeader}`
+      }
+    });
+    if (!response.ok) {
+      if(response.status === 401){
+        setIsExpired(true)
+      }
+      throw new Error('Network response was not ok');
     }
-}, []);
+    return response.json();
+  };
 
   const getListFollowedConferences = async () => {
-    if(user){
-      const response = await fetch(`${baseURL}/follow`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
+    setLoading(true)
+    if (user || localStorage.getItem('user')) {
+      try {
+
+        const firstPageData = await fetchPage(1);
+        const totalPages = firstPageData.maxPages; // Lấy số lượng trang từ dữ liệu đầu tiên
+        const totalConf = firstPageData.maxRecords
+
+        sessionStorage.setItem('totalConfFollow', JSON.stringify(totalConf))
+        sessionStorage.setItem('totalPagesFollow', JSON.stringify(totalPages))
+
+        const extractData = firstPageData.data.map(item => item.callForPaper);
+        const newConferences = updateNewList(extractData)
+       
+        updateDataListInStorage("listFollow", newConferences)
+        dispatch(getFollowedConferenceAction(newConferences))
+
+        // Fetch remaining pages asynchronously
+        for (let i = 2; i <= totalPages; i++) {
+          const pageData = await fetchPage(i);
+          const extractData = pageData.data.map(item => item.callForPaper);
+          const newConferences = updateNewList(extractData)
+          dispatch(getFollowedConferenceAction(newConferences))
+
         }
-      });
-      if (!response.ok) {
-        throw new Error(response.message);
+
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
       }
-      const data = await response.json();      
-      const extractData = data.data.map(item => item.callForPaper); // Trích xuất dữ liệu từ trường callForPaper của mỗi object và tạo một object mới trong danh sách data
-      dispatch(getFollowedConferenceAction(extractData))
+
     }
+    setLoading(false);
   }
   const followConference = async (id) => {
-    if(token){
+    setLoading(true)
+    if (user || localStorage.getItem('user')) {
+      let storedToken = JSON.parse(localStorage.getItem('token'));
+
+      const tokenHeader = token ? token : storedToken
       try {
         const response = await fetch(`${baseURL}/follow`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${tokenHeader}`
           },
-          body: JSON.stringify({ cfp_id: id})
+          body: JSON.stringify({ cfp_id: id })
         });
-  
+        const responsedata = await response.json()
+
+        setLoading(false)
         if (!response.ok) {
+          if(response.status === 401){
+            setIsExpired(true)
+          }
           throw new Error(response.message);
         }
         else {
@@ -108,6 +130,7 @@ const useFollow = () => {
     }
   }
   const unfollowConference = async (id) => {
+    setLoading(true)
     try {
       const response = await fetch(`${baseURL}/follow`, {
         method: 'DELETE',
@@ -115,11 +138,13 @@ const useFollow = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ cfp_id: id})
+        body: JSON.stringify({ cfp_id: id })
       });
-
+      setLoading(false)
       if (!response.ok) {
-       
+        if(response.status === 401){
+          setIsExpired(true)
+        }
         return false
       }
       else {
@@ -131,13 +156,14 @@ const useFollow = () => {
     }
   }
 
-    return {
-      listFollowed: state.listFollowed,
-      getListFollowedConferences,
-      followConference,
-      unfollowConference,
-    }
+  return {
+    loading,
+    listFollowed: state.listFollowed,
+    getListFollowedConferences,
+    followConference,
+    unfollowConference,
   }
+}
 
 
-  export default useFollow
+export default useFollow

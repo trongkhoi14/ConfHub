@@ -13,7 +13,11 @@ h5 {
 .fs-7 {
     font-size: 12px !important;
 }
-
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear
+{
+    display: none;
+}
 
 /*can deu*/
 .text-justify {
@@ -73,13 +77,14 @@ button.text-color-darker:hover {
 
 button.text-primary-normal:hover {
     color: #459e92;
-    font-weight: 600;
 }
 
 .border-primary-normal {
     border-color: #4EB1A4 !important;
 }
-
+input:focus {
+    border: 1px solid #4EB1A4;
+  }
 .border-primary-light {
     border-color: #C2F1EB;
 }
@@ -205,7 +210,7 @@ a.dropdown-item:active {
 }
 
 /*phan loai thong bao*/
-.color-extend {
+.text-color-extend {
     color: #1E4540;
 }
 
@@ -306,7 +311,7 @@ a {
 
 .btn:disabled {
     background-color: #666666;
-    color: lightgray;
+    color: darkgray;
 }
 
 
@@ -355,7 +360,6 @@ a {
 
     height: 160px;
     background-color: white;
-    padding: 20px;
     align-items: center;
     border-radius: 20px;
     display: flex;
@@ -375,7 +379,16 @@ a {
 /*****/
 .my-conf-card {
     border-radius: 15px;
-    border: none;
+    border: 1px solid #f2fbfc;
+    background-color: #c8efea;
+    cursor: pointer;
+    padding: 20px 40px;
+    margin: 20px 0px;
+}
+
+.my-conf-card:hover {
+    border-radius: 15px;
+    border: 1px solid #81d2e4;
     background-color: #C2F1EB;
     cursor: pointer;
     padding: 20px 40px;
@@ -404,7 +417,6 @@ a {
 }
 
 .icon-follow {
-    position: absolute;
     width: 140px;
     height: 40px;
     right: 50px;
@@ -530,21 +542,15 @@ a {
 .sticky {
     position: fixed;
     top: 60px;
-    width: 100%;
+    left: 0;
+    right: 0;
+    z-index: 999;
 }
 
 .sticky+.content {
     padding-top: 102px;
 }
 
-.tooltip-arrow::before {
-    border-right-color: #4EB1A4 !important
-}
-
-.tooltip-inner {
-    background-color: #4EB1A4 !important;
-    padding: 4px;
-}
 
 /*render event*/
 .event-container {
@@ -566,3 +572,68 @@ a {
 .rbc-calendar {
     min-height: 500px ;
   }
+
+
+  .accordion-button {
+    padding: 8px 10px;
+    border-color: 2px solid #1A7482;
+  }
+
+  .text-dropdown-toggle,
+  .text-dropdown-toggle:hover,
+  .text-dropdown-toggle:active,
+  .text-dropdown-toggle:focus{
+    color: #3f3f3f;
+  }
+
+  .notification-message {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.upcoming-tag {
+    content: "Upcoming";
+    position: absolute;
+    top: 0px;
+    right: -27px;
+    width: 75px;
+    text-align: center;
+    transform: rotate(45deg);
+    background: #FFB13B;
+    padding: 10px;
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+}
+/* HTML: <div class="ribbon">Your text content</div> */
+.ribbon {
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+  }
+  .ribbon {
+    --f: .5em; /* control the folded part */
+    
+    position: absolute;
+    top: 0;
+    right: 0;
+    line-height: 1.8;
+    padding-inline: 1lh;
+    padding-bottom: var(--f);
+    border-image: conic-gradient(#0008 0 0) 51%/var(--f);
+    clip-path: polygon(
+      100% calc(100% - var(--f)),100% 100%,calc(100% - var(--f)) calc(100% - var(--f)),var(--f) calc(100% - var(--f)), 0 100%,0 calc(100% - var(--f)),999px calc(100% - var(--f) - 999px),calc(100% - 999px) calc(100% - var(--f) - 999px));
+    transform: translate(calc((1 - cos(45deg))*100%), -100%) rotate(45deg);
+    transform-origin: 0% 100%;
+    background-color: #FFB13B; /* the main color  */
+  }
+
+.filter-selected{
+    transition: width 2s;
+    transition-timing-function: ease-in-out;
+}
+

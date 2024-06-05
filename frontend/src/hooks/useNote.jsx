@@ -111,7 +111,7 @@ const useNote = () => {
     
   const getAllNotes = async () => {
     setLoading(true)
-    if(user){
+    if(user || localStorage.getItem('user')){
         const response = await fetch(`${baseURL}/note`, {
           method: 'GET',
           headers: {
@@ -124,7 +124,6 @@ const useNote = () => {
         const data = await response.json(); 
         // Sử dụng hàm này để lấy thông tin từ danh sách dựa trên OrganizationOrgId
         const newDataByOrgId = extractDataByOrgId(listFollowed, data.data);
-        console.log({newDataByOrgId})
         dispatch(getNotes(newDataByOrgId))
         setLoading(false)
       }
@@ -137,7 +136,7 @@ const useNote = () => {
     const updateData = {
       note: note
     }
-    if(user){
+    if(user || localStorage.getItem('user')){
       const response = await fetch(`${baseURL}/note/${id}`, {
         method: 'PUT',
         headers: {
@@ -152,7 +151,7 @@ const useNote = () => {
         throw new Error(response.message);
       }
       else {
-        const message = data.message
+        const message = data.message || data.data
         return {status: true, message}
       }
     }
@@ -163,7 +162,7 @@ const useNote = () => {
       note: note,
       date_value: date_value
     }
-    if(user){
+    if(user || localStorage.getItem('user')){
         const response = await fetch(`${baseURL}/note`, {
           method: 'Post',
           headers: {
@@ -177,14 +176,14 @@ const useNote = () => {
         }
         else {
           const data = await response.json();   
-          const message = data.message
+          const message = data.message || data.data
           return {status: true, message}
         }
       }
   }
   const deleteNote = async (id) => {
     setLoading(true)
-    if(user){
+    if(user || localStorage.getItem('user')){
         const response = await fetch(`${baseURL}/note/${id}`, {
           method: 'DELETE',
           headers: {
@@ -197,7 +196,7 @@ const useNote = () => {
           throw new Error(response.message);
         }
         else {
-          const message = data.message
+          const message = data.message || data.data
           return {status: true, message}
         }
       }

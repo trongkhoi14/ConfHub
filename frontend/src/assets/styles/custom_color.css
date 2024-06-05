@@ -14,7 +14,7 @@
     background-color: #bcedd8;
 }
 
-.bg-beige-normal:hover {
+button.bg-beige-normal:hover {
     background-color: #a9d5c2;
 }
 
@@ -71,11 +71,11 @@ button.bg-teal-light:active {
     background-color: #f2fbfc;
 }
 
-.bg-skyblue-light:hover {
+button.bg-skyblue-light:hover {
     background-color: #ecf8fb;
 }
 
-.bg-skyblue-light:active {
+button.bg-skyblue-light:active {
     background-color: #d8f1f7;
 }
 .bg-skyblue-normal {
@@ -138,18 +138,6 @@ button.bg-teal-light:active {
     background-color: #fffac1;
 }
 
-.bg-yellow-normal {
-    background-color: #ffee38;
-}
-
-button.bg-yellow-normal:hover {
-    background-color: #e6d632;
-}
-
-button.bg-yellow-normal:active {
-    background-color: #ccbe2d;
-}
-
 .bg-yellow-dark {
     background-color: #bfb32a;
 }
@@ -172,10 +160,15 @@ button.bg-yellow-normal:active {
 }
 
 .text-teal-normal {
-    color: #065758;
+    color: #065758  !important;
 }
 .text-teal-dark{ 
     color: #054142;
+}
+
+
+.text-skyblue-normal{ 
+    color: #81d2e4;
 }
 
 .text-skyblue-dark{ 
@@ -187,3 +180,44 @@ button.bg-yellow-normal:active {
     background-image: linear-gradient(to bottom, #bcedd8 , #f8fdfb);
   }
 
+.nav-link{
+    color: #054142;
+    border-bottom: 2px solid #054142;
+}
+
+.nav-link:hover{
+    color: #043435;
+}
+.nav-link.active{
+    color: #024546 !important;
+    font-weight: 600;
+
+}
+
+.nav-item.custom-tab {
+    color:  #619eab !important;
+  }
+  
+  /* Màu tiêu đề tab khi được bấm */
+  .custom-tab:hover,
+ .custom-tab:focus {
+    color: #4d7e89;
+  }
+
+.btn-noti-more:hover,
+.btn-noti-more:active{
+    color: #00999f;
+}
+
+.noti-wrapper{
+    cursor: pointer;
+}
+.noti-wrapper:hover,
+.noti-wrapper:active
+{
+    background-color: #ddf1f6;
+}
+
+.btn-show-advanced:disabled{
+    color: #4EB1A4;
+}

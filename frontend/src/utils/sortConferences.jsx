@@ -23,9 +23,20 @@ const sortByUpcoming = (conferences) => {
 
   // Sắp xếp danh sách các hội nghị theo ngày diễn ra
   conferences.sort((a, b) => {
-    const dateA = new Date(a.organizations[0].start_date);
-    const dateB = new Date(b.organizations[0].start_date);
 
+    const orgA = a.organizations.find(org => org.status === "new" && org.start_date);
+    const orgB = b.organizations.find(org => org.status === "new" && org.start_date);
+
+    // Nếu không tìm thấy organizations hoặc không tìm thấy start_date, sắp xếp xuống cuối danh sách
+    if (!orgA) return 1;
+    if (!orgB) return -1;
+
+    
+    const dateA = new Date(orgA.start_date);
+    const dateB = new Date(orgB.start_date);
+
+   
+    
     // Kiểm tra xem hội nghị A đã diễn ra hay chưa
     const hasHappenedA = dateA < today;
     // Kiểm tra xem hội nghị B đã diễn ra hay chưa
@@ -111,12 +122,7 @@ const sortAndFilterConferences = (conferences) => {
 };
 
 const sortByFollow = (conferences, followedConferences) => {
-  console.log({conferences, followedConferences})
-  // Kiểm tra nếu danh sách followedConferences rỗng
-  if (followedConferences.length || conferences === undefined || conferences.length === 0) {
-    // Trả về danh sách conferences không được sắp xếp
-    return conferences
-  }
+  
   // Hàm sắp xếp để ưu tiên các conf đã follow
   const sortedConferences = [...conferences].sort((a, b) => {
     const isAFollowedIndex = followedConferences.findIndex(conf => conf.id === a.id);
@@ -130,11 +136,11 @@ const sortByFollow = (conferences, followedConferences) => {
       return 0; // Giữ nguyên thứ tự
     }
   });
-  console.log({sortedConferences})
   return sortedConferences;
 };
 
 const sortConferences = (sortby, conferences) => {
+
   const hasElementsInList = checkExistValue(conferences)
   const isExist = hasElementsInList.some(value => value === true);
   if (isExist || conferences.length > 0) {

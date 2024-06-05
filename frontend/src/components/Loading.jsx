@@ -30,7 +30,7 @@ function Loading({onReload}) {
     };
   
     return (
-      <div>
+      <div className='text-center'>
         {showReloadMessage ? (
           <div>
             <Button className='bg-transparent border-0' onClick={handleReload}>Reload</Button>

@@ -2,7 +2,6 @@ import React from "react";
 import TablePagination from "./Pagination";
 
 const TableContent = ({ data, accessors }) => {
-  console.log({ data, accessors })
   return (
     <>
       {

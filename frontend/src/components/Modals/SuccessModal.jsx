@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import usePost from '../../hooks/usePost';
+import { useState, useEffect } from 'react';
+import { Modal } from 'react-bootstrap';
 
 
 function SuccessfulModal({ message, show, handleClose }) {
 
-  const [countdown, setCountdown] = useState(2);
+  const [countdown, setCountdown] = useState(1);
 
   useEffect(() => {
     if (show) {
       const timer = setInterval(() => {
         setCountdown(prevCountdown => prevCountdown - 1);
-      }, 1000);
+      }, 1);
 
       // Đóng modal sau 3 giây
       setTimeout(() => {
         handleClose()
         setCountdown(2); // Reset thời gian đếm ngược
-      }, 2000);
+      }, 1);
 
       // Hủy bỏ timer khi component unmount
       return () => {
@@ -33,9 +32,12 @@ function SuccessfulModal({ message, show, handleClose }) {
   return (
     <div>
       <Modal show={show} onHide={handleCloseSuccessModal} centered>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className='border-0'>
           <Modal.Title className='text-success text-center w-100'>Success</Modal.Title>
         </Modal.Header>
+        <Modal.Body>
+          <span className='text-success'> {message}</span>
+        </Modal.Body>
         <Modal.Footer>
 
           {show && <p>Auto closing in {countdown} seconds</p>}

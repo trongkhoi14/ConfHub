@@ -1,45 +1,56 @@
 // useAuth.js
 // handleLogin, handleRegister, Logout, updateProfile
 import { useAppContext } from '../context/authContext';
-import { loginRequest, loginSuccess, loginFailure, logoutUser, registrationRequest, registrationSuccess, registrationFailure, setError, requestApi } from '../actions/actions';
+import { loginRequest, loginSuccess, loginFailure, logoutUser, registrationFailure } from '../actions/actions';
 import { useNavigate } from 'react-router-dom';
 import { baseURL } from './api/baseApi';
 import useLocalStorage from './useLocalStorage';
 import useToken from './useToken';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const useAuth = () => {
   const { state, dispatch } = useAppContext();
   const { token, savetokenToLocalStorage } = useToken()
-  const { saveUserToLocalStorage, deleteUserFromLocalStorage, updateUserInStorage} = useLocalStorage()
+  const { user, saveUserToLocalStorage, deleteUserFromLocalStorage, updateUserInStorage } = useLocalStorage()
   const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
-  const [status, setStatus] = useState(false)
+  const [userId, setUserId] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [isExpiredLogin, setIsExpired] = useState(false)
   const navigate = useNavigate()
+
+
+
 
   const handleLogin = async (email, password) => {
     dispatch(loginRequest());
-
-    //test account page
+    setLoading(true)
     try {
-      const response = await fetch(`${baseURL}/user/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      if (!user || !token) {
+        const response = await fetch(`${baseURL}/user/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
 
-      if (response.ok) {
+        setLoading(false)
         const responseData = await response.json()
-        const userData = responseData.data
-        dispatch(loginSuccess(userData));
-        saveUserToLocalStorage(userData)
-        savetokenToLocalStorage(userData.accessToken)
-        navigate('/home')
-      } else {
-        const errorData = await response.json();
-        dispatch(loginFailure(errorData.message));
+        if (response.ok) {
+          const userData = responseData.data
+          dispatch(loginSuccess(userData));
+          saveUserToLocalStorage(userData)
+          savetokenToLocalStorage(userData.accessToken)
+          navigate('/')
+
+          return { status: true, message: responseData.message }
+        } else {
+          return { status: false, message: responseData.message }
+        }
+      }
+      else {
+        alert('You are still logged in.')
+        navigate('/')
       }
     } catch (error) {
       dispatch(loginFailure('An error occurred during login.'));
@@ -47,41 +58,41 @@ const useAuth = () => {
 
   };
 
-  const handleRegister = async (email, password) => {
-    const user = {
+  const handleRegister = async (email, password, phone) => {
+    const account = {
       email: email,
-      name: '',
-      phone: '',
-      address: '',
-      nationality: '',
+      name: ' ',
+      phone: phone,
+      address: ' ',
+      nationality: ' ',
       password: password
     }
     try {
-      // Dispatch registration request action
-      dispatch(registrationRequest());
+      if (!user) {
+        // Dispatch registration request action
+        setLoading(true)
 
-      // Make API request to register
-      const response = await fetch(`${baseURL}/user/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      });
+        // Make API request to register
+        const response = await fetch(`${baseURL}/user/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(account),
+        });
 
-      if (response.ok && response.status !== 400) {
-        // Successful registration
         const responseData = await response.json();
-        const userData = responseData.data
-        dispatch(registrationSuccess(userData));
-        saveUserToLocalStorage(userData)
-        navigate('/home')
-
-        // Optionally, you can perform additional actions like redirecting to a login page
-      } else {
-        // Handle registration failure
-        const errorData = await response.json();
-        dispatch(registrationFailure(errorData.message));
+        const responseMessages = responseData.message
+        setLoading(false)
+        if (response.ok) {
+          return { status: true, message: responseMessages }
+        } else {
+          return { status: false, message: responseMessages }
+        }
+      }
+      else {
+        alert('You are still logged in.')
+        navigate('/')
       }
     } catch (error) {
       // Handle unexpected errors
@@ -90,50 +101,68 @@ const useAuth = () => {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(logoutUser());
-    deleteUserFromLocalStorage()
-    navigate('/home')
+    await deleteUserFromLocalStorage()
+    navigate('/')
     window.location.reload()
   };
 
 
-  const updateProfile = (updateData) => {
-    console.log({updateData})
-    fetch(`${baseURL}/user/infomation`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(updateData),
-    })
-      .then(response => {
-        if (response.ok) {
-          updateUserInStorage(updateData)
-        }
-        return response.json();
-      })
-      .catch(error => {
-        setError(error)
+  const updateProfile = async (updateData) => {
+    let storedToken = JSON.parse(localStorage.getItem('token'));
+    const tokenHeader = token ? token : storedToken
+    try {
+      const response = await fetch(`${baseURL}/user/infomation`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenHeader}`
+        },
+        body: JSON.stringify(updateData),
       });
+
+      const responseData = await response.json();
+      setLoading(false)
+      if (!response.ok) {
+        if(response.status === 401){
+          setIsExpired(true)
+        }
+        setError(response.status) 
+      }
+      return responseData
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+
   }
 
   const changePassword = async (currentPassword, newPassword) => {
-    
+    setLoading(true)
+    let storedToken = JSON.parse(localStorage.getItem('token'));
+    const tokenHeader = token ? token : storedToken
     try {
       const response = await fetch(`${baseURL}/user/changePassword`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${tokenHeader}`
         },
         body: JSON.stringify({
           currentPassword: currentPassword,
           newPassword: newPassword
         })
       });
+
       const responseData = await response.json();
+      setLoading(false)
+      if (!response.ok) {
+        if(response.status === 401){
+          setIsExpired(true)
+        }
+        setError(response.status) 
+      }
       return responseData
     } catch (error) {
       console.error(error);
@@ -141,18 +170,51 @@ const useAuth = () => {
     }
   }
 
+  const getCurrentUser = async () => {
+    let storedToken = JSON.parse(localStorage.getItem('token'));
+    const tokenHeader = token ? token : storedToken
+    try {
+      const response = await fetch(`${baseURL}/user/infomation`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenHeader}`
+        },
+      });
+
+      if (!response.ok) {
+        if(response.status === 401){
+          setIsExpired(true)
+        }
+        setError(response.status)        
+        throw new Error(response.message);
+      }
+      else {
+        const data = await response.json()
+        const user_id = data.data.id
+        sessionStorage.setItem('user-id', JSON.stringify(user_id))
+        setUserId(user_id)
+      }
+    } catch (error) {
+      console.error('Error:', error);
+
+    }
+  }
 
   return {
     user: state.user,
-    loading: state.loading,
     error: error,
-    message: message,
-    status: status,
+    userId,
+    loading,
+    isExpiredLogin,
+    isLogin: state.isLogin,
+    setIsExpired,
     handleLogin,
     handleRegister,
     handleLogout,
     updateProfile,
     changePassword,
+    getCurrentUser
   };
 };
 

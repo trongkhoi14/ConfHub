@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getIdFromPathname } from '../../utils/getID'
 import useFeedback from '../../hooks/useFeedbacks'
@@ -19,19 +19,15 @@ const AllFeedbackOfConf = () => {
     const {user} = useLocalStorage()
     const [idEdit, setIdEdit] = useState(null)
     const [idCFP, setidCFP] = useState(null)
-    const [loading, setLoading] = useState(false)
     
     const [selectedOption, setSelectedOption] = useState(null);
     const [displayFeedback, setDisplayfeedback] = useState([])
-    useEffect(()=>{
-        getAllFeedbacks()
-    },[])
+   
     useEffect(()=>{        
         const handleGetFeedbacks = async () => {
             
             const idinpathname = await getIdFromPathname(pathname)
             const response = await getAllFeedbacks(idinpathname)
-            console.log({response})
             setDisplayfeedback(response.rows)
         }   
         handleGetFeedbacks()
@@ -44,13 +40,11 @@ const AllFeedbackOfConf = () => {
     ];
       // Hàm xử lý khi người dùng chọn một tùy chọn từ dropdown
       const handleSelectOption = (option) => {
-        console.log({option})
         setSelectedOption(option);
     };
     const handleChooseFeedback = (e, index) => {
         setIdEdit(feedbacks[index].tid)
         setidCFP(feedbacks[index].CallForPaperCfpId)
-        console.log(feedbacks[index])
     }
 
     const handleDeleteFeedback = (tid)=> {
@@ -65,6 +59,11 @@ const AllFeedbackOfConf = () => {
         handleSortFeedback()
     }, [selectedOption])
 
+    const renderUser = (user) => {
+        const displayName = user.name.trim() ? user.name : user.email;
+
+    return displayName
+    }
   return (
     <div className='ps-5'>
         <div className="d-flex align-items-center justify-content-between mt-4">
@@ -79,7 +78,8 @@ const AllFeedbackOfConf = () => {
     displayFeedback.map((feedback, index) => (
         <div className="p-3 m-1 mt-3 rounded shadow-sm w-100 border border-light" key={feedback.tid}>
             <div className="d-flex justify-content-between align-items-center bg-primary-light p-2 rounded">
-                <span className="fw-bold m-0">{feedback.user ? feedback.user.name : 'Undefined user'} wrote:</span>
+                <span className="fw-bold m-0">{
+                  renderUser(feedback.User)  }               wrote:</span>
                 <span>at {formatTime(feedback.time)}</span>
             </div>
             <div key={index}>

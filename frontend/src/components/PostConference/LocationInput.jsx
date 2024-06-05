@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Col } from 'react-bootstrap';
 import data from './../Filter/options.json'
-const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) => {
+const LocationInput = ({ onLocationChange, orgIndex }) => {
     
     const [formData, setFormData] = useState({
         numberStreet: '',
@@ -23,7 +23,7 @@ const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) =>
         const { numberStreet, stateProvince, city, country } = formData;
         const locationArray = [numberStreet, stateProvince, city, country].filter(Boolean);
         const location = locationArray.join(", ");
-        onLocationChange(location);
+        onLocationChange(orgIndex, location);
     }, [formData]);
 
     return (
@@ -37,6 +37,7 @@ const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) =>
                         value={formData.numberStreet}
                         onChange={handleInputChange}
                         placeholder="Enter number street..."
+                        autoComplete="off"
                     />
                 </Col>
             </Form.Group>
@@ -49,6 +50,7 @@ const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) =>
                         value={formData.stateProvince}
                         onChange={handleInputChange}
                         placeholder="Enter state/province..."
+                        autoComplete='off'
                     />
                 </Col>
             </Form.Group>
@@ -61,6 +63,7 @@ const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) =>
                         value={formData.city}
                         onChange={handleInputChange}
                         placeholder="Enter city..."
+                        autoComplete='off'
                     />
                 </Col>
             </Form.Group>
@@ -71,7 +74,7 @@ const LocationInput = ({ onLocationChange, locationInput, setLocationInput }) =>
                     name="country"
                     value={formData.country}
                     onChange={handleInputChange}
-
+                    autoComplete='off'
                 >
                     <option value="">Select organizations type...</option>
                     {

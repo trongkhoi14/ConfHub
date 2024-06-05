@@ -1,4 +1,4 @@
-import {Routes, Route, Navigate} from 'react-router-dom'
+import {Routes, Route} from 'react-router-dom'
 
 import Homepage from '../pages/public/Homepage'
 import Login from '../pages/public/Login'
@@ -26,12 +26,12 @@ import UserDetail from '../pages/admin/UserDetail'
 import DetailedInformationPage from '../pages/public/DetailedInformationPage'
 
 const authPage = [
-  { path: 'account', element: <Account /> },
-  { path: 'followed', element: <Followed /> },
-  { path: 'yourconferences', element: <YourConf /> },
-  { path: 'schedule', element: <Timestamp /> },
-  { path: 'notifications', element: <Notifications /> },
-  { path: 'setting', element: <Setting /> },
+  { path: 'user/account', element: <Account /> },
+  { path: 'user/followed', element: <Followed /> },
+  { path: 'user/yourconferences', element: <YourConf /> },
+  { path: 'user/schedule', element: <Timestamp /> },
+  { path: 'user/notifications', element: <Notifications /> },
+  { path: 'user/setting', element: <Setting /> },
 ]
 
 const admin = [

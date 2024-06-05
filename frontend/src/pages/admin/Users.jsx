@@ -18,7 +18,6 @@ const Users = () => {
       // Tăng giá trị fetchCount sau khi fetch
       setFetchCount(fetchCount + 1);
     }
-      console.log(conferences)
     }, [conferences, ])
 
   const fixedcolumns = [

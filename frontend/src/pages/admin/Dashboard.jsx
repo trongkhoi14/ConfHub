@@ -25,7 +25,6 @@ const Dashboard = () => {
       // Tăng giá trị fetchCount sau khi fetch
       setFetchCount(fetchCount + 1);
     }
-    console.log(conferences)
   }, [conferences, handleGetList])
 
   const headers = ["ConferenceID", "Name", "Acronym", "Source", "Rank", "Field of Research", "Location", "Type", "Conference date", "Crawl date", "Update date"];

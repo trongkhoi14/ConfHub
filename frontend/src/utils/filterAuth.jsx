@@ -1,5 +1,4 @@
 const filterListbyCondition = (conferences, listOptions) => {
-    console.log({ conferences, listOptions })
     // Duyệt qua từng thuộc tính trong filters 
     const filteredConferences = conferences.filter(conference => {
         if (listOptions.submissionDate.length > 0) {
@@ -33,7 +32,6 @@ const filterListbyCondition = (conferences, listOptions) => {
                 const endDate = new Date(matches[1]);
                 // So sánh xem filterDate có nằm trong khoảng từ startDate đến endDate không
                 const isWithinRange = filterDate >= startDate && filterDate <= endDate;
-                console.log('isWithinRange', {isWithinRange, filterDate, startDate, endDate});
                 return isWithinRange;
             }
         }
@@ -46,7 +44,6 @@ const filterListbyCondition = (conferences, listOptions) => {
             const arrayKey = ['fieldOfResearch', 'importantDates', 'organizations', 'type', 'location',]
             return Object.keys(listOptions).some(filterKey => {
                 if (listOptions[filterKey].length > 0) {
-                    console.log('filterkey', filterKey)
                     let formatKey = filterKey
                     let formatFilterOptions = listOptions[filterKey]
                     let conferenceValue = ''
@@ -54,13 +51,11 @@ const filterListbyCondition = (conferences, listOptions) => {
                     if (arrayKey.includes(filterKey)) {
                         if (filterKey === 'fieldOfResearch') {
                             conferenceValue = conference[formatKey]['for_name']
-                            console.log('conferenceValue', conferenceValue)
                         }
                         else if (filterKey === 'importantDates') {
                             const subDates = conference.importantDates.filter(date => date.date_type === 'sub');
                             // Lấy ra các giá trị date_value từ các object có date_type là 'sub'
                             const subDateValues = subDates.map(date => date.date_value);
-                            console.log('subdate', subDateValues)
                         }
                         else {
                             if (filterKey === 'type') {
@@ -74,7 +69,6 @@ const filterListbyCondition = (conferences, listOptions) => {
                     else if (filterKey === 'search') {
                         formatKey = 'name'
                         formatFilterOptions = listOptions[filterKey].map(value => value.toUpperCase())
-                        console.log('search', formatFilterOptions)
                     }
                     else if(filterKey === 'category') return true
                     else conferenceValue = conference[formatKey];
@@ -84,14 +78,12 @@ const filterListbyCondition = (conferences, listOptions) => {
 
                     // So sánh chuỗi đã chuyển đổi
                     const isEqual = formatFilterOptionsLower.includes(conferenceValueLower);
-                    console.log('final conferencev', { conferenceValue, formatFilterOptions, isEqual })
                     return formatFilterOptionsLower.includes(conferenceValueLower)
                 }
 
             });
         }
     });
-    console.log('thoa', filteredConferences)
     return filteredConferences;
 
 };

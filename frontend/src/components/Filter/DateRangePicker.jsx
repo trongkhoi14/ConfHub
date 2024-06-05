@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { Dropdown, Image, ButtonGroup, Button, Row, Col } from 'react-bootstrap';
@@ -10,8 +10,8 @@ import useSearch from '../../hooks/useSearch';
 import dateIcon from '../../assets/imgs/conf_date_light.png'
 import { formatDate } from '../../utils/formatDate';
 import { formatLabel } from '../../utils/formatWord';
-const DateRangePicker = ({ label, onApply }) => {
-  const { sendFilterDate, addKeywords } = useSearch()
+const DateRangePicker = ({ label }) => {
+  const { addKeywords } = useSearch()
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -26,15 +26,10 @@ const DateRangePicker = ({ label, onApply }) => {
     setEndDate(date);
   };
 
-  const handleApplyFilter = async () => {
-    
+  const handleApplyFilter = async () => {    
     handleToggleClick()
-    const keywordFormat = `${formatLabel(label)}: from ${formatDate(startDate)} to ${formatDate(endDate)}`        
-    const quantity = await sendFilterDate(startDate, endDate, label, [keywordFormat])
-    const keyword = `${keywordFormat} (${quantity})`
-    console.log({keywordFormat, keyword})
-    addKeywords(label, [keyword])
-    onApply(label, keyword)
+    const keywordFormat = `${formatLabel(label)}: from ${formatDate(startDate)} to ${formatDate(endDate)}`         
+    addKeywords(label, [keywordFormat])
   };
   return (
     <Dropdown className="w-100" show={showDropdown} onHide={() => setShowDropdown(false)}>
@@ -79,7 +74,7 @@ const DateRangePicker = ({ label, onApply }) => {
           </Row>
         </div>
         <Dropdown.Divider />
-        <ButtonGroup className='top-100 w-100 bg-white px-2 pb-2'>
+        <ButtonGroup className='top-100 w-100 bg-white px-2 pb-2 m-2'>
           <Button
             onClick={() => setShowDropdown(false)}
             className='w-50 me-2 rounded-2 border-0 bg-secondary'>

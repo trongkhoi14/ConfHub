@@ -13,7 +13,6 @@ const useToken = () => {
   }, []);
 
   const refreshToken = async (oldToken) => {
-    console.log('token', oldToken)
     try {
       const response = await fetch(`${baseURL}/user/refreshToken`, {
         method: 'GET',
@@ -23,7 +22,6 @@ const useToken = () => {
       });
       if (response.ok) {
         const responseData = await response.data.newAccessToken
-        console.log(responseData)
         savetokenToLocalStorage(responseData)
       } else {
         const errorData = await response.message

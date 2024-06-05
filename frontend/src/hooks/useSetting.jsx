@@ -53,7 +53,7 @@ const useSetting = () => {
   const getAllSetting = async () => {
     setLoading(true);
     try {
-      if(user){
+      if(user || localStorage.getItem('user')){
         const response = await fetch(`${baseURL}/user/setting`, {
           method: 'GET',
           headers: {
@@ -70,7 +70,6 @@ const useSetting = () => {
         setLoading(false);
         const updatedData = await updateData(data.data)
         setSetttings(updatedData)
-        console.log({updatedData})
         return updatedData;
       }
     } catch (error) {
@@ -96,7 +95,6 @@ const useSetting = () => {
           status: status
         }
       }
-      console.log({postData})
         // Gửi yêu cầu lấy danh sách feedback đến API
         const response = await fetch(`${baseURL}/user/setting`, {
           method: 'PUT',

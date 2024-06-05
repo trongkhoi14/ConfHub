@@ -1,74 +1,86 @@
 import {useEffect, useState} from 'react'
 
 
-import SlideShow from '../../components/SlideShow'
-import Conference from '../../components/Conference'
+import Conference from '../../components/Conference/Conference'
 
 
 import useSearch from '../../hooks/useSearch'
 import useConference from '../../hooks/useConferences'
-import { checkExistValue, getUniqueConferences, mergeConferencesByKeyword } from '../../utils/checkFetchedResults'
+import { checkExistValue } from '../../utils/checkFetchedResults'
 import useFollow from '../../hooks/useFollow'
-import useFilterStorage from '../../hooks/useFilterStorage'
-import Search from '../../components/Filter/Search'
-import { Row } from 'react-bootstrap'
 import useFilter from '../../hooks/useFilter'
+import usePost from '../../hooks/usePost'
+import Filter from '../../components/Filter/Filter'
+import useLocalStorage from '../../hooks/useLocalStorage'
+import { useLocation } from 'react-router-dom'
 
 const Homepage = () => {
-    const [showSlideShow, setShowSlideShow] = useState(true)
-    const {total, optionsSelected, getOptionsFilter} = useSearch()
-    const {loading: loadingAll, conferences, totalPages: totalPagesAllConf, totalConferences, handleGetList} = useConference()
+    const { optionsSelected, getOptionsFilter, updateOptionsSelectedFromParams} = useSearch()
+    const {loading: loadingAll, conferences, handleGetList} = useConference()
+    const {getItemInLocalStorage} = useLocalStorage()
     const {getListFollowedConferences} = useFollow()
-    const [check, setCheck] = useState(false)
-    const [fetchParams, setFetchParams] = useState({ key: '', keyword: '' });
-    const {selectOptionFilter, inputFilter, resultInputFilter, searchInput}= useFilter()
-    const { dataFilters, loading, clearKeyValues, clearAllKeywords } = useFilterStorage(fetchParams.key, fetchParams.keyword);
+    const {getPostedConferences}= usePost()
+    const {pathname} = useLocation()
+    const {
+      priorityKeywords, 
+      filterConferences, 
+      sortConferencesByPriorityKeyword}= useFilter()
+    
 
-    const [displayConferences, setDisplayedConferences] = useState([])
-    const [backupDisplayConf, setBackupDisplayConf] = useState([])
-   
+    const [displayConferences, setDisplayedConferences] = useState(conferences)
+    const [totalConferences, setTotalConferences] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+
+
     useEffect(()=>{
-      handleGetList()
+      getOptionsFilter("", [])
+      if(conferences.length === 0 || !conferences){
+        handleGetList()
+      }
+      const totalConfLS = getItemInLocalStorage('totalConferences')
+      const totalPagesLS = getItemInLocalStorage('totalPagesConferences')
+      setTotalConferences(totalConfLS)
+      setTotalPages(Math.ceil(totalPagesLS))
+      setDisplayedConferences(conferences)
     }, [conferences])
 
-   useEffect(()=>{
-    const isAppliedFilter = checkExistValue(optionsSelected).some(value => value === true);
-    getListFollowedConferences()    
-    getOptionsFilter("", [])
-    setCheck(isAppliedFilter)
 
+    useEffect(()=>{
+      getListFollowedConferences()
+      getPostedConferences()
+    },[])
+  
 
-    const displayList = mergeConferencesByKeyword(dataFilters, selectOptionFilter)
-    
-    
+    useEffect(()=>{
+      const isApliedFilter = checkExistValue(optionsSelected).some(value => value === true);
+      
+      if(isApliedFilter){
 
-    setDisplayedConferences(displayList)
-    setBackupDisplayConf(displayList)
-    console.log({displayList, optionsSelected})
-    
-
-   },[selectOptionFilter, dataFilters, resultInputFilter])
+        const filterResult = filterConferences(conferences, optionsSelected)
+        const sortConferences = sortConferencesByPriorityKeyword(filterResult, priorityKeywords)
+        console.log({sortConferences})
+        setDisplayedConferences(sortConferences)
+        setTotalConferences(filterResult.length)
+        setTotalPages(Math.ceil(filterResult.length / 7))
+      }
+      else {
+        console.log('ko apply',conferences)
+        const totalConfLS = getItemInLocalStorage('totalConferences')
+        const totalPagesLS = getItemInLocalStorage('totalPagesConferences')
+        setTotalConferences(totalConfLS)
+        setTotalPages(Math.ceil(totalPagesLS))
+        setDisplayedConferences(conferences)
+      }
+      
+    }, [optionsSelected, conferences, priorityKeywords])
+  
+    useEffect(()=>{
+      console.log({pathname, optionsSelected})
+    }, [pathname, optionsSelected])
 
    
-   useEffect(()=>{
-    
-    const commonConfs = backupDisplayConf.filter(item1 => resultInputFilter.some(item2 => item2.id === item1.id));
-    console.log({commonConfs, displayConferences, resultInputFilter, inputFilter})
-    setDisplayedConferences(commonConfs)
-   }, [resultInputFilter])
-
-    const handleApplyFilter = (key, keyword) => {
-        setFetchParams({ key, keyword });
-    };
-
-
-      const displayConf = check ? displayConferences : conferences;
-      const totalPagesDisplay = check ? Math.ceil(displayConf.length / 7) : totalPagesAllConf;
-      const totalConfDisplay = check ? displayConf.length : totalConferences
-      const isLoading = check ? loading : loadingAll
-
   return (
-    <div style={{marginTop: "100px"}}>        
+    <div style={{marginTop: "100px"}} className='overflow-x-hidden overflow-y-auto'>        
         {/*showSlideShow &&
         <Container>
           <Stack direction='horizontal' className='w-100'>
@@ -76,8 +88,13 @@ const Homepage = () => {
             <SlideShow showSlideShow={showSlideShow} setShowSlideShow={setShowSlideShow}/>
           </Stack>
   </Container>*/}
-         <Search onApply={handleApplyFilter} onDelete={clearKeyValues} onClearAll={clearAllKeywords}/>
-         <Conference conferencesProp={displayConf} onReloadPage={handleGetList} totalPages={totalPagesDisplay} totalConferences={totalConfDisplay} loading={isLoading}/>
+         <Filter />
+         <Conference 
+         conferencesProp={displayConferences} 
+         onReloadPage={handleGetList} 
+         totalPages={totalPages} 
+         totalConferences={totalConferences} 
+         loading={loadingAll}/>
     </div>
     
   )

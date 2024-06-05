@@ -52,7 +52,7 @@ const DropdownOptions = ({ label, placeholder }) => {
     const location = useLocation();
     const pathname = location.pathname;
     useEffect(()=>{
-      if(pathname === '/' || pathname === '/home'){
+      if(pathname === '/'){
         setStateName('optionsSelected')
       }
       else setStateName('filterOptionsAuth')
@@ -63,7 +63,7 @@ const DropdownOptions = ({ label, placeholder }) => {
         sendFilter(label, selectedValues)
     };
     useEffect(() => {
-        console.log('dropdown', {label, placeholder, filterOptions})
+        
         let transformedState = []
         if (filterOptions !== null) {
             if (label === 'category') {

@@ -19,7 +19,6 @@ const Timestamp = () => {
       await getListFollowedConferences();
       await getAllNotes()
     };
-    console.log({listFollowed, notes})
     if(listFollowed.length ===0 || notes.length === 0){
 
       fetchData();
@@ -41,12 +40,12 @@ const Timestamp = () => {
           value={true}
         />
       </div>
-      <Row>
+      <Row className='w-75'>
 
       <UpcomingNote/>
       </Row>
       <Row className='mt-5'>
-        <Col xs="9">          
+        <Col xs="9" >          
           <EventCalendar notes={notes}/>
         </Col>
         <Col xs="3" className='ps-3'>          

@@ -24,7 +24,6 @@ const ListNotesInModal = ({ show, showDetailModal, setShowDetailModal, setDetail
 
 
   const handleShowDetailModal = (note) => {
-    console.log({ note })
     setDetailNote(note)
     setShowDetailModal(!showDetailModal)
     onClose()
@@ -32,7 +31,7 @@ const ListNotesInModal = ({ show, showDetailModal, setShowDetailModal, setDetail
   return (
     <Modal show={show} onHide={onClose} centered size='lg'>
       <Modal.Header closeButton>
-        <Modal.Title className='text-center w-100'>{`All events in ${moment(dateClicked).format('dddd, MM/DD/YYYY')}`}</Modal.Title>
+        <Modal.Title className='text-center w-100'>{`All events in ${moment(dateClicked).format('dddd, YYYY/MM/DD')}`}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Carousel activeIndex={index} onSelect={handleSelect} indicators={false} controls={false} interval={null}>
@@ -69,7 +68,7 @@ const ListNotesInModal = ({ show, showDetailModal, setShowDetailModal, setDetail
                           className='border-0 bg-transparent '
                           onClick={() => navigate(`/detail/information/${note.conf_id}`)}
                           title='Click here to go detailed information page'
-                          disabled={note.date_type === 'Your note' ? true : false}>
+                          disabled={note.date_type === 'Personal note' ? true : false}>
                           <Image src={ArrowIcon} width={20} className='rounded-circle border' />
                         </Button>
                       </div>
