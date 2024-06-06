@@ -6,7 +6,7 @@ const dbConnect = async () => {
         console.log("DB is connecting!");
         await sequelize.sync({
             // force: true,
-            alter: true
+            // alter: true
         });
         console.log("All models were synchronized successfully.");
 

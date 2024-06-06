@@ -5,8 +5,10 @@ const ConferenceQuery = require("./conference-queries");
 const ImportantDatesQuery = require("./important-date-queries");
 const OrganizationQuery = require("./organization-queries");
 const sequelize = require('../config/database.js');
+const { submissionKeywords } = require('../keyword/index.js');
 const { Op } = require('sequelize');
 const { sendNotifications } = require('../services/notification-services.js');
+const CallForPaper = require('../models/call-for-paper-model.js');
 require('dotenv').config();
 
 const selectAllCallForPapers = async function (filterConditions) {
@@ -44,6 +46,63 @@ const selectAllCallForPapers = async function (filterConditions) {
             count: conferences.length,
             data: conferences
         }
+
+    } catch (error) {
+        throw (error);
+    }
+};
+
+const selectCallForPaperForFilter = async function (cfpID) {
+    try {
+        const conference = await model.callForPaperModel.findByPk(cfpID, {
+            include: [
+                {
+                    model: model.sourceModel,
+                    attributes: ['src_name']
+                },
+                {
+                    model: model.conferenceModel,
+                    attributes: { exclude: ['conf_id'] }
+                },
+                {
+                    model: model.importantDateModel,
+                    attributes: { exclude: ['CallForPaperCfpId'] },
+                },
+                {
+                    model: model.organizationModel,
+                    attributes: { exclude: ['CallForPaperCfpId'] }
+                },
+                {
+                    model: model.cfpForModel,
+                    include: {
+                        model: model.fieldOfResearchModel,
+                        attributes: ['for_name']
+                    }
+                }
+            ]
+        });
+
+        const conferenceData = {
+            id: conference.cfp_id,
+            information: {
+                name: conference.Conference.conf_name,
+                acronym: conference.Conference.acronym,
+                // link: conference.link,
+                rating: conference.rating,
+                rank: conference.rank,
+                // owner: conference.owner,
+                source: conference.Source.src_name,
+                // status: conference.status,
+                fieldOfResearch: conference.CfpFors.map(CfpFor => { return CfpFor.FieldOfResearch.for_name }),
+            },
+            organizations: conference.Organizations,
+            submissionDates: conference.ImportantDates.filter(item => item.date_type.includes("sub") || submissionKeywords.includes(item.date_type)),
+            // callForPaper: conference.content,
+            // createdAt: conference.createdAt,
+            updatedAt: conference.updatedAt,
+        };
+
+        return conferenceData;
 
     } catch (error) {
         throw (error);

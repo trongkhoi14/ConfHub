@@ -182,7 +182,7 @@ const deleteDateByID = async function (dateID, transaction) {
     try {
         const date = await model.importantDateModel.findByPk(dateID);
         if (date && date.status === "new") {
-            return await model.importantDateModel.destroy({ where: { date_type: date.date_type } }, { transaction: transaction });
+            return await model.importantDateModel.destroy({ where: { date_type: date.date_type, CallForPaperCfpId: date.CallForPaperCfpId } }, { transaction: transaction });
         } else if (date) {
             return await model.importantDateModel.destroy({ where: { date_id: date.date_id } }, { transaction: transaction });
         }

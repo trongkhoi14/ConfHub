@@ -195,7 +195,7 @@ const deleteOrganizationByID = async function (orgID, transaction) {
     try {
         const organization = await model.organizationModel.findByPk(orgID);
         if (organization && organization.status === "new") {
-            return await model.organizationModel.destroy({ where: { name: organization.name } }, { transaction: transaction });
+            return await model.organizationModel.destroy({ where: { name: organization.name, CallForPaperCfpId: organization.CallForPaperCfpId } }, { transaction: transaction });
         } else if (organization) {
             return await model.organizationModel.destroy({ where: { org_id: organization.org_id } }, { transaction: transaction });
         }
