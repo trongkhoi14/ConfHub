@@ -13,12 +13,16 @@ const selectConferenceDates = async function (cfpID, option) {
                 where: {
                     CallForPaperCfpId: cfpID,
                     status: "new"
-                }
+                },
+                // benchmark: true,
+                // logging: console.log,
             });
         }
-        return await model.importantDateModel.findAll(
-            { where: { CallForPaperCfpId: cfpID } }
-        );
+        return await model.importantDateModel.findAll({
+            where: { CallForPaperCfpId: cfpID },
+            // benchmark: true,
+            // logging: console.log,
+        });
 
     } catch (error) {
         throw (error);

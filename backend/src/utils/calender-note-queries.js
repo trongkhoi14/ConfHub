@@ -19,32 +19,32 @@ const selectNote = async function (noteID) {
 
 const insertNote = async function (note, transaction) {
     try {
-        const toCompare = {}
-        if (note.FollowTid) {
-            toCompare.follow = await model.followModel.findByPk(note.FollowTid);
-        }
+        // const toCompare = {}
+        // if (note.FollowTid) {
+        //     toCompare.follow = await model.followModel.findByPk(note.FollowTid);
+        // }
 
-        if (note.ImportantDateDateId && note.OrganizationOrgId) {
-            throw new Error("Conflicting data.");
+        // if (note.ImportantDateDateId && note.OrganizationOrgId) {
+        //     throw new Error("Conflicting data.");
 
-        } else if (note.ImportantDateDateId) {
-            toCompare.date = await model.importantDateModel.findByPk(note.ImportantDateDateId);
-            if (toCompare.date) {
-                if (toCompare.follow && toCompare.follow.CallForPaperCfpId !== toCompare.date.CallForPaperCfpId) {
-                    throw new Error("Conflicting data.");
-                }
-                note.date_value = toCompare.date.date_value;
-            }
+        // } else if (note.ImportantDateDateId) {
+        //     toCompare.date = await model.importantDateModel.findByPk(note.ImportantDateDateId);
+        //     if (toCompare.date) {
+        //         if (toCompare.follow && toCompare.follow.CallForPaperCfpId !== toCompare.date.CallForPaperCfpId) {
+        //             throw new Error("Conflicting data.");
+        //         }
+        //         note.date_value = toCompare.date.date_value;
+        //     }
 
-        } else if (note.OrganizationOrgId) {
-            toCompare.date = await model.organizationModel.findByPk(note.OrganizationOrgId);
-            if (toCompare.date) {
-                if (toCompare.follow && toCompare.follow.CallForPaperCfpId !== toCompare.date.CallForPaperCfpId) {
-                    throw new Error("Conflicting data.");
-                }
-                note.date_value = [toCompare.date.start_date, toCompare.date.end_date].join(" to ");
-            }
-        }
+        // } else if (note.OrganizationOrgId) {
+        //     toCompare.date = await model.organizationModel.findByPk(note.OrganizationOrgId);
+        //     if (toCompare.date) {
+        //         if (toCompare.follow && toCompare.follow.CallForPaperCfpId !== toCompare.date.CallForPaperCfpId) {
+        //             throw new Error("Conflicting data.");
+        //         }
+        //         note.date_value = [toCompare.date.start_date, toCompare.date.end_date].join(" to ");
+        //     }
+        // }
 
         return await model.calenderNoteModel.create({
             UserId: note.UserId,

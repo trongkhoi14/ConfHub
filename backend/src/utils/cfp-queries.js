@@ -270,5 +270,6 @@ module.exports = {
     selectCallForPaper,
     insertCallForPaper,
     updateCallForPaper,
-    deleteCallForPaper
+    deleteCallForPaper,
+    selectCallForPaperForFilter
 };
