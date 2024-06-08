@@ -24,6 +24,8 @@ callForPaperModel.hasMany(cfpForModel, { onDelete: 'CASCADE' });
 cfpForModel.belongsTo(callForPaperModel);
 fieldOfResearchModel.hasMany(cfpForModel, { onDelete: 'CASCADE' });
 cfpForModel.belongsTo(fieldOfResearchModel);
+callForPaperModel.belongsToMany(fieldOfResearchModel, { through: cfpForModel });
+fieldOfResearchModel.belongsToMany(callForPaperModel, { through: cfpForModel });
 
 callForPaperModel.hasMany(importantDateModel, { onDelete: 'CASCADE' });
 importantDateModel.belongsTo(callForPaperModel);

@@ -1,6 +1,7 @@
 const model = require('../models/index.js');
 const CallForPaperQuery = require('./cfp-queries.js');
 const sequelize = require('../config/database.js');
+const { conferenceData, insertToList, updateToList, removeFromList } = require('../temp/index.js');
 require('dotenv').config();
 
 const selectAllPosts = async function (filterConditions) {
@@ -36,7 +37,7 @@ const selectAllPosts = async function (filterConditions) {
 
 const insertPost = async function (conference) {
     try {
-        return await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             const cfp = await CallForPaperQuery.insertCallForPaper(conference, t);
             if (conference.userID) {
                 await model.postModel.create(
@@ -47,8 +48,15 @@ const insertPost = async function (conference) {
                     },
                     { transaction: t });
             }
-            return true;
         });
+
+        // update view list
+        const newID = await model.callForPaperModel.findOne({
+            attributes: ['cfp_id'],
+            order: [['createdAt', 'DESC']]
+        });
+
+        await insertToList(newID.cfp_id, conferenceData.listOfConferences);
 
     } catch (error) {
         throw (error);
@@ -57,10 +65,15 @@ const insertPost = async function (conference) {
 
 const updatePost = async function (conference) {
     try {
-        return await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             await CallForPaperQuery.updateCallForPaper(conference, t);
-            return true;
         });
+
+        // update view list
+        await updateToList(conference.cfp_id, conferenceData.listOfConferences);
+
+        return true;
+
     } catch (error) {
         throw (error);
     }
@@ -68,7 +81,13 @@ const updatePost = async function (conference) {
 
 const deletePost = async function (cfpID) {
     try {
-        return await CallForPaperQuery.deleteCallForPaper(cfpID);
+        await CallForPaperQuery.deleteCallForPaper(cfpID);
+
+        // update view list
+        await removeFromList(cfpID, conferenceData.listOfConferences);
+
+        return true;
+
     } catch (error) {
         throw (error);
     }

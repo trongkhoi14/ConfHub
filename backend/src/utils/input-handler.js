@@ -36,8 +36,8 @@ async function getUser(conditions) {
 
 function getPagination(conditions) {
     return {
-        page: conditions.page ? parseInt(conditions.page) : null,
-        size: conditions.size ? parseInt(conditions.size) : null,
+        page: conditions.page ? parseInt(conditions.page) : 1,
+        size: conditions.size ? parseInt(conditions.size) : 7,
         offset: conditions.size && conditions.page ? ((conditions.page - 1) * conditions.size) : null
     }
 };
@@ -102,7 +102,7 @@ function getRank(conditions) {
 function getAcronym(conditions) {
     if (!containsEmptyValue(conditions.acronym)) {
         const acronyms = conditions.acronym.map(acronym => ({
-            "$Conference.acronym$": { [Op.iLike]: `%${acronym}%` }
+            "$Conference.acronym$": { [Op.eq]: `%${acronym}%` }
         }));
         return { [Op.or]: acronyms };
 
@@ -142,7 +142,7 @@ function getSubmissionDate(conditions) {
             "$ImportantDates.date_type$": {
                 [Op.or]: [
                     { [Op.iLike]: `%${"sub"}%` },
-                    { [Op.in]: submissionKeywords }
+                    // { [Op.in]: submissionKeywords }
                 ]
             },
             "$ImportantDates.date_value$": { [Op.between]: [moment.utc(conditions.subStart).toDate(), moment.utc(process.env.MAX_DATE).toDate()] }
@@ -153,7 +153,7 @@ function getSubmissionDate(conditions) {
             "$ImportantDates.date_type$": {
                 [Op.or]: [
                     { [Op.iLike]: `%${"sub"}%` },
-                    { [Op.in]: submissionKeywords }
+                    // { [Op.in]: submissionKeywords }
                 ]
             },
             "$ImportantDates.date_value$": { [Op.between]: [moment.utc(process.env.MIN_DATE).toDate(), moment.utc(conditions.subEnd).toDate()] }
@@ -164,7 +164,7 @@ function getSubmissionDate(conditions) {
             "$ImportantDates.date_type$": {
                 [Op.or]: [
                     { [Op.iLike]: `%${"sub"}%` },
-                    { [Op.in]: submissionKeywords }
+                    // { [Op.in]: submissionKeywords }
                 ]
             },
             "$ImportantDates.date_value$": { [Op.between]: [moment.utc(conditions.subStart).toDate(), moment.utc(conditions.subEnd).toDate()] }
@@ -208,71 +208,97 @@ function getFieldsOfResearch(conditions) {
     }
 };
 
-// function createPriority(priority, order) {
-//     if (priority !== null && priority !== undefined) {
-//         const attribute = priority[0];
-//         const values = priority[1];
+function createPriority(priorityArr, order) {
+    while (priorityArr.length > 0) {
+        const priority = priorityArr.shift();
 
-//         if (attribute === 'p_search') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "Conference".conf_name ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_subStart') {
-//             order.push([sequelize.literal(`CASE WHEN ("ImportantDates".date_type ILIKE '%sub%' OR "ImportantDates".date_type IN ${submissionKeywords}) AND "ImportantDates".date_value >= ${values} THEN 0 ELSE 1 END`), 'ASC']);
-//         } else if (attribute === 'p_subEnd') {
-//             order.push([sequelize.literal(`CASE WHEN ("ImportantDates".date_type ILIKE '%sub%' OR "ImportantDates".date_type IN ${submissionKeywords}) AND "ImportantDates".date_value <= ${values} THEN 0 ELSE 1 END`), 'ASC']);
-//         } else if (attribute === 'p_type') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "Organizations".type ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_confStart') {
-//             order.push([sequelize.literal(`CASE WHEN "Organizations".start_date >= ${values} THEN 0 ELSE 1 END`), 'ASC']);
-//             order.push(["Organizations", 'start_date', 'DESC']);
-//         } else if (attribute === 'p_confEnd') {
-//             order.push([sequelize.literal(`CASE WHEN "Organizations".end_date <= ${values} THEN 0 ELSE 1 END`), 'ASC']);
-//         } else if (attribute === 'p_location') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "Organizations".location ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_acronym') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "Conference".conf_name ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_source') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "Source".src_name ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_rating') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "CallForPaper".rating >= '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_rank') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "CallForPaper".rank ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         } else if (attribute === 'p_for') {
-//             for (let i of values) {
-//                 order.push([sequelize.literal(`CASE WHEN "FieldOfResearch".for_name ILIKE '${i}' THEN 0 ELSE 1 END`), 'ASC']);
-//             }
-//         }
-//     }
+        if (priority !== null && priority !== undefined) {
+            const attribute = priority[0];
+            const values = priority[1];
 
-//     return priority
-// }
+            if (attribute === 'p_search') {
+                order.push([sequelize.literal(`CASE WHEN "Conference".conf_name ILIKE '%${values}%' THEN 0 ELSE 1 END`), 'ASC']);
 
-// function getOrder(req) {
-//     const priorities = Object.fromEntries(
-//         Object.entries(req.query).filter(([key, value]) => key.startsWith('p_'))
-//     );
+            } else if (attribute === 'p_subStart') {
+                // const tuples = submissionKeywords.map(item => `'${item.replace(/'/g, "''")}'`).join(", ");
+                const indexToRemove = priorityArr.findIndex(item => item[0] === 'p_subEnd');
+                if (indexToRemove !== -1) {
+                    const removedElement = priorityArr.splice(indexToRemove, 1);
+                    const pEndValue = removedElement[0][1];
+                    order.push([sequelize.literal(`CASE WHEN "ImportantDates".status = 'new' AND ("ImportantDates".date_type ILIKE '%sub%') AND "ImportantDates".date_value >= '${values}' AND "ImportantDates".date_value <= '${pEndValue}' THEN 0 ELSE 1 END`), 'ASC']);
+                } else {
+                    order.push([sequelize.literal(`CASE WHEN "ImportantDates".status = 'new' AND ("ImportantDates".date_type ILIKE '%sub%') AND "ImportantDates".date_value >= '${values}' AND "ImportantDates".date_value <= '2050-01-01' THEN 0 ELSE 1 END`), 'ASC']);
+                }
 
-//     let order = [];
+            } else if (attribute === 'p_type') {
+                const tuples = values.map(item => `'${item.replace(/'/g, "''")}'`).join(", ");
+                order.push([sequelize.literal(`CASE WHEN "Organizations".status = 'new' AND "Organizations".type IN (${tuples}) THEN 0 ELSE 1 END`), 'ASC']);
 
-//     Object.entries(priorities).map((i) => createPriority(i, order));
+            } else if (attribute === 'p_confStart') {
+                const indexToRemove = priorityArr.findIndex(item => item[0] === 'p_confEnd');
+                if (indexToRemove !== -1) {
+                    const removedElement = priorityArr.splice(indexToRemove, 1);
+                    const pEndValue = removedElement[0][1];
+                    order.push([sequelize.literal(`CASE WHEN "Organizations".status = 'new' AND "Organizations".start_date >= '${values}' AND "Organizations".end_date <= '${pEndValue}' THEN 0 ELSE 1 END`), 'ASC']);
+                } else {
+                    order.push([sequelize.literal(`CASE WHEN "Organizations".status = 'new' AND "Organizations".start_date >= '${values}' AND "Organizations".end_date <= '2050-01-01' THEN 0 ELSE 1 END`), 'ASC']);
+                }
 
-//     order.push(['updatedAt', 'DESC']);
-//     console.log(order);
-//     return order;
-// }
+            } else if (attribute === 'p_location') {
+                for (let i of values) {
+                    order.push([sequelize.literal(`CASE WHEN "Organizations".status = 'new' AND "Organizations".location ILIKE '%${i}%' THEN 0 ELSE 1 END`), 'ASC']);
+                }
+
+            } else if (attribute === 'p_acronym') {
+                const tuples = values.map(item => `'${item.replace(/'/g, "''")}'`).join(", ");
+                order.push([sequelize.literal(`CASE WHEN "Conference".conf_name IN (${tuples}) THEN 0 ELSE 1 END`), 'ASC']);
+
+            } else if (attribute === 'p_source') {
+                const tuples = values.map(item => `'${item.replace(/'/g, "''")}'`).join(", ");
+                order.push([sequelize.literal(`CASE WHEN "Source".src_name IN (${tuples}) THEN 0 ELSE 1 END`), 'ASC']);
+
+            } else if (attribute === 'p_rating') {
+                for (let i of values) {
+                    order.push([sequelize.literal(`CASE WHEN "CallForPaper".rating >= '${i}' THEN 0 ELSE 1 END`), 'ASC']);
+                }
+
+            } else if (attribute === 'p_rank') {
+                const tuples = values.map(item => `'${item.replace(/'/g, "''")}'`).join(", ");
+                order.push([sequelize.literal(`CASE WHEN "CallForPaper".rank IN (${tuples}) THEN 0 ELSE 1 END`), 'ASC']);
+
+            } else if (attribute === 'p_for') {
+                const tuples = values.map(item => `'${item.replace(/'/g, "''")}'`).join(", ");
+                order.push([sequelize.literal(`CASE WHEN "FieldOfResearches".for_name IN (${tuples}) THEN 0 ELSE 1 END`), 'ASC']);
+            }
+        }
+    }
+
+    return true;
+}
+
+async function getOrder(req) {
+    const priorities = Object.fromEntries(
+        Object.entries(req.query).filter(([key, value]) => key.startsWith('p_'))
+    );
+
+    let order = [];
+
+    const priorityArr = Object.entries(priorities).map((i) => i);
+    createPriority(priorityArr, order);
+
+    const orderType = req.query.order || 'r';
+    if (orderType.toLowerCase() === 'n') {
+        order.push(['Conference', 'conf_name', 'ASC']);
+    } else if (orderType.toLowerCase() === 'u') {
+        order.push([sequelize.literal(`CASE WHEN "Organizations".status = 'new' AND "Organizations".start_date >= CURRENT_DATE THEN start_date END`), 'ASC']);
+    } else if (orderType.toLowerCase() === 'p') {
+        // here
+    }
+
+    order.push(['updatedAt', 'DESC']);
+
+    return order;
+}
 
 
 function makeFilterCondition(compulsoryConditions, optionalConditions) {
@@ -350,7 +376,8 @@ async function getFilterConditions(req) {
             page: pagination.page,
             size: pagination.size,
             offset: pagination.offset,
-            filter: filter
+            filter: filter,
+            raw: rawConditions
         }
     } catch (error) {
         throw (error);
@@ -412,5 +439,6 @@ module.exports = {
     getFilterConditions,
     getConferenceObject,
     getNote,
-    getSetting
+    getSetting,
+    getOrder
 }

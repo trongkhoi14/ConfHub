@@ -10,6 +10,7 @@ const { infoLogger } = require('./src/utils/logger');
 const NotificationController = require('./src/controllers/notification-controller');
 const http = require('http');
 const { initSocket, users } = require('./src/config/socket');
+const { loadDataForFilter } = require('./src/temp/index');
 var cron = require('node-cron');
 require('dotenv').config();
 
@@ -76,6 +77,8 @@ cron.schedule("0 */12 * * *", async () => {
 }, {
 	timezone: "Asia/Ho_Chi_Minh"
 });
+
+loadDataForFilter();
 
 server.listen(port, () => {
 	console.log(`Server was running on port ${port}`);

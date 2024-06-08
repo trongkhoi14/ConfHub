@@ -24,7 +24,8 @@ const insertNotification = async function (notification, transaction) {
         where: {
             title: notification.title,
             message: notification.message,
-            FollowTid: notification.FollowTid
+            FollowTid: notification.FollowTid,
+            ctime: Date()
         },
         defaults: {
             title: notification.title,

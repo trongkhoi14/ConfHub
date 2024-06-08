@@ -81,7 +81,7 @@ const updateOrganizations = async function (conference, transaction) {
                 }
             });
             if (isExisted) {
-                deleteOrganizationByID(isExisted.org_id);
+                await deleteOrganizationByID(isExisted.org_id, transaction);
 
                 // [#hc]
                 notifications.push({

@@ -79,7 +79,7 @@ const updateDates = async function (conference, transaction) {
                 }
             });
             if (isExisted) {
-                deleteDateByID(isExisted.date_id);
+                await deleteDateByID(isExisted.date_id, transaction);
 
                 // [#hc]
                 notifications.push({

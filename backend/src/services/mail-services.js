@@ -38,7 +38,7 @@ const sendingEmail = async (payload) => {
 
     try {
         await transport.sendMail(data);
-        console.log(">> Send email successfully to " + payload.uEmail);
+        console.log(">> [" + new Date() + "] Send email successfully to " + payload.uEmail);
 
     } catch (error) {
         console.log("Error in SendingEmail: " + error);

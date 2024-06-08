@@ -8,36 +8,43 @@ const sequelize = require('../config/database.js');
 const { submissionKeywords } = require('../keyword/index.js');
 const { Op } = require('sequelize');
 const { sendNotifications } = require('../services/notification-services.js');
-const CallForPaper = require('../models/call-for-paper-model.js');
+const { conferenceData } = require('../temp/index.js');
 require('dotenv').config();
 
 const selectAllCallForPapers = async function (filterConditions) {
     try {
-        const conferenceIDs = await model.callForPaperModel.findAndCountAll({
-            attributes: ['cfp_id'],
-            distinct: true,
-            group: ['cfp_id'],
-            where: filterConditions.filter,
-            include: [
-                { model: model.sourceModel, as: "Source", required: false, duplicating: false, attributes: [] },
-                { model: model.conferenceModel, as: "Conference", required: false, duplicating: false, attributes: [] },
-                { model: model.importantDateModel, as: "ImportantDates", required: false, duplicating: false, attributes: [] },
-                { model: model.organizationModel, as: "Organizations", required: false, duplicating: false, attributes: [] },
-                {
-                    model: model.cfpForModel, as: "CfpFors", required: false, duplicating: false, attributes: [],
-                    include: { model: model.fieldOfResearchModel, as: "FieldOfResearch", required: false, duplicating: false, attributes: [] },
-                }
-            ],
-            order: [['updatedAt', 'DESC']],
-            limit: filterConditions.size,
-            offset: filterConditions.offset
-        });
+        // const filterResults = await model.callForPaperModel.findAll({
+        //     attributes: ['cfp_id'],
+        //     // where: filterConditions.filter,
+        //     // include: [
+        //     //     { model: model.sourceModel, as: "Source", required: false, duplicating: false, attributes: [] },
+        //     //     { model: model.conferenceModel, as: "Conference", required: false, duplicating: false, attributes: [] },
+        //     //     { model: model.importantDateModel, as: "ImportantDates", required: false, duplicating: false, attributes: [] },
+        //     //     { model: model.organizationModel, as: "Organizations", required: false, duplicating: false, attributes: [] },
+        //     //     {
+        //     //         model: model.fieldOfResearchModel, as: "FieldOfResearches", required: false, duplicating: false, attributes: [],
+        //     //         include: { model: model.cfpForModel, as: "CfpFors", required: false, duplicating: false, attributes: [] },
+        //     //     }
+        //     // ],
+        //     // order: order,
+        //     // limit: filterConditions.size,
+        //     // offset: filterConditions.offset,
+        // });
 
-        const conferences = await Promise.all(conferenceIDs.rows.map(async (id) => {
-            return await selectCallForPaper(id.cfp_id);
-        }));
+        // const conferenceIDs = filterResults.map(item => item.cfp_id);
+        // const conferences = await Promise.all(conferenceIDs.map(async (id) => {
+        //     return await selectCallForPaperForFilter(id);
+        // }));
 
-        const maxRecords = conferenceIDs.count.length;
+        const status = filterConditions.raw.status;
+        let conferences = [...conferenceData.listOfConferences];
+
+        if (status === 'true' || status === 'false') {
+            conferences = conferences.filter(i => String(i.information.status) === String(status));
+        }
+
+        const maxRecords = conferences.length;
+
         return {
             maxRecords: maxRecords,
             maxPages: Math.ceil(maxRecords / filterConditions.size),
@@ -92,13 +99,13 @@ const selectCallForPaperForFilter = async function (cfpID) {
                 rank: conference.rank,
                 // owner: conference.owner,
                 source: conference.Source.src_name,
-                // status: conference.status,
+                status: conference.status,
                 fieldOfResearch: conference.CfpFors.map(CfpFor => { return CfpFor.FieldOfResearch.for_name }),
             },
             organizations: conference.Organizations,
-            submissionDates: conference.ImportantDates.filter(item => item.date_type.includes("sub") || submissionKeywords.includes(item.date_type)),
+            importantDates: conference.ImportantDates/*.filter(item => item.date_type.includes("sub") || submissionKeywords.includes(item.date_type))*/,
             // callForPaper: conference.content,
-            // createdAt: conference.createdAt,
+            createdAt: conference.createdAt,
             updatedAt: conference.updatedAt,
         };
 
@@ -215,7 +222,7 @@ const updateCallForPaper = async function (conference, transaction) {
         const notifications2 = await ImportantDatesQuery.updateDates(conference, transaction);
 
         const notifications = [...notifications1, ...notifications2];
-        await sendNotifications(notifications);
+        sendNotifications(notifications);
 
         return true;
 
@@ -235,6 +242,7 @@ const deleteCallForPaper = async function (cfpID) {
     }
 };
 
+// not use
 const updateRating = async function (cfpID) {
     const numbersOfFeedbacks = await model.feedbackModel.findAndCountAll({
         where: { CallForPaperCfpId: cfpID, rating: { [Op.ne]: null } }

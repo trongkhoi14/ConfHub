@@ -9,8 +9,11 @@ class ConferenceCFPController {
     // [GET] /api/v1/conference/
     getAllConferences = asyncHandler(async (req, res, next) => {
         try {
-            // const order = input.getOrder(req);
+
+            // const order = await input.getOrder(req);
+
             const filterConditions = await input.getFilterConditions(req);
+
             const conferences = await query.CallForPaperQuery.selectAllCallForPapers(filterConditions);
             return res.status(status.OK).json({
                 maxRecords: conferences.maxRecords,
