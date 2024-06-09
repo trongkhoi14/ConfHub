@@ -7,6 +7,7 @@ const emailService = require('../services/mail-services.js');
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { formatDate } = require('../utils/date-handler');
+const { conferenceData } = require('../temp/index.js');
 require('dotenv').config();
 
 const sendNotificationToUser = (userID, message) => {
@@ -34,11 +35,12 @@ const selectUpcomingEvents = async function () {
 
     for (const date of upcomingDates) {
         if (date) {
-            const conference = await selectCallForPaper(date.CallForPaperCfpId);
+            // const conference = await selectCallForPaper(date.CallForPaperCfpId);
+            const conference = conferenceData.listOfConferences.filter(item => String(item.id) === String(date.CallForPaperCfpId));
             upcomingEvents.push({
                 title: process.env.TITLE_UPCOMING_EVENT,
                 cfp_id: date.CallForPaperCfpId,
-                confName: conference.information.name + ' - ' + conference.information.acronym,
+                confName: conference[0].information.name + ' - ' + conference[0].information.acronym,
                 detail: '[UPCOMING] ' + date.date_type + ': "' + formatDate(date.date_value) + '"'
             });
         }
@@ -53,11 +55,12 @@ const selectUpcomingEvents = async function () {
 
     for (const org of upcomingOrgs) {
         if (org) {
-            const conference = await selectCallForPaper(org.CallForPaperCfpId);
+            // const conference = await selectCallForPaper(org.CallForPaperCfpId);
+            const conference = conferenceData.listOfConferences.filter(item => String(item.id) === String(org.CallForPaperCfpId));
             upcomingEvents.push({
                 title: process.env.TITLE_UPCOMING_EVENT,
                 cfp_id: org.CallForPaperCfpId,
-                confName: conference.information.name + ' - ' + conference.information.acronym,
+                confName: conference[0].information.name + ' - ' + conference[0].information.acronym,
                 detail: org.end_date ? '[UPCOMING] Conference start from "' + formatDate(org.start_date) + ' to ' + formatDate(org.end_date) + '"'
                     : '[UPCOMING] Conference start from "' + formatDate(org.start_date) + '"'
             });
