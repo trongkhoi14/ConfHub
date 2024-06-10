@@ -396,7 +396,7 @@ function getConferenceObject(req) {
             rank: req.body.rank,
             owner: req.body.owner,
             nkey: req.body.nkey || null,
-            status: req.body.status || false,
+            // status: req.body.status || false,
             fieldsOfResearch: req.body.fieldsOfResearch || [],
             organizations: req.body.organizations || [],
             importantDates: req.body.importantDates || []

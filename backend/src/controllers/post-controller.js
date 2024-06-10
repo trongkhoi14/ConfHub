@@ -108,7 +108,7 @@ class postController {
                 });
             };
 
-            const excludes = ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates', 'nkey'];
+            const excludes = ['cfp_id', 'name', 'acronym', 'owner', 'organizations', 'importantDates', 'nkey', 'status'];
             if (input.containsEmptyValue(conference, excludes)) {
                 return res.status(status.BAD_REQUEST).json({
                     status: false,

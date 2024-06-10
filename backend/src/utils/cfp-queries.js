@@ -212,7 +212,7 @@ const updateCallForPaper = async function (conference, transaction) {
                 content: conference.callForPaper,
                 link: conference.link,
                 rank: conference.rank,
-                status: conference.status,
+                // status: conference.status,
                 updatedAt: new Date()
             },
             { where: { cfp_id: conference.cfp_id } },
