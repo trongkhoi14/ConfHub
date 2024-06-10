@@ -393,7 +393,7 @@ function getConferenceObject(req) {
             callForPaper: req.body.callForPaper,
             link: req.body.link,
             source: req.body.source || process.env.DEFAULT_SOURCE,
-            rank: req.body.rank,
+            rank: req.body.rank || 'N/I',
             owner: req.body.owner,
             nkey: req.body.nkey || null,
             // status: req.body.status || false,
