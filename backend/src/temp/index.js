@@ -45,6 +45,7 @@ const selectCallForPaperForFilter = async function (cfpID) {
                 // link: conference.link,
                 rating: conference.rating,
                 rank: conference.rank,
+                nkey: conference.nkey,
                 // owner: conference.owner,
                 source: conference.Source.src_name,
                 status: conference.status,

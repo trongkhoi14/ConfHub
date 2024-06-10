@@ -97,6 +97,7 @@ const selectCallForPaperForFilter = async function (cfpID) {
                 // link: conference.link,
                 rating: conference.rating,
                 rank: conference.rank,
+                nkey: conference.nkey,
                 // owner: conference.owner,
                 source: conference.Source.src_name,
                 status: conference.status,
@@ -210,6 +211,7 @@ const updateCallForPaper = async function (conference, transaction) {
                 content: conference.callForPaper,
                 link: conference.link,
                 rank: conference.rank,
+                status: conference.status,
                 updatedAt: new Date()
             },
             { where: { cfp_id: conference.cfp_id } },
