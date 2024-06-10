@@ -94,17 +94,17 @@ const sendNotifications = async function (events) {
             }
 
             // send mail
-            if (!instance.stime) {
-                const mail = {
-                    title: event.title,
-                    confName: event.confName,
-                    detail: event.detail,
-                    uEmail: follow.User.email
-                }
-                emailService.sendingEmail(mail);
-                instance.stime = new Date();
-                instance.save();
-            }
+            // if (!instance.stime) {
+            //     const mail = {
+            //         title: event.title,
+            //         confName: event.confName,
+            //         detail: event.detail,
+            //         uEmail: follow.User.email
+            //     }
+            //     emailService.sendingEmail(mail);
+            //     instance.stime = new Date();
+            //     instance.save();
+            // }
         }
     }
 }
