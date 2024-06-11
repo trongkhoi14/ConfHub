@@ -54,6 +54,7 @@ io.on('connection', (socket) => {
 	if (userID) {
 		users.set(userID, socket.id);
 		console.log(`User ${userID} registered with socket ID ${socket.id}`);
+		io.emit('currentUser', users.size);
 	} else {
 		console.log('No user ID found in headers');
 	}
@@ -66,11 +67,12 @@ io.on('connection', (socket) => {
 				break;
 			}
 		}
+		io.emit('currentUser', users.size);
 	});
 });
 
 // send upcoming notification
-// cron.schedule("*/4 * * * *", async () => {
+//cron.schedule("*/2 * * * *", async () => {
 cron.schedule("0 0 * * *", async () => {
 	console.log("[" + new Date() + "] Sending upcoming notifications emails.");
 	NotificationController.sendUpcomingNotification();

@@ -35,7 +35,7 @@ User.init({
     phone: {
         type: DataTypes.TEXT,
         allowNull: true,
-        unique: true
+        unique: false
     },
     email: {
         type: DataTypes.TEXT,
@@ -47,7 +47,7 @@ User.init({
     },
     address: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: true
     },
     nationality: {
         type: DataTypes.TEXT,

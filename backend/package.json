@@ -24,6 +24,7 @@
     "express-rate-limit": "^7.1.4",
     "express-winston": "^2.6.0",
     "google-auth-library": "^9.9.0",
+    "googleapis": "^140.0.0",
     "jsonwebtoken": "^9.0.2",
     "mail-template": "^1.0.9",
     "moment": "^2.30.1",

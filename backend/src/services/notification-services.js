@@ -16,7 +16,7 @@ const sendNotificationToUser = (userID, message) => {
         const io = getIO();
         io.to(socketID).emit('notification', message);
     } else {
-        console.log(`User ${userID} is not connected`);
+        // console.log(`User ${userID} is not connected`);
     }
 };
 
@@ -37,12 +37,14 @@ const selectUpcomingEvents = async function () {
         if (date) {
             // const conference = await selectCallForPaper(date.CallForPaperCfpId);
             const conference = conferenceData.listOfConferences.filter(item => String(item.id) === String(date.CallForPaperCfpId));
-            upcomingEvents.push({
-                title: process.env.TITLE_UPCOMING_EVENT,
-                cfp_id: date.CallForPaperCfpId,
-                confName: conference[0].information.name + ' - ' + conference[0].information.acronym,
-                detail: '[UPCOMING] ' + date.date_type + ': "' + formatDate(date.date_value) + '"'
-            });
+            if (String(conference[0].information.status) === 'true') {
+                upcomingEvents.push({
+                    title: process.env.TITLE_UPCOMING_EVENT,
+                    cfp_id: date.CallForPaperCfpId,
+                    confName: conference[0].information.name + ' - ' + conference[0].information.acronym,
+                    detail: '[UPCOMING] ' + date.date_type + ': "' + formatDate(date.date_value) + '"'
+                });
+            }
         }
     };
 
@@ -57,13 +59,15 @@ const selectUpcomingEvents = async function () {
         if (org) {
             // const conference = await selectCallForPaper(org.CallForPaperCfpId);
             const conference = conferenceData.listOfConferences.filter(item => String(item.id) === String(org.CallForPaperCfpId));
-            upcomingEvents.push({
-                title: process.env.TITLE_UPCOMING_EVENT,
-                cfp_id: org.CallForPaperCfpId,
-                confName: conference[0].information.name + ' - ' + conference[0].information.acronym,
-                detail: org.end_date ? '[UPCOMING] Conference start from "' + formatDate(org.start_date) + ' to ' + formatDate(org.end_date) + '"'
-                    : '[UPCOMING] Conference start from "' + formatDate(org.start_date) + '"'
-            });
+            if (String(conference[0].information.status) === 'true') {
+                upcomingEvents.push({
+                    title: process.env.TITLE_UPCOMING_EVENT,
+                    cfp_id: org.CallForPaperCfpId,
+                    confName: conference[0].information.name + ' - ' + conference[0].information.acronym,
+                    detail: org.end_date ? '[UPCOMING] Conference start from "' + formatDate(org.start_date) + ' to ' + formatDate(org.end_date) + '"'
+                        : '[UPCOMING] Conference start from "' + formatDate(org.start_date) + '"'
+                });
+            }
         }
     };
     return upcomingEvents;
@@ -94,17 +98,17 @@ const sendNotifications = async function (events) {
             }
 
             // send mail
-            // if (!instance.stime) {
-            //     const mail = {
-            //         title: event.title,
-            //         confName: event.confName,
-            //         detail: event.detail,
-            //         uEmail: follow.User.email
-            //     }
-            //     emailService.sendingEmail(mail);
-            //     instance.stime = new Date();
-            //     instance.save();
-            // }
+            if (!instance.stime) {
+                const mail = {
+                    title: event.title,
+                    confName: event.confName,
+                    detail: event.detail,
+                    uEmail: follow.User.email
+                }
+                emailService.sendingEmail(mail);
+                instance.stime = new Date();
+                instance.save();
+            }
         }
     }
 }

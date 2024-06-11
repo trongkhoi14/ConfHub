@@ -16,9 +16,10 @@ router.get('/refreshToken', userController.refreshAccessToken);
 
 router.post('/register', userController.register);
 
-router.get('/', verifyAccessToken, checkAdminRole, userController.getAll);
-
 router.get('/setting', verifyAccessToken, settingController.getAllSettings);
 router.put('/setting', verifyAccessToken, settingController.changeSetting);
+
+// admin side
+router.get('/', verifyAccessToken, checkAdminRole, userController.getAll);
 
 module.exports = router;

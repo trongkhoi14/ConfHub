@@ -12,7 +12,9 @@ class UserController {
     register = asyncHandler(async (req, res) => {
         /* Params: Name, Phone, Email, Address, Nationality, Password */
         const { name, phone, email, address, nationality, password } = req.body
-        if (!name || !phone || !email || !address || !nationality || !password) {
+
+        // if (!name || !phone || !email || !address || !nationality || !password) {
+        if (!name || !email || !password) {
             return res.status(status.BAD_REQUEST).json({
                 status: false,
                 data: "Missing registration information"
@@ -23,12 +25,12 @@ class UserController {
             where: {
                 [Op.or]: [
                     { email: email },
-                    { phone: phone }
+                    // { phone: phone }
                 ]
             }
         })
         if (user) {
-            throw new Error('Email or phone number already exists.')
+            throw new Error('This email address is already in use.')
         } else {
             const newUser = await userModel.create(req.body);
 
@@ -202,26 +204,35 @@ class UserController {
                 })
             }
 
-            const { name, phone, address, nationality, license } = req.body
-            if (!name || !phone || !address || !nationality) {
-                return res.status(status.BAD_REQUEST).json({
-                    status: false,
-                    data: "Missing informations."
-                })
+            const { name, phone, address, nationality, license, email } = req.body
+            // if (!name || !phone || !address || !nationality) {
+            //     return res.status(status.BAD_REQUEST).json({
+            //         status: false,
+            //         data: "Missing informations."
+            //     })
+            // }
+
+            if (email) {
+                const checkEmail = await userModel.findOne({ where: { email: email } });
+                if (checkEmail) {
+                    return res.status(status.BAD_REQUEST).json({
+                        status: false,
+                        data: "This email address is already in use."
+                    })
+                }
             }
 
-            const user = await userModel.findByPk(_id, { attributes: ['role'] });
-            const role = user.role;
-            if (role) {
-                await userModel.update(
-                    {
-                        name: name,
-                        phone: phone,
-                        address: address,
-                        nationality: nationality
-                    },
-                    { where: { id: _id } }
-                );
+            const user = await userModel.findByPk(_id);
+
+            if (user && (user.role === 'user' || user.role === 'admin')) {
+                let newData = {};
+                if (name) newData.name = name;
+                if (phone) newData.phone = phone;
+                if (address) newData.address = address;
+                if (nationality) newData.nationality = nationality;
+                if (email) newData.email = email;
+
+                await user.update(newData);
             }
 
             res.status(status.OK).json({

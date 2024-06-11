@@ -1,6 +1,6 @@
 const express = require('express');
 const { PostController } = require('../controllers');
-const { verifyAccessToken, checkUserLicense } = require('../middlewares/verifyToken');
+const { verifyAccessToken, checkAdminRole } = require('../middlewares/verifyToken');
 
 const router = express.Router();
 const postController = new PostController();
@@ -10,5 +10,8 @@ router.post('/', verifyAccessToken, postController.addPost);
 router.put('/:id', verifyAccessToken, postController.updatePost);
 router.delete('/:id', verifyAccessToken, postController.deletePost);
 router.post('/etl', postController.etlPost);
+
+router.put('/:id/activate', verifyAccessToken, checkAdminRole, postController.activatePost);
+router.put('/:id/deactivate', verifyAccessToken, checkAdminRole, postController.deactivatePost);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const input = require('../utils/input-handler.js');
 const query = require('../utils/queries.js');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
+const { conferenceData, updateToList } = require('../temp/index.js');
 require('dotenv').config();
 
 class postController {
@@ -143,6 +144,43 @@ class postController {
 
             return res.status(status.OK).json({
                 message: "Delete post successfully."
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    // [PUT]
+    activatePost = asyncHandler(async (req, res, next) => {
+        try {
+            const cfpID = req.params?.id;
+            const cfp = await model.callForPaperModel.findByPk(cfpID);
+            if (cfp) {
+                await cfp.update({ status: 'true' });
+                await updateToList(cfpID, conferenceData.listOfConferences);
+            }
+
+            return res.status(status.OK).json({
+                message: cfp ? `Call for paper ${cfpID} is active.` : `Can not find this call for papers.`
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    deactivatePost = asyncHandler(async (req, res, next) => {
+        try {
+            const cfpID = req.params?.id;
+            const cfp = await model.callForPaperModel.findByPk(cfpID);
+            if (cfp) {
+                await cfp.update({ status: 'false' });
+                await updateToList(cfpID, conferenceData.listOfConferences);
+            }
+
+            return res.status(status.OK).json({
+                message: cfp ? `Call for paper ${cfpID} is inactive.` : `Can not find this call for papers.`
             });
 
         } catch (err) {

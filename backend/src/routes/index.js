@@ -11,6 +11,8 @@ const calenderNoteRouter = require('./calender-note-router');
 const feedbackRouter = require('./feedback-router');
 const notificationRouter = require('./notification-router');
 const rankRouter = require('./rank-router');
+const viewRouter = require('./view-router');
+const dashboardRouter = require('./dashboard-router');
 
 module.exports = function (app) {
     app.use('/api/v1/user', userRouter);
@@ -26,4 +28,6 @@ module.exports = function (app) {
     app.use('/api/v1/feedback', feedbackRouter);
     app.use('/api/v1/notification', notificationRouter);
     app.use('/api/v1/rank', rankRouter);
+    app.use('/api/v1/view', viewRouter);
+    app.use('/api/v1/dashboard', dashboardRouter);
 }

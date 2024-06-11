@@ -1,14 +1,16 @@
 const { conferenceData, loadDataForFilter } = require('../temp/index');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
+const { users } = require('../config/socket.js');
 
-class ViewLoadingController {
-    reloading = asyncHandler(async (req, res, next) => {
+class DashboardController {
+    getLoggingUsers = asyncHandler(async (req, res, next) => {
         try {
-            loadDataForFilter();
-            console.log("Reloading! Please wait...");
+            const userIDs = Array.from(users.keys());
+
             return res.status(status.OK).json({
-                message: "Reloading! Please wait...",
+                count: userIDs.length,
+                userIDs: userIDs
             });
         } catch (err) {
             next(err);
@@ -16,4 +18,4 @@ class ViewLoadingController {
     });
 };
 
-module.exports = ViewLoadingController;
+module.exports = DashboardController;
