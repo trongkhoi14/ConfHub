@@ -6,11 +6,12 @@ const { users } = require('../config/socket.js');
 class DashboardController {
     getLoggingUsers = asyncHandler(async (req, res, next) => {
         try {
-            const userIDs = Array.from(users.keys());
+            // const userIDs = Array.from(users.keys());
+            const array = Array.from(users, ([userID, socketID]) => ({ userID, socketID }));
 
             return res.status(status.OK).json({
-                count: userIDs.length,
-                userIDs: userIDs
+                count: array.size,
+                userIDs: array
             });
         } catch (err) {
             next(err);

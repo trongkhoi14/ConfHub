@@ -39,7 +39,7 @@ const isEnable = async function (setting) {
         });
 
         if (toCheck) {
-            return toCheck.status ? true : false;
+            return String(toCheck.status) == 'true' ? true : false;
         } else {
             return false;
         }

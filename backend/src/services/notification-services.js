@@ -8,6 +8,7 @@ const moment = require('moment');
 const { Op } = require('sequelize');
 const { formatDate } = require('../utils/date-handler');
 const { conferenceData } = require('../temp/index.js');
+const SettingQuery = require('../utils/setting-queries.js');
 require('dotenv').config();
 
 const sendNotificationToUser = (userID, message) => {
@@ -97,17 +98,48 @@ const sendNotifications = async function (events) {
                 sendNotificationToUser(follow.UserId, notification);
             }
 
-            // send mail
-            if (!instance.stime) {
-                const mail = {
-                    title: event.title,
-                    confName: event.confName,
-                    detail: event.detail,
-                    uEmail: follow.User.email
+            // check setting receive email
+            if (event.title === process.env.TITLE_UPCOMING_EVENT) {
+                let receiveEmailSetting = {
+                    userID: follow.UserId,
+                    name: process.env.YOUR_UPCOMING_EVENT
                 }
-                emailService.sendingEmail(mail);
-                instance.stime = new Date();
-                instance.save();
+                const isEnable = await SettingQuery.isEnable(receiveEmailSetting);
+
+                // send mail
+                if (!instance.stime && isEnable == true) {
+
+                    const mail = {
+                        title: event.title,
+                        confName: event.confName,
+                        detail: event.detail,
+                        uEmail: follow.User.email
+                    }
+                    await emailService.sendingEmail(mail);
+                    instance.stime = new Date();
+                    instance.save();
+                }
+
+            } else if (event.title == process.env.TITLE_NEW_UPDATED_EVENT || event.title == process.env.TITLE_CANCELLED_EVENT) {
+                let receiveEmailSetting = {
+                    userID: follow.UserId,
+                    name: process.env.CHANGE_AND_UPDATE
+                }
+                const isEnable = await SettingQuery.isEnable(receiveEmailSetting);
+
+                // send mail
+                if (!instance.stime && isEnable == true) {
+
+                    const mail = {
+                        title: event.title,
+                        confName: event.confName,
+                        detail: event.detail,
+                        uEmail: follow.User.email
+                    }
+                    await emailService.sendingEmail(mail);
+                    instance.stime = new Date();
+                    instance.save();
+                }
             }
         }
     }

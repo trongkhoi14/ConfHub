@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
 });
 
 // send upcoming notification
-//cron.schedule("*/2 * * * *", async () => {
+// cron.schedule("*/1 * * * *", async () => {
 cron.schedule("0 0 * * *", async () => {
 	console.log("[" + new Date() + "] Sending upcoming notifications emails.");
 	NotificationController.sendUpcomingNotification();

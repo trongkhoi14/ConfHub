@@ -25,7 +25,6 @@ const insertNotification = async function (notification, transaction) {
             title: notification.title,
             message: notification.message,
             FollowTid: notification.FollowTid,
-            ctime: Date()
         },
         defaults: {
             title: notification.title,
