@@ -141,7 +141,7 @@ class FeedbackController {
                 throw new Error("You don't have permission to change this feedback.")
             }
 
-            await model.feedbackModel.destroy({ where: { tid: fbID } });
+            await feedback.destroy();
             return res.status(status.OK).json({
                 message: "Delete feedback successfully.",
             });

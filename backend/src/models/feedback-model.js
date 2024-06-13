@@ -30,17 +30,25 @@ const updateRating = async function (cfpID) {
         where: { CallForPaperCfpId: cfpID, rating: { [Op.ne]: null } }
     });
 
-    let sum = 0;
-    numbersOfFeedbacks.rows.map(fb => {
-        sum = sum + fb.rating;
-    });
-
     const cfp = await callForPaperModel.findByPk(cfpID);
+
     if (cfp) {
+
+        if (numbersOfFeedbacks.count == 0) {
+            cfp.rating = null;
+            await cfp.save();
+            return cfp;
+        }
+
+        let sum = 0;
+        numbersOfFeedbacks.rows.map(fb => {
+            sum = sum + fb.rating;
+        });
+
         let avgRating = sum / numbersOfFeedbacks.count
         if (avgRating) {
             cfp.rating = avgRating;
-            cfp.save();
+            await cfp.save();
         }
     }
 

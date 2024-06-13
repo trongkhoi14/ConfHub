@@ -15,4 +15,6 @@ router.get('/:id/org', organizationController.getConferenceOrganizations);
 router.get('/:id/feedback', feedbackController.getAllFeedbacks);
 router.post('/:id/feedback', verifyAccessToken, feedbackController.addFeedback);
 
+router.put('/:id/updateNow', conferenceCFPController.updateNow);
+
 module.exports = router;

@@ -12,6 +12,7 @@ const http = require('http');
 const { initSocket, users } = require('./src/config/socket');
 const { loadDataForFilter } = require('./src/temp/index');
 var cron = require('node-cron');
+const { createNewLog, increaseUserLog } = require('./src/utils/dashboard');
 require('dotenv').config();
 
 const app = express();
@@ -49,14 +50,20 @@ const server = http.createServer(app);
 const io = initSocket(server);
 
 io.on('connection', (socket) => {
-	const userID = socket.handshake.query['user-id'];
+	let userID = socket.handshake.query['user-id'];
+
+	if (!userID || userID == 'null') {
+		userID = 'guest' + Math.random();
+	}
 
 	if (userID) {
 		users.set(userID, socket.id);
 		console.log(`User ${userID} registered with socket ID ${socket.id}`);
 		io.emit('currentUser', users.size);
+		increaseUserLog();
+
 	} else {
-		console.log('No user ID found in headers');
+		console.log('No user ID found in headers.');
 	}
 
 	socket.on('disconnect', () => {
@@ -79,6 +86,9 @@ cron.schedule("0 0 * * *", async () => {
 }, {
 	timezone: "Asia/Ho_Chi_Minh"
 });
+
+// create log
+createNewLog();
 
 loadDataForFilter();
 
