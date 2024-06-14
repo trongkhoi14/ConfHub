@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const router = require('./src/routes');
 const dbConnect = require('./src/config/dbconnect');
+const crawlerDBConnect = require('./src/config/crawlerdb');
 const cookieParser = require('cookie-parser');
 const { dataSeeding } = require('./src/seeders/data-seeding');
 const { notFound, errorHandler } = require('./src/middlewares/errorHandling');
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 // connect to database
 dbConnect();
 // dataSeeding(['admin', 'conferences']);
+crawlerDBConnect();
 
 // create router
 router(app);

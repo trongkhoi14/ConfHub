@@ -243,6 +243,54 @@ class UserController {
             next(err);
         }
     });
+
+    adminLogin = asyncHandler(async (req, res) => {
+        const { email, password } = req.body
+        if (!email || !password) {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Missing login information.",
+                data: []
+            })
+        }
+        const response = await userModel.findOne({ where: { email: email, role: 'admin' } });
+        if (!response) {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Email not found.",
+                data: []
+            })
+        }
+        const passwordCorrect = await response.isCorrectPassword(password);
+        //console.log(passwordCorrect);
+        if (passwordCorrect) {
+            // generate access token
+            const accessToken = generateAccessToken(response.id, response.role)
+            // generate refresh token
+            const newRefreshToken = generateRefreshToken(response.id)
+            // save refresh token to the database
+            await userModel.update(
+                { refreshToken: newRefreshToken },
+                { where: { id: response.id }, returning: true })
+            // save refresh token to cookie
+            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000 })
+            return res.status(status.OK).json({
+                message: "Login successfully",
+                data: {
+                    name: response.name,
+                    phone: response.phone,
+                    email: response.email,
+                    address: response.address,
+                    nationality: response.nationality,
+                    role: response.role,
+                    accessToken
+                }
+            })
+        } else {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Incorrect password",
+                data: []
+            })
+        }
+    })
 }
 
 module.exports = UserController;

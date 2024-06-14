@@ -21,5 +21,6 @@ router.put('/setting', verifyAccessToken, settingController.changeSetting);
 
 // admin side
 router.get('/', verifyAccessToken, checkAdminRole, userController.getAll);
+router.post('/login/admin', userController.adminLogin);
 
 module.exports = router;
