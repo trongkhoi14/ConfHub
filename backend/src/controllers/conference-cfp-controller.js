@@ -36,14 +36,14 @@ class ConferenceCFPController {
     getConferenceDetail = asyncHandler(async (req, res, next) => {
         try {
             const conferenceID = req.params?.id;
-            const userID = req.user?._id;
+            // const userID = req.user?._id;
 
-            const toCheckConference = conferenceData.inactiveConferences.find(item => item.CallForPaperCfpId == conferenceID);
-            if (toCheckConference && toCheckConference.UserId != userID) {
-                return res.status(status.BAD_REQUEST).json({
-                    data: []
-                });
-            }
+            // const toCheckConference = conferenceData.inactiveConferences.find(item => item.CallForPaperCfpId == conferenceID);
+            // if (toCheckConference && toCheckConference.UserId != userID) {
+            //     return res.status(status.BAD_REQUEST).json({
+            //         data: []
+            //     });
+            // }
 
             const data = await query.CallForPaperQuery.selectCallForPaper(conferenceID);
             return res.status(status.OK).json({
