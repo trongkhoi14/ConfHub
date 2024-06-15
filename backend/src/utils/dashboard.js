@@ -30,17 +30,21 @@ const createNewLog = async function () {
     }
 };
 
-const getUserLog = async function () {
+const getUserLog = async function (conditions) {
     try {
-        return await UserLog.findAll();
+        return await UserLog.findAll({
+            where: conditions
+        });
     } catch (error) {
         throw (error);
     }
 }
 
-const getETLLog = async function () {
+const getETLLog = async function (conditions) {
     try {
-        return await ETLLog.findAll();
+        return await ETLLog.findAll({
+            where: conditions
+        });
     } catch (error) {
         throw (error);
     }

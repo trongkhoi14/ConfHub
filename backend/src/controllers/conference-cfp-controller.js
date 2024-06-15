@@ -3,8 +3,9 @@ const query = require('../utils/queries.js');
 const input = require('../utils/input-handler.js');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
-const { crawlConferenceById } = require('../services/crawl-services.js');
 const { conferenceData, updateToList } = require('../temp/index.js');
+const { addCrawlJob } = require('../utils/crawl-job.js');
+const { crawlJob } = require('../config/socket');
 require('dotenv').config();
 
 class ConferenceCFPController {
@@ -35,9 +36,18 @@ class ConferenceCFPController {
     getConferenceDetail = asyncHandler(async (req, res, next) => {
         try {
             const conferenceID = req.params?.id;
-            const conferenceData = await query.CallForPaperQuery.selectCallForPaper(conferenceID);
+            const userID = req.user?._id;
+
+            const toCheckConference = conferenceData.inactiveConferences.find(item => item.CallForPaperCfpId == conferenceID);
+            if (toCheckConference && toCheckConference.UserId != userID) {
+                return res.status(status.BAD_REQUEST).json({
+                    data: []
+                });
+            }
+
+            const data = await query.CallForPaperQuery.selectCallForPaper(conferenceID);
             return res.status(status.OK).json({
-                data: conferenceData
+                data: data
             });
 
         } catch (err) {
@@ -48,25 +58,26 @@ class ConferenceCFPController {
     updateNow = asyncHandler(async (req, res, next) => {
         try {
             const conferenceID = req.params?.id;
-            const conference = conferenceData.listOfConferences.filter(item => item.id == conferenceID);
-            if (conference.length === 0) {
-                return res.status(status.NOT_FOUND).json({
-                    message: "Can not find this call for paper!"
-                });
-            }
+            const userID = req.user?._id
+            // const conference = conferenceData.listOfConferences.filter(item => item.id == conferenceID);
+            // if (conference.length === 0) {
+            //     return res.status(status.NOT_FOUND).json({
+            //         message: "Can not find this call for paper!"
+            //     });
+            // }
 
-            const nkey = conference[0].information.nkey;
-            if (!nkey) {
-                return res.status(status.BAD_REQUEST).json({
-                    message: "We don't have permission to crawl this conference!"
-                });
-            }
+            // const nkey = conference[0].information.nkey;
+            // if (!nkey) {
+            //     return res.status(status.BAD_REQUEST).json({
+            //         message: "We don't have permission to update this conference!"
+            //     });
+            // }
 
-            // crawlConferenceById(conferenceID, nkey)
+            const jobID = await addCrawlJob(conferenceID);
+            crawlJob.set(jobID.toString(), userID);
 
-            console.log('Trả về phản hồi')
             return res.status(status.OK).json({
-                message: 'This page will be updated in about 5 minutes'
+                message: 'This page will be updated soon. Please waiting for next notification.'
             });
 
         } catch (err) {

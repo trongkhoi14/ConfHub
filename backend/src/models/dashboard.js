@@ -10,7 +10,7 @@ const UserLog = sequelize.define('UserLog', {
     time: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        defaultValue: new Date()
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     total_visiters: {
         type: DataTypes.INTEGER,
@@ -31,7 +31,7 @@ const ETLLog = sequelize.define('ETLLog', {
     time: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        defaultValue: new Date()
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     total_etl_processes: {
         type: DataTypes.INTEGER,

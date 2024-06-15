@@ -11,7 +11,7 @@ const { infoLogger } = require('./src/utils/logger');
 const NotificationController = require('./src/controllers/notification-controller');
 const http = require('http');
 const { initSocket, users } = require('./src/config/socket');
-const { loadDataForFilter } = require('./src/temp/index');
+const { loadDataForFilter, loadInactiveConference } = require('./src/temp/index');
 var cron = require('node-cron');
 const { createNewLog, increaseUserLog } = require('./src/utils/dashboard');
 require('dotenv').config();
@@ -92,7 +92,13 @@ cron.schedule("0 0 * * *", async () => {
 // create log
 createNewLog();
 
+// read conference list
 loadDataForFilter();
+loadInactiveConference();
+
+// change stream
+const { monitorChanges } = require('./src/services/change-stream');
+monitorChanges();
 
 server.listen(port, () => {
 	console.log(`Server was running on port ${port}`);

@@ -14,7 +14,7 @@ const ImportantDate = sequelize.define('ImportantDate', {
     date_value: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        defaultValue: new Date()
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     },
     status: {
         type: DataTypes.TEXT,

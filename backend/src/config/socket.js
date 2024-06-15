@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 
 let io;
 const users = new Map();
+const crawlJob = new Map();
 
 const initSocket = (server) => {
     io = new Server(server, {
@@ -24,5 +25,6 @@ const getIO = () => {
 module.exports = {
     initSocket,
     getIO,
-    users
+    users,
+    crawlJob
 };

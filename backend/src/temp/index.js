@@ -4,7 +4,8 @@ const sequelize = require('../config/database.js');
 require('dotenv').config();
 
 const conferenceData = {
-    listOfConferences: []
+    listOfConferences: [],
+    inactiveConferences: []
 };
 
 const selectCallForPaperForFilter = async function (cfpID) {
@@ -108,8 +109,25 @@ async function removeFromList(cfp_id, list) {
     }
 }
 
+async function loadInactiveConference() {
+    const inactiveConferences = await model.postModel.findAll({
+        attributes: ['UserId', 'CallForPaperCfpId'],
+        where: {
+            '$CallForPaper.status$': false
+        },
+        include: [{
+            model: model.callForPaperModel, as: "CallForPaper",
+            required: false,
+            attributes: []
+        }]
+    })
+
+    conferenceData.inactiveConferences = [...inactiveConferences];
+}
+
 module.exports = {
     loadDataForFilter,
+    loadInactiveConference,
     conferenceData,
     selectCallForPaperForFilter,
     insertToList,
