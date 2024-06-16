@@ -1,6 +1,6 @@
 const express = require('express');
 const { ConferenceCFPController, ImportantDateController, OrganizationController, FeedbackController } = require('../controllers');
-const { getCurrentUser, verifyAccessToken } = require('../middlewares/verifyToken');
+const { getCurrentUser, verifyAccessToken, checkAdminRole } = require('../middlewares/verifyToken');
 
 const router = express.Router();
 const conferenceCFPController = new ConferenceCFPController();
@@ -16,5 +16,6 @@ router.get('/:id/feedback', feedbackController.getAllFeedbacks);
 router.post('/:id/feedback', verifyAccessToken, feedbackController.addFeedback);
 
 router.put('/:id/updateNow', getCurrentUser, conferenceCFPController.updateNow);
+router.delete('/:id', verifyAccessToken, checkAdminRole, conferenceCFPController.deleteCallForPaper);
 
 module.exports = router;

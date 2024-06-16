@@ -32,7 +32,7 @@ const setMessage = function (payload) {
     else if (payload.title === process.env.TITLE_CANCELLED_CONFERENCE) {
         return `
                 <p> Dear Sir/Madam,</p>
-                <p> We would like to inform you about an cancelled conference that you are following:</p>
+                <p> We would like to inform you about an cancelled conference that you are concerned about:</p>
                 <p>${payload.confName}</p>
                 <p>From now on, you will no longer find any information about this conference on ConferenceHub. Sorry for this inconvenience.</p>
                 `

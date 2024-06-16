@@ -85,6 +85,7 @@ io.on('connection', (socket) => {
 cron.schedule("0 0 * * *", async () => {
 	console.log("[" + new Date() + "] Sending upcoming notifications emails.");
 	NotificationController.sendUpcomingNotification();
+	createNewLog();
 }, {
 	timezone: "Asia/Ho_Chi_Minh"
 });

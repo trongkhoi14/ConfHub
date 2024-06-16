@@ -6,6 +6,7 @@ const jobSchema = new mongoose.Schema(
         conf_id: { type: String, required: true },
         data: { type: Object },
         error: { type: String },
+        duration: { type: Number }
     },
     { timestamps: true }
 );

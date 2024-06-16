@@ -84,6 +84,21 @@ class ConferenceCFPController {
             next(err);
         }
     });
+
+    deleteCallForPaper = asyncHandler(async (req, res, next) => {
+        try {
+            const conferenceID = req.params?.id;
+
+            await query.PostQuery.deletePost(conferenceID);
+
+            return res.status(status.OK).json({
+                message: "Delete this call for paper successfully."
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    });
 };
 
 module.exports = ConferenceCFPController;

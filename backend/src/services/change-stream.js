@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const JobModel = require('../models/job-model');
 const { getIO, crawlJob, users } = require('../config/socket');
-const { sendNotificationToUser } = require('../services/notification-services')
+const { sendNotificationToUser } = require('../services/notification-services');
+const { increaseETLLog } = require('../utils/dashboard.js');
 require('dotenv').config();
 
 const io = getIO();
@@ -42,7 +43,6 @@ const monitorChanges = async () => {
             const message = `The conference you want to "Update now" has been updated!`
             sendNotificationToUser(userID, message);
             deleteByJobId(jobID);
-
         });
 
         console.log('Server is listening for changes...');

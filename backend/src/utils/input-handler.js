@@ -399,7 +399,8 @@ function getConferenceObject(req) {
             // status: req.body.status || false,
             fieldsOfResearch: req.body.fieldsOfResearch || [],
             organizations: req.body.organizations || [],
-            importantDates: req.body.importantDates || []
+            importantDates: req.body.importantDates || [],
+            duration: req.body.duration || 0
         }
     } catch (error) {
         throw (error);

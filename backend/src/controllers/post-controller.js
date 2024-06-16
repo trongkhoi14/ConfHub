@@ -4,6 +4,7 @@ const query = require('../utils/queries.js');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
 const { conferenceData, updateToList } = require('../temp/index.js');
+const { increaseETLLog } = require('../utils/dashboard.js');
 require('dotenv').config();
 
 class postController {
@@ -73,6 +74,7 @@ class postController {
                 const isExisted = await model.callForPaperModel.findOne({ where: { nkey: conference.nkey } });
                 if (!isExisted) {
                     await query.PostQuery.insertPost(conference);
+                    increaseETLLog(conference.duration);
                     return res.status(status.OK).json({
                         message: "Add new post successfully."
                     });
@@ -80,6 +82,7 @@ class postController {
                 } else {
                     conference.cfp_id = isExisted.cfp_id;
                     await query.PostQuery.updatePost(conference);
+                    increaseETLLog(conference.duration);
                     return res.status(status.OK).json({
                         message: "Update post successfully."
                     });
@@ -87,6 +90,8 @@ class postController {
             }
 
             await query.PostQuery.insertPost(conference);
+            increaseETLLog(conference.duration);
+
             return res.status(status.OK).json({
                 message: "Add new post with no natural key successfully."
             });
