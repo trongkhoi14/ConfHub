@@ -59,21 +59,23 @@ class ConferenceCFPController {
         try {
             const conferenceID = req.params?.id;
             const userID = req.user?._id
-            // const conference = conferenceData.listOfConferences.filter(item => item.id == conferenceID);
-            // if (conference.length === 0) {
-            //     return res.status(status.NOT_FOUND).json({
-            //         message: "Can not find this call for paper!"
-            //     });
-            // }
+            const conference = conferenceData.listOfConferences.filter(item => item.id == conferenceID);
+            if (conference.length === 0) {
+                return res.status(status.NOT_FOUND).json({
+                    message: "Can not find this call for paper!"
+                });
+            }
 
-            // const nkey = conference[0].information.nkey;
-            // if (!nkey) {
-            //     return res.status(status.BAD_REQUEST).json({
-            //         message: "We don't have permission to update this conference!"
-            //     });
-            // }
+            const nkey = conference[0].information.nkey;
+            if (!nkey) {
+                return res.status(status.BAD_REQUEST).json({
+                    message: "We don't have permission to update this conference!"
+                });
+            }
 
-            const jobID = await addCrawlJob(conferenceID);
+            console.log(nkey);
+
+            const jobID = await addCrawlJob(nkey);
             crawlJob.set(jobID.toString(), userID);
 
             return res.status(status.OK).json({

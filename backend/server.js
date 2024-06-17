@@ -97,6 +97,8 @@ createNewLog();
 loadDataForFilter();
 loadInactiveConference();
 
+process.env.TZ = "Asia/Ho_Chi_Minh"
+
 // change stream
 const { monitorChanges } = require('./src/services/change-stream');
 monitorChanges();
