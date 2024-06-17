@@ -55,11 +55,7 @@ const increaseUserLog = async function () {
         const today = new Date();
         const dateOnly = today.toDateString();
 
-        const [log, created] = await UserLog.findOrCreate({
-            where: { time: dateOnly },
-            defaults: { time: dateOnly }
-        });
-
+        const log = await UserLog.findOne({ where: { time: dateOnly } });
         if (log) {
             log.total_visiters = log.total_visiters + 1;
             await log.save();
