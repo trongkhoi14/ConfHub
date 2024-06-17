@@ -3,6 +3,8 @@ const model = require('../models/index.js');
 const sequelize = require('../config/database.js');
 require('dotenv').config();
 
+process.env.TZ = "Asia/Ho_Chi_Minh"
+
 const conferenceData = {
     listOfConferences: [],
     inactiveConferences: []
