@@ -149,7 +149,7 @@ const selectCallForPaper = async function (cfpID) {
         });
 
         conference.view = conference.view + 1;
-        conference.save();
+        await conference.save();
         const index = conferenceData.listOfConferences.findIndex(item => String(item.id) === String(conference.cfp_id));
         conferenceData.listOfConferences[index].view = conference.view;
 
