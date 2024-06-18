@@ -44,7 +44,7 @@ const monitorChanges = async () => {
             const userID = findByJobId(jobID, crawlJob);
             const cfpID = findByJobId(jobID, cfpJob);
             const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
-
+            console.log(conference.information.name);
             const message = `{ "id": "${cfpID}", "name": "${conference.information.name}" }`
             sendNotificationToUser(userID, message);
 

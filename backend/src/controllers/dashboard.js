@@ -8,7 +8,7 @@ const { Op } = require('sequelize');
 class DashboardController {
     getLoginUsers = asyncHandler(async (req, res, next) => {
         try {
-            const userIDs = Array.from(users.keys());
+            const userIDs = Array.from(users);
 
             return res.status(status.OK).json({
                 count: userIDs.size,

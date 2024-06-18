@@ -12,10 +12,14 @@ const SettingQuery = require('../utils/setting-queries.js');
 require('dotenv').config();
 
 const sendNotificationToUser = (userID, message) => {
-    const socketID = users.get(userID);
-    if (socketID) {
+    if (userID) {
         const io = getIO();
-        io.to(socketID).emit('notification', message);
+        for (let [socketID, uid] of users.entries()) {
+            if (uid === userID) {
+                io.to(socketID).emit('notification', message);
+            }
+        }
+
     } else {
         // console.log(`User ${userID} is not connected`);
     }

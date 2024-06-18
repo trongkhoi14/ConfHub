@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
 	}
 
 	if (userID) {
-		users.set(userID, socket.id);
+		users.set(socket.id, userID);
 		console.log(`User ${userID} registered with socket ID ${socket.id}`);
 		io.emit('currentUser', users.size);
 		increaseUserLog();
@@ -70,12 +70,13 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', () => {
 		console.log('User disconnected');
-		for (let [userID, socketID] of users) {
-			if (socketID === socket.id) {
-				users.delete(userID);
-				break;
-			}
-		}
+		// for (let [socketID, userID] of users) {
+		// 	if (socketID === socket.id) {
+		// 		users.delete(userID);
+		// 		break;
+		// 	}
+		// }
+		users.delete(socket.id);
 		io.emit('currentUser', users.size);
 	});
 });
