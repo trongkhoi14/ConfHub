@@ -15,7 +15,7 @@ class FileController {
                 newConference.Rank = req.body.rank;
                 newConference.PrimaryFoR = req.body.PrimaryFoR
                 await newConference.save();
-                console.log("run A")
+
                 return res.status(status.OK).json({
                     newConference
                 });
@@ -36,13 +36,12 @@ class FileController {
                     Location: null,
                     Type: null
                 });
-                console.log("run B")
+
                 return res.status(status.OK).json({
                     newConference
                 });
             }
 
-            console.log("run C")
             return res.status(status.OK).json({
                 message: "This conference is existed."
             });
