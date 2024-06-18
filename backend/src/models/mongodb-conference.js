@@ -19,11 +19,11 @@ var conferenceSchema = new mongoose.Schema({
     },
     Note: {
         type: String,
-        required: true
+        // required: true
     },
     DBLP: {
         type: String,
-        required: true
+        // required: true
     },
     PrimaryFoR: {
         type: String,
@@ -31,11 +31,11 @@ var conferenceSchema = new mongoose.Schema({
     },
     Comments: {
         type: String,
-        required: true
+        // required: true
     },
     AverageRating: {
         type: String,
-        required: true
+        // required: true
     },
     Links: {
         type: Array

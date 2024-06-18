@@ -1,19 +1,50 @@
-const { Conference } = require('../models/mongodb-conference');
+const ConferenceModel = require('../models/mongodb-conference');
 const { status } = require('../constants/index.js');
+const asyncHandler = require('express-async-handler');
+const mongoose = require('mongoose');
 
-class MongoDBConference {
+class FileController {
     insert = asyncHandler(async (req, res, next) => {
         try {
-            const existingConference = await Conference.findOne({ Title: title, Acronym: acronym });
+            const existingConference = await ConferenceModel.findOne({ Title: req.body.title, Acronym: req.body.acronym });
 
-            if (existingConference) {
+            if (existingConference && existingConference.Source != req.body.source) {
+                const newConference = new ConferenceModel(existingConference.toObject());
+                newConference._id = new mongoose.Types.ObjectId();
+                newConference.Source = req.body.source;
+                newConference.Rank = req.body.rank;
+                newConference.PrimaryFoR = req.body.PrimaryFoR
+                await newConference.save();
+                console.log("run A")
+                return res.status(status.OK).json({
+                    newConference
+                });
 
-            } else {
-
+            } else if (!existingConference) {
+                const newConference = await ConferenceModel.create({
+                    Title: req.body.title,
+                    Acronym: req.body.acronym,
+                    Source: req.body.source,
+                    Rank: req.body.rank,
+                    PrimaryFoR: req.body.PrimaryFoR,
+                    Links: [],
+                    ConferenceDate: [],
+                    SubmissonDate: [],
+                    NotificationDate: [],
+                    CameraReady: [],
+                    CallForPaper: null,
+                    Location: null,
+                    Type: null
+                });
+                console.log("run B")
+                return res.status(status.OK).json({
+                    newConference
+                });
             }
 
+            console.log("run C")
             return res.status(status.OK).json({
-
+                message: "This conference is existed."
             });
 
         } catch (err) {
@@ -22,4 +53,4 @@ class MongoDBConference {
     });
 }
 
-module.exports = MongoDBConference;
+module.exports = FileController;
