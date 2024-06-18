@@ -58,6 +58,7 @@ const checkAdminRole = asyncHandler(async (req, res, next) => {
     const user = await query.UserQuery.selectUser(req.user?._id);
     if (user) {
         if (user.role.toLowerCase() === "admin") {
+            req.user._r = "ad"
             next();
 
         } else {

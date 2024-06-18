@@ -39,7 +39,7 @@ class ConferenceCFPController {
             const userID = req.user?._id;
 
             const toCheckConference = conferenceData.inactiveConferences.find(item => item.CallForPaperCfpId == conferenceID);
-            if (toCheckConference && toCheckConference.UserId != userID) {
+            if (toCheckConference && toCheckConference.UserId != userID && req.user._r != "ad") {
                 return res.status(status.BAD_REQUEST).json({
                     data: []
                 });
