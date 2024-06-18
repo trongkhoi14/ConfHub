@@ -70,13 +70,12 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', () => {
 		console.log('User disconnected');
-		// for (let [socketID, userID] of users) {
-		// 	if (socketID === socket.id) {
-		// 		users.delete(userID);
-		// 		break;
-		// 	}
-		// }
-		users.delete(socket.id);
+		for (let [socketID, userID] of users) {
+			if (socketID === socket.id) {
+				users.delete(userID);
+				break;
+			}
+		}
 		io.emit('currentUser', users.size);
 	});
 });
