@@ -1,6 +1,7 @@
 const ConferenceModel = require('../models/mongodb-conference');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
+const { addCrawlJob } = require('../utils/crawl-job.js');
 const mongoose = require('mongoose');
 
 class FileController {
@@ -36,6 +37,8 @@ class FileController {
                     Location: null,
                     Type: null
                 });
+
+                await addCrawlJob(newConference._id.toString());
 
                 return res.status(status.OK).json({
                     newConference
