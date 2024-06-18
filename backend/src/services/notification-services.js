@@ -16,6 +16,7 @@ const sendNotificationToUser = (userID, message) => {
     if (socketID) {
         const io = getIO();
         io.to(socketID).emit('notification', message);
+
     } else {
         // console.log(`User ${userID} is not connected`);
     }

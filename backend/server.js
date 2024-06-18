@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
 	}
 
 	if (userID) {
-		users.set(socket.id, userID);
+		users.set(userID, socket.id);
 		console.log(`User ${userID} registered with socket ID ${socket.id}`);
 		io.emit('currentUser', users.size);
 		increaseUserLog();

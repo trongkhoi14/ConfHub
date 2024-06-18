@@ -44,12 +44,15 @@ const monitorChanges = async () => {
             const userID = findByJobId(jobID, crawlJob);
             const cfpID = findByJobId(jobID, cfpJob);
             const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
-            console.log(conference.information.name);
-            const message = `{ "id": "${cfpID}", "name": "${conference.information.name}" }`
-            sendNotificationToUser(userID, message);
+            if (conference) {
+                const name = conference.information.name;
+                const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
+                sendNotificationToUser(userID, message);
 
-            deleteByJobId(jobID, crawlJob);
-            deleteByJobId(jobID, cfpJob);
+                deleteByJobId(jobID, crawlJob);
+                deleteByJobId(jobID, cfpJob);
+            }
+
         });
 
         console.log('Server is listening for changes...');
