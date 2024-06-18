@@ -41,26 +41,39 @@ class ConferenceCFPController {
             const toCheckConference = conferenceData.inactiveConferences.find(item => item.CallForPaperCfpId == conferenceID);
 
             if (toCheckConference) {
-                const user = await model.userModel.findOne({
-                    where: {
-                        id: userID,
-                        role: "admin"
-                    }
-                });
+                if (userID) {
+                    const user = await model.userModel.findOne({
+                        where: {
+                            id: userID,
+                            role: "admin"
+                        }
+                    });
 
-                if (!user) {
-                    if (toCheckConference.UserId != userID) {
+                    if (user || toCheckConference.UserId == userID) {
+                        const data = await query.CallForPaperQuery.selectCallForPaper(conferenceID);
+                        return res.status(status.OK).json({
+                            data: data
+                        });
+
+                    } else {
+
                         return res.status(status.BAD_REQUEST).json({
                             data: []
                         });
                     }
-                }
-            }
 
-            const data = await query.CallForPaperQuery.selectCallForPaper(conferenceID);
-            return res.status(status.OK).json({
-                data: data
-            });
+                } else {
+                    return res.status(status.BAD_REQUEST).json({
+                        data: []
+                    });
+                }
+
+            } else {
+                const data = await query.CallForPaperQuery.selectCallForPaper(conferenceID);
+                return res.status(status.OK).json({
+                    data: data
+                });
+            }
 
         } catch (err) {
             next(err);
