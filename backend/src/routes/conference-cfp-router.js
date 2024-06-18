@@ -11,7 +11,7 @@ const feedbackController = new FeedbackController();
 const fileController = new FileController();
 
 router.get('/', conferenceCFPController.getAllConferences);
-router.get('/:id', conferenceCFPController.getConferenceDetail);
+router.get('/:id', getCurrentUser, conferenceCFPController.getConferenceDetail);
 router.get('/:id/dates', importantDateController.getConferenceDates);
 router.get('/:id/org', organizationController.getConferenceOrganizations);
 router.get('/:id/feedback', feedbackController.getAllFeedbacks);
