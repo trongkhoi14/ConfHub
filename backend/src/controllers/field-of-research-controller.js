@@ -13,7 +13,7 @@ class fieldOfResearchController {
                 if (item.information.status == true && item.information.fieldOfResearch.length > 0) {
                     return item.information.fieldOfResearch;
                 } else {
-                    return []; s
+                    return [];
                 }
             });
 

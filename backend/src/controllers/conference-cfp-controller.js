@@ -5,7 +5,7 @@ const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
 const { conferenceData, updateToList } = require('../temp/index.js');
 const { addCrawlJob } = require('../utils/crawl-job.js');
-const { crawlJob } = require('../config/socket');
+const { crawlJob, cfpJob } = require('../config/socket');
 require('dotenv').config();
 
 class ConferenceCFPController {
@@ -73,10 +73,9 @@ class ConferenceCFPController {
                 });
             }
 
-            console.log(nkey);
-
             const jobID = await addCrawlJob(nkey);
             crawlJob.set(jobID.toString(), userID);
+            cfpJob.set(jobID.toString(), conferenceID);
 
             return res.status(status.OK).json({
                 message: 'This page will be updated soon. Please waiting for next notification.'

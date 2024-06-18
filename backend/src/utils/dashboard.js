@@ -2,6 +2,8 @@ const { UserLog, ETLLog } = require('../models/dashboard.js');
 const User = require('../models/user-model.js');
 require('dotenv').config();
 
+process.env.TZ = "Asia/Ho_Chi_Minh"
+
 const createNewLog = async function () {
     try {
         const today = new Date();

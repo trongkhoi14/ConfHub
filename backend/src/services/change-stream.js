@@ -1,25 +1,26 @@
 const mongoose = require('mongoose');
 const JobModel = require('../models/job-model');
-const { getIO, crawlJob, users } = require('../config/socket');
+const { getIO, crawlJob, cfpJob } = require('../config/socket');
 const { sendNotificationToUser } = require('../services/notification-services');
 const { increaseETLLog } = require('../utils/dashboard.js');
+const { conferenceData } = require('../temp/index.js');
 require('dotenv').config();
 
 const io = getIO();
 
-function findUserIdByJobId(jobId) {
-    for (const [jobID, userID] of crawlJob.entries()) {
+function findByJobId(jobId, map) {
+    for (const [jobID, id] of map.entries()) {
         if (jobID === jobId) {
-            return userID;
+            return id;
         }
     }
     return null;
 }
 
-function deleteByJobId(jobId) {
-    for (const [jobID, userID] of crawlJob.entries()) {
+function deleteByJobId(jobId, map) {
+    for (const [jobID, id] of map.entries()) {
         if (jobID === jobId) {
-            crawlJob.delete(jobID);
+            map.delete(jobID);
             return true;
         }
     }
@@ -37,12 +38,18 @@ const monitorChanges = async () => {
 
         changeStream.on('change', (change) => {
             console.log('Server detected change:', change);
+            increaseETLLog(change.updateDescription.updatedFields.duration)
 
             const jobID = change.documentKey._id.toString();
-            const userID = findUserIdByJobId(jobID);
-            const message = `The conference you want to "Update now" has been updated!`
+            const userID = findByJobId(jobID, crawlJob);
+            const cfpID = findByJobId(jobID, cfpJob);
+            const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
+
+            const message = `"id": "${cfpID}", "name": "${conference.information.name}"`
             sendNotificationToUser(userID, message);
-            deleteByJobId(jobID);
+
+            deleteByJobId(jobID, crawlJob);
+            deleteByJobId(jobID, cfpJob);
         });
 
         console.log('Server is listening for changes...');
