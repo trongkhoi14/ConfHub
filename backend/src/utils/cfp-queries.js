@@ -108,6 +108,7 @@ const selectCallForPaperForFilter = async function (cfpID) {
             // callForPaper: conference.content,
             createdAt: conference.createdAt,
             updatedAt: conference.updatedAt,
+            view: conference.view
         };
 
         return conferenceData;
@@ -147,7 +148,12 @@ const selectCallForPaper = async function (cfpID) {
             ]
         });
 
-        const conferenceData = {
+        conference.view = conference.view + 1;
+        conference.save();
+        const index = conferenceData.listOfConferences.findIndex(item => String(item.id) === String(conference.cfp_id));
+        conferenceData.listOfConferences[index].view = conference.view;
+
+        const data = {
             id: conference.cfp_id,
             information: {
                 name: conference.Conference.conf_name,
@@ -166,9 +172,10 @@ const selectCallForPaper = async function (cfpID) {
             callForPaper: conference.content,
             createdAt: conference.createdAt,
             updatedAt: conference.updatedAt,
+            view: conference.view
         };
 
-        return conferenceData;
+        return data;
 
     } catch (error) {
         throw (error);
@@ -245,28 +252,11 @@ const deleteCallForPaper = async function (cfpID) {
     }
 };
 
-// not use
-const updateRating = async function (cfpID) {
-    const numbersOfFeedbacks = await model.feedbackModel.findAndCountAll({
-        where: { CallForPaperCfpId: cfpID, rating: { [Op.ne]: null } }
-    });
-
-    let sum = 0;
-    numbersOfFeedbacks.rows.map(fb => {
-        sum = sum + fb.rating;
-    });
-
-    const cfp = await model.callForPaperModel.findByPk(cfpID);
-    if (cfp) {
-        let avgRating = sum / numbersOfFeedbacks.count
-        if (avgRating) {
-            cfp.rating = avgRating;
-            cfp.save();
-        }
-    }
-
-    return cfp;
-};
+function findTopView(arr, k) {
+    const sortArr = arr.slice().sort((a, b) => b.view - a.view);
+    let result = sortArr.slice(0, k);
+    return result;
+}
 
 module.exports = {
     selectAllCallForPapers,
@@ -274,5 +264,6 @@ module.exports = {
     insertCallForPaper,
     updateCallForPaper,
     deleteCallForPaper,
-    selectCallForPaperForFilter
+    selectCallForPaperForFilter,
+    findTopView
 };

@@ -59,6 +59,7 @@ const selectCallForPaperForFilter = async function (cfpID) {
             // callForPaper: conference.content,
             // createdAt: conference.createdAt,
             updatedAt: conference.updatedAt,
+            view: conference.view
         };
 
         return conferenceData;

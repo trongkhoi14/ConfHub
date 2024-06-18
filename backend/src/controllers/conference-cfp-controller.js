@@ -100,6 +100,21 @@ class ConferenceCFPController {
             next(err);
         }
     });
+
+    selectTopView = asyncHandler(async (req, res, next) => {
+        try {
+            const amount = req.query.amount || 10;
+            const arr = conferenceData.listOfConferences.filter(item => item.information.status == true);
+            const topViewArr = query.CallForPaperQuery.findTopView(arr, amount);
+
+            return res.status(status.OK).json({
+                topViewArr
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    });
 };
 
 module.exports = ConferenceCFPController;

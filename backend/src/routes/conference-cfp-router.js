@@ -15,6 +15,8 @@ router.get('/:id/org', organizationController.getConferenceOrganizations);
 router.get('/:id/feedback', feedbackController.getAllFeedbacks);
 router.post('/:id/feedback', verifyAccessToken, feedbackController.addFeedback);
 
+router.get('/top/view', conferenceCFPController.selectTopView);
+
 router.put('/:id/updateNow', getCurrentUser, conferenceCFPController.updateNow);
 router.delete('/:id', verifyAccessToken, checkAdminRole, conferenceCFPController.deleteCallForPaper);
 

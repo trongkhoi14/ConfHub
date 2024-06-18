@@ -44,6 +44,10 @@ const CallForPaper = sequelize.define('CallForPaper', {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    view: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     }
 }, {
     timestamps: false,
