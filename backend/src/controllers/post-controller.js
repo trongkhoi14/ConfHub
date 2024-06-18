@@ -5,6 +5,7 @@ const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
 const { conferenceData, updateToList } = require('../temp/index.js');
 const { increaseETLLog } = require('../utils/dashboard.js');
+const CallForPaper = require('../models/call-for-paper-model.js');
 require('dotenv').config();
 
 class postController {
@@ -164,6 +165,11 @@ class postController {
             if (cfp) {
                 await cfp.update({ status: 'true' });
                 await updateToList(cfpID, conferenceData.listOfConferences);
+                // remove from inactive list
+                const index = conferenceData.inactiveConferences.findIndex(item => String(item.CallForPaperCfpId) === String(cfpID));
+                if (index !== -1) {
+                    conferenceData.inactiveConferences.splice(index, 1);
+                }
             }
 
             return res.status(status.OK).json({
@@ -182,6 +188,22 @@ class postController {
             if (cfp) {
                 await cfp.update({ status: 'false' });
                 await updateToList(cfpID, conferenceData.listOfConferences);
+                // add to inactive list
+                const post = await model.postModel.findOne({
+                    attributes: ['UserId', 'CallForPaperCfpId'],
+                    where: {
+                        CallForPaperCfpId: cfpID
+                    }
+                });
+
+                if (post) {
+                    conferenceData.inactiveConferences.unshift(post)
+                } else {
+                    conferenceData.inactiveConferences.unshift({
+                        UserId: req.user._id,
+                        CallForPaperCfpId: cfpID
+                    })
+                }
             }
 
             return res.status(status.OK).json({
