@@ -26,8 +26,7 @@ var conferenceSchema = new mongoose.Schema({
         // required: true
     },
     PrimaryFoR: {
-        type: String,
-        required: true
+        type: Array
     },
     Comments: {
         type: String,
