@@ -148,11 +148,6 @@ const selectCallForPaper = async function (cfpID) {
             ]
         });
 
-        conference.view = conference.view + 1;
-        await conference.save();
-        const index = conferenceData.listOfConferences.findIndex(item => String(item.id) === String(conference.cfp_id));
-        conferenceData.listOfConferences[index].view = conference.view;
-
         const data = {
             id: conference.cfp_id,
             information: {
@@ -174,6 +169,14 @@ const selectCallForPaper = async function (cfpID) {
             updatedAt: conference.updatedAt,
             view: conference.view
         };
+
+        if (conference.status == true) {
+            conference.view = conference.view + 1;
+            await conference.save();
+            const index = conferenceData.listOfConferences.findIndex(item => String(item.id) === String(conference.cfp_id));
+            conferenceData.listOfConferences[index].view = conference.view;
+        }
+
 
         return data;
 
