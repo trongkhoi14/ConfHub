@@ -38,20 +38,26 @@ const monitorChanges = async () => {
 
         changeStream.on('change', (change) => {
             console.log('Server detected change:', change);
-            increaseETLLog(change.updateDescription.updatedFields.duration)
+            try {
+                const duration = change.updateDescription?.updatedFields?.duration || 0;
+                if (duration) increaseETLLog(duration);
 
-            const jobID = change.documentKey._id.toString();
-            const userID = findByJobId(jobID, crawlJob);
-            const cfpID = findByJobId(jobID, cfpJob);
-            const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
-            if (conference) {
-                const name = conference.information.name;
-                const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
-                // sendNotificationToUser(userID, message);
-                io.emit('notification', message);
-                deleteByJobId(jobID, crawlJob);
-                deleteByJobId(jobID, cfpJob);
+                const jobID = change.documentKey._id.toString();
+                const userID = findByJobId(jobID, crawlJob);
+                const cfpID = findByJobId(jobID, cfpJob);
+                const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
+                if (conference) {
+                    const name = conference.information.name;
+                    const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
+                    sendNotificationToUser(userID, message);
+
+                    deleteByJobId(jobID, crawlJob);
+                    deleteByJobId(jobID, cfpJob);
+                }
+            } catch (error) {
+                console.log(error);
             }
+
 
         });
 
