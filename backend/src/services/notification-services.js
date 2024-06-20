@@ -13,6 +13,7 @@ require('dotenv').config();
 
 const sendNotificationToUser = (userID, message) => {
     const socketID = users.get(userID);
+    console.log(socketID, userID)
     if (socketID) {
         const io = getIO();
         io.to(socketID).emit('notification', message);
