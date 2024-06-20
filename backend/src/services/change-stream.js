@@ -45,6 +45,7 @@ const monitorChanges = async () => {
                 const jobID = change.documentKey._id.toString();
                 const socketID = findByJobId(jobID, crawlJob);
                 const cfpID = findByJobId(jobID, cfpJob);
+                console.log(socketID)
                 const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
                 if (conference) {
                     const name = conference.information.name;
