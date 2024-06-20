@@ -47,8 +47,8 @@ const monitorChanges = async () => {
             if (conference) {
                 const name = conference.information.name;
                 const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
-                sendNotificationToUser(userID, message);
-
+                // sendNotificationToUser(userID, message);
+                io.emit('notification', message);
                 deleteByJobId(jobID, crawlJob);
                 deleteByJobId(jobID, cfpJob);
             }
