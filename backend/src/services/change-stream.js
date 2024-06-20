@@ -39,7 +39,11 @@ const monitorChanges = async () => {
                             io.to(i._socketID).emit('notification', message);
                         }
 
-                        socketJob = socketJob.filter(i => !toInform.some(item => item._jobID == i._jobID))
+                        for (let i = socketJob.length - 1; i >= 0; i--) {
+                            if (socketJob[i]._jobID == jobID) {
+                                socketJob.splice(i, 1);
+                            }
+                        }
                     }
                 }
 
