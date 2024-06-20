@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', () => {
 		console.log('User disconnected');
-		for (let [socketID, userID] of users) {
+		for (let [userID, socketID] of users) {
 			if (socketID === socket.id) {
 				users.delete(userID);
 				break;
