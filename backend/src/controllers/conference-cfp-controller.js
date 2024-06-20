@@ -83,7 +83,8 @@ class ConferenceCFPController {
     updateNow = asyncHandler(async (req, res, next) => {
         try {
             const conferenceID = req.params?.id;
-            const userID = req.user?._id
+            const socketID = req.body?.socketID;
+
             const conference = conferenceData.listOfConferences.filter(item => item.id == conferenceID);
             if (conference.length === 0) {
                 return res.status(status.NOT_FOUND).json({
@@ -99,7 +100,7 @@ class ConferenceCFPController {
             }
 
             const jobID = await addCrawlJob(nkey);
-            crawlJob.set(jobID.toString(), userID);
+            crawlJob.set(jobID.toString(), socketID);
             cfpJob.set(jobID.toString(), conferenceID);
 
             return res.status(status.OK).json({

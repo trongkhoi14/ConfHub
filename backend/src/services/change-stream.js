@@ -43,13 +43,13 @@ const monitorChanges = async () => {
                 if (duration) increaseETLLog(duration);
 
                 const jobID = change.documentKey._id.toString();
-                const userID = findByJobId(jobID, crawlJob);
+                const socketID = findByJobId(jobID, crawlJob);
                 const cfpID = findByJobId(jobID, cfpJob);
                 const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
                 if (conference) {
                     const name = conference.information.name;
                     const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
-                    sendNotificationToUser(userID, message);
+                    io.to(socketID).emit('notification', message);
 
                     deleteByJobId(jobID, crawlJob);
                     deleteByJobId(jobID, cfpJob);

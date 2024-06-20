@@ -17,6 +17,8 @@ class FileController {
                 newConference.PrimaryFoR = req.body.PrimaryFoR
                 await newConference.save();
 
+                await addCrawlJob(newConference._id.toString());
+
                 return res.status(status.OK).json({
                     newConference
                 });

@@ -19,7 +19,7 @@ router.post('/:id/feedback', verifyAccessToken, feedbackController.addFeedback);
 
 router.get('/top/view', conferenceCFPController.selectTopView);
 
-router.put('/:id/updateNow', getCurrentUser, conferenceCFPController.updateNow);
+router.put('/:id/updateNow', conferenceCFPController.updateNow);
 router.delete('/:id', verifyAccessToken, checkAdminRole, conferenceCFPController.deleteCallForPaper);
 router.post('/file/import', verifyAccessToken, checkAdminRole, fileController.insert);
 
