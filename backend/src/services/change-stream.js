@@ -1,31 +1,12 @@
 const mongoose = require('mongoose');
 const JobModel = require('../models/job-model');
-const { getIO, crawlJob, cfpJob } = require('../config/socket');
+const { getIO, socketJob } = require('../config/socket');
 const { sendNotificationToUser } = require('../services/notification-services');
 const { increaseETLLog } = require('../utils/dashboard.js');
 const { conferenceData } = require('../temp/index.js');
 require('dotenv').config();
 
 const io = getIO();
-
-function findByJobId(jobId, map) {
-    for (const [jobID, id] of map.entries()) {
-        if (jobID === jobId) {
-            return id;
-        }
-    }
-    return null;
-}
-
-function deleteByJobId(jobId, map) {
-    for (const [jobID, id] of map.entries()) {
-        if (jobID === jobId) {
-            map.delete(jobID);
-            return true;
-        }
-    }
-    return false;
-}
 
 const monitorChanges = async () => {
     try {
@@ -43,18 +24,25 @@ const monitorChanges = async () => {
                 if (duration) increaseETLLog(duration);
 
                 const jobID = change.documentKey._id.toString();
-                const socketID = findByJobId(jobID, crawlJob);
-                const cfpID = findByJobId(jobID, cfpJob);
-                console.log(socketID)
-                const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
-                if (conference) {
-                    const name = conference.information.name;
-                    const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
-                    io.to(socketID).emit('notification', message);
 
-                    deleteByJobId(jobID, crawlJob);
-                    deleteByJobId(jobID, cfpJob);
+                const toInform = socketJob.filter(item => item._jobID == jobID);
+
+                if (toInform.length > 0) {
+                    const cfpID = toInform[0]._cfpID;
+                    const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
+
+                    if (conference) {
+                        const name = conference.information.name;
+                        const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
+
+                        for (let i of toInform) {
+                            io.to(i._socketID).emit('notification', message);
+                        }
+
+                        socketJob = socketJob.filter(i => !toInform.some(item => item._jobID == i._jobID))
+                    }
                 }
+
             } catch (error) {
                 console.log(error);
             }
