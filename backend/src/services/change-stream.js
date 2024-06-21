@@ -33,7 +33,8 @@ const monitorChanges = async () => {
 
                     if (conference) {
                         const name = conference.information.name;
-                        const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}" }`);
+                        const status = change.updateDescription?.updatedFields?.status || 'unknown';
+                        const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}", "status": "${status}" }`);
 
                         for (let i of toInform) {
                             io.to(i._socketID).emit('notification', message);
