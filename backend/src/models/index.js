@@ -51,10 +51,10 @@ feedbackModel.belongsTo(callForPaperModel);
 userModel.hasMany(calenderNoteModel, { onDelete: 'CASCADE' });
 calenderNoteModel.belongsTo(userModel);
 
-importantDateModel.hasOne(calenderNoteModel, { onDelete: 'CASCADE' });
+importantDateModel.hasMany(calenderNoteModel, { onDelete: 'CASCADE' });
 calenderNoteModel.belongsTo(importantDateModel);
 
-organizationModel.hasOne(calenderNoteModel, { onDelete: 'CASCADE' });
+organizationModel.hasMany(calenderNoteModel, { onDelete: 'CASCADE' });
 calenderNoteModel.belongsTo(organizationModel);
 
 followModel.hasMany(calenderNoteModel, { onDelete: 'CASCADE' });
