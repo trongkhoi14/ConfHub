@@ -47,6 +47,11 @@ const insertPost = async function (conference) {
                         CallForPaperCfpId: cfp.cfp_id
                     },
                     { transaction: t });
+
+                if (!cfp.status) conferenceData.inactiveConferences.push({
+                    CallForPaperCfpId: cfp.cfp_id,
+                    UserId: conference.userID
+                });
             }
         });
 
