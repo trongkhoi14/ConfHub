@@ -49,8 +49,23 @@ const isEnable = async function (setting) {
     }
 };
 
+const selectSetting = async function (setting) {
+    try {
+        return await model.settingModel.findOne({
+            where: {
+                UserId: setting.userID,
+                name: setting.name
+            }
+        });
+
+    } catch (error) {
+        throw (error);
+    }
+};
+
 module.exports = {
     selectAllSettings,
     updateSetting,
-    isEnable
+    isEnable,
+    selectSetting
 };

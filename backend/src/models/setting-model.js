@@ -12,7 +12,8 @@ const Setting = sequelize.define('Setting', {
         allowNull: false
     },
     value: {
-        type: DataTypes.DOUBLE
+        type: DataTypes.DOUBLE,
+        defaultValue: 7
     },
     status: {
         type: DataTypes.BOOLEAN,
