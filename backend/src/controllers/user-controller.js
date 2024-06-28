@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 const { generateAccessToken, generateRefreshToken } = require('../middlewares/jwt');
 const { status } = require('./../constants');
 const { Op } = require('sequelize');
+const axios = require('axios');
 const sequelize = require('../config/database.js');
-const model = require('../models')
+const model = require('../models');
 
 class UserController {
     // [POST] /api/v1/user/register
@@ -290,7 +291,47 @@ class UserController {
                 data: []
             })
         }
-    })
+    });
+
+    handleGoogleLogin = asyncHandler(async (req, res) => {
+        try {
+            const user = req.user;
+
+            if (!user) {
+                return res.status(401).json({ message: 'Login failed.' });
+            }
+
+            const response = await userModel.findOne({ where: { email: user.email } });
+
+            const accessToken = generateAccessToken(response.id, response.role)
+            const newRefreshToken = generateRefreshToken(response.id)
+            await userModel.update(
+                { refreshToken: newRefreshToken },
+                { where: { id: response.id }, returning: true })
+            // save refresh token to cookie
+            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000 });
+
+            return res.status(status.OK).json({
+                message: "Login successfully",
+                data: {
+                    name: response.name,
+                    phone: response.phone,
+                    email: response.email,
+                    address: response.address,
+                    nationality: response.nationality,
+                    role: response.role,
+                    accessToken
+                }
+            });
+
+        } catch (error) {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Login failed.",
+                error: error
+            });
+        }
+
+    });
 }
 
 module.exports = UserController;

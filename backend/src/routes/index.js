@@ -13,6 +13,7 @@ const notificationRouter = require('./notification-router');
 const rankRouter = require('./rank-router');
 const viewRouter = require('./view-router');
 const dashboardRouter = require('./dashboard-router');
+const gmailLoginRouter = require('./gmail-login-router');
 
 module.exports = function (app) {
     app.use('/api/v1/user', userRouter);
@@ -30,4 +31,5 @@ module.exports = function (app) {
     app.use('/api/v1/rank', rankRouter);
     app.use('/api/v1/view', viewRouter);
     app.use('/api/v1/dashboard', dashboardRouter);
+    app.use('/auth/google', gmailLoginRouter);
 }

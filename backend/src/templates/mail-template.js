@@ -6,38 +6,48 @@ const setMessage = function (payload) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an upcoming event that is scheduled to take place soon:</p>
-                <p>Conference: <b>${payload.confName}</b></p>
-                <p>Detail: <b>${payload.detail}</b></p>
-                <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
+                <p> Conference: <b>${payload.confName}</b></p>
+                <p> Detail: <b>${payload.detail}</b></p>
+                <p> Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
     else if (payload.title === process.env.TITLE_NEW_UPDATED_EVENT) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an updated event from a conference you are following:</p>
-                <p>Conference: <b>${payload.confName}</b></p>
-                <p>Detail: <b>${payload.detail}</b></p>
-                <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
+                <p> Conference: <b>${payload.confName}</b></p>
+                <p> Detail: <b>${payload.detail}</b></p>
+                <p> Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
     else if (payload.title === process.env.TITLE_CANCELLED_EVENT) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an cancelled event of one of your followed conference:</p>
-                <p>Conference: <b>${payload.confName}</b></p>
-                <p>Detail: <b>${payload.detail}</b></p>
-                <p>Please be prepared to join this event and don't forget to mark your calendar!</p>
+                <p> Conference: <b>${payload.confName}</b></p>
+                <p> Detail: <b>${payload.detail}</b></p>
+                <p> Please be prepared to join this event and don't forget to mark your calendar!</p>
                 `
     }
     else if (payload.title === process.env.TITLE_CANCELLED_CONFERENCE) {
         return `
                 <p> Dear Sir/Madam,</p>
                 <p> We would like to inform you about an cancelled conference that you are concerned about:</p>
-                <p>${payload.confName}</p>
-                <p>From now on, you will no longer find any information about this conference on ConferenceHub. Sorry for this inconvenience.</p>
+                <p> ${payload.confName}</p>
+                <p> From now on, you will no longer find any information about this conference on ConferenceHub. Sorry for this inconvenience.</p>
+                `
+    }
+    else if (payload.title === process.env.TITLE_REGISTER_SUCCESSFULLY) {
+        return `
+                <p> Dear Sir/Madam,</p>
+                <p> Thank you for participating in using CONFHUB.</p>
+                <p> Your password is: <b>${payload.password}</b>.</p>
+                <p> For safety, please change your password immediately after logging in. </p>
+                <p> If you have any questions, please email ${process.env.ADMIN_EMAIL_ADDRESS}.</p>
                 `
     }
 }
+
 
 module.exports.mail = (payload) => {
     const key = RandomNumber(6);

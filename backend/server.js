@@ -14,6 +14,8 @@ const { initSocket, users } = require('./src/config/socket');
 const { loadDataForFilter, loadInactiveConference } = require('./src/temp/index');
 var cron = require('node-cron');
 const { createNewLog, increaseUserLog } = require('./src/utils/dashboard');
+const session = require('express-session');
+const passport = require('./src/services/passport');
 require('dotenv').config();
 
 const app = express();
@@ -35,17 +37,28 @@ app.use(infoLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// express-session middleware
+app.use(session({
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// create router
+router(app);
+
 // connect to database
 dbConnect();
 // dataSeeding(['admin', 'conferences']);
 crawlerDBConnect();
 
-// create router
-router(app);
-
 // middleware handle error
 app.use(notFound);
 app.use(errorHandler);
+
 
 // Create HTTP server and integrate with Socket.IO
 const server = http.createServer(app);
