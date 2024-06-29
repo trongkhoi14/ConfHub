@@ -310,7 +310,7 @@ class UserController {
                 { where: { id: response.id }, returning: true })
             // save refresh token to cookie
             res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000 });
-
+            res.redirect('https://jjoevv.github.io/demo-conference-search/?page=1&#/login');
             return res.status(status.OK).json({
                 message: "Login successfully",
                 data: {
