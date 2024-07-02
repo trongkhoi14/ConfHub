@@ -14,5 +14,6 @@ module.exports = {
     NotificationController: require('./notification-controller'),
     RankController: require('./rank-controller'),
     ViewLoadingController: require('./view-loading'),
-    DashboardController: require('./dashboard')
+    DashboardController: require('./dashboard'),
+    JobController: require('./crawl-job-controller')
 };

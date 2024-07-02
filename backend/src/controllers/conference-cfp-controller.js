@@ -99,7 +99,7 @@ class ConferenceCFPController {
                 });
             }
 
-            const jobID = await addCrawlJob(nkey);
+            const jobID = await addCrawlJob(nkey, "update now");
             socketJob.push({
                 _socketID: socketID,
                 _jobID: jobID.toString(),

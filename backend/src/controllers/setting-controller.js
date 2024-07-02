@@ -2,7 +2,6 @@ const input = require('../utils/input-handler.js');
 const query = require('../utils/queries.js');
 const { status } = require('../constants/index.js');
 const asyncHandler = require('express-async-handler');
-const { set } = require('mongoose');
 require('dotenv').config();
 
 class settingController {

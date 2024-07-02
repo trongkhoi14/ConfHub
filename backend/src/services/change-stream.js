@@ -15,43 +15,59 @@ const monitorChanges = async () => {
             useUnifiedTopology: true
         });
 
-        const changeStream = JobModel.watch([{ $match: { 'operationType': 'update' } }]);
+        const changeStream = JobModel.watch();
 
-        changeStream.on('change', (change) => {
-            console.log('Server detected change:', change);
+        changeStream.on('change', async (change) => {
+            // console.log('Server detected change:', change);
             try {
-                const duration = change.updateDescription?.updatedFields?.duration || 0;
-                if (duration) increaseETLLog(duration);
-
                 const jobID = change.documentKey._id.toString();
+                // admin will listen all change
+                const res = {
+                    operationType: change.operationType,
+                    jobID: jobID
+                }
+                io.emit('job', res);
 
-                const toInform = socketJob.filter(item => item._jobID == jobID);
+                // user only listen to update change
+                if (change.operationType == "update") {
+                    const toInform = socketJob.filter(item => item._jobID == jobID);
 
-                if (toInform.length > 0) {
-                    const cfpID = toInform[0]._cfpID;
-                    const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
+                    if (toInform.length > 0) {
+                        const cfpID = toInform[0]._cfpID;
+                        const conference = conferenceData.listOfConferences.find(item => item.id == cfpID);
 
-                    if (conference) {
-                        const name = conference.information.name;
-                        const status = change.updateDescription?.updatedFields?.status || 'unknown';
-                        const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}", "status": "${status}" }`);
+                        if (conference) {
+                            const name = conference.information.name;
+                            const status = change.updateDescription?.updatedFields?.status || 'updating';
+                            const error = change.updateDescription?.updatedFields?.error || null;
+                            const progress = JSON.stringify(change.updateDescription?.updatedFields?.progress) || null;
 
-                        for (let i of toInform) {
-                            io.to(i._socketID).emit('notification', message);
-                        }
+                            const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}", "status": "${status}", "progress": "${progress}", "error": "${error}" }`);
 
-                        for (let i = socketJob.length - 1; i >= 0; i--) {
-                            if (socketJob[i]._jobID == jobID) {
-                                socketJob.splice(i, 1);
+                            for (let i of toInform) {
+                                io.to(i._socketID).emit('notification', message);
+                            }
+
+                            // stop listening to this job's change stream
+                            if (status == "failed" || status == "completed") {
+                                const duration = change.updateDescription?.updatedFields?.duration || 0;
+                                if (duration) increaseETLLog(duration);
+
+                                for (let i = socketJob.length - 1; i >= 0; i--) {
+                                    if (socketJob[i]._jobID == jobID) {
+                                        socketJob.splice(i, 1);
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
+
 
             } catch (error) {
                 console.log(error);
             }
-
 
         });
 

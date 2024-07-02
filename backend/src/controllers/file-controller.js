@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { dataPineline } = require('../utils/copy-of-datapineline.js');
 const { conferenceData, insertToList } = require('../temp/index');
 const { insertCallForPaper, selectCallForPaperForFilter } = require('../utils/cfp-queries.js');
-const e = require('express');
+
 class FileController {
     insert = asyncHandler(async (req, res, next) => {
         try {
@@ -22,7 +22,7 @@ class FileController {
                 await newConference.save();
 
                 // 2. crawl job
-                const jobID = await addCrawlJob(newConference._id.toString());
+                const jobID = await addCrawlJob(newConference._id.toString(), "import conference");
 
                 // 3. pg
 
@@ -49,7 +49,7 @@ class FileController {
             } else if (existingConferences.length > 0) {
                 const existingConference = existingConferences.find(item => item.Source == req.body.source);
                 // 2. crawl job
-                const jobID = await addCrawlJob(existingConference._id.toString());
+                const jobID = await addCrawlJob(existingConference._id.toString(), "import conference");
 
                 // 3. pg
                 const isExistedPgInstance = conferenceData.listOfConferences.some(item =>
@@ -108,7 +108,7 @@ class FileController {
                 });
 
                 // 2. crawl job
-                const jobID = await addCrawlJob(newConference._id.toString());
+                const jobID = await addCrawlJob(newConference._id.toString(), "import conference");
 
                 // 3. pg
                 const conferenceObj = await dataPineline(newConference);
