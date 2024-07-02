@@ -22,9 +22,18 @@ const monitorChanges = async () => {
             try {
                 const jobID = change.documentKey._id.toString();
                 // admin will listen all change
+                let job;
+                let cfp;
+                if (change.operationType != "delete") {
+                    job = await JobModel.findById(jobID);
+                    cfp = conferenceData.listOfConferences.find(item => item.nkey == job.conf_id)?.information;
+                }
+
                 const res = {
                     operationType: change.operationType,
-                    jobID: jobID
+                    jobID: jobID,
+                    job: job,
+                    cfp: cfp
                 }
                 io.emit('job', res);
 
