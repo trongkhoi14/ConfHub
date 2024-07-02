@@ -138,8 +138,7 @@ const updateDates = async function (conference, transaction) {
                 });
 
             } else if (isExisted) {
-                console.log(!moment(isExisted.date_value).isSame(moment(element.date_value)), isExisted.date_value, element.date_value)
-                if (!moment(isExisted.date_value).isSame(moment(element.date_value))) {
+                if (!moment(isExisted.date_value).isSame(moment(formatDate(element.date_value)))) {
                     const newDate = await model.importantDateModel.create({
                         date_type: element.date_type,
                         date_value: element.date_value,

@@ -145,7 +145,7 @@ const updateOrganizations = async function (conference, transaction) {
                 });
 
             } else if (isExisted) {
-                if (isExisted.type !== element.type || isExisted.location !== element.location || !moment(isExisted.start_date).isSame(moment(element.start_date)) || !moment(isExisted.end_date).isSame(moment(element.end_date))) {
+                if (isExisted.type !== element.type || isExisted.location !== element.location || !moment(isExisted.start_date).isSame(moment(formatDate(element.start_date))) || !moment(isExisted.end_date).isSame(formatDate(moment(element.end_date)))) {
                     const newOrganization = await model.organizationModel.create({
                         name: !isEmpty(element.name) ? element.name : "location " + (conference.organizations.indexOf(element) + 1),
                         type: element.type,
