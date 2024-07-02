@@ -22,7 +22,7 @@ class FileController {
                 await newConference.save();
 
                 // 2. crawl job
-                await addCrawlJob(newConference._id.toString());
+                const jobID = await addCrawlJob(newConference._id.toString());
 
                 // 3. pg
 
@@ -32,16 +32,24 @@ class FileController {
 
                     // 4. view
                     await insertToList(pgInstance.cfp_id, conferenceData.listOfConferences);
+
+                    return res.status(status.OK).json({
+                        message: "mode 1",
+                        newMongoInstance: true,
+                        crawlJob: jobID,
+                        newPgInstance: true,
+                        cfp_id: pgInstance.cfp_id
+                    });
                 }
 
-                return res.status(status.OK).json({
-                    message: "mode 1"
+                return res.status(status.INTERNAL_ERROR).json({
+                    message: "Error in mode 1."
                 });
 
             } else if (existingConferences.length > 0) {
                 const existingConference = existingConferences.find(item => item.Source == req.body.source);
                 // 2. crawl job
-                await addCrawlJob(existingConference._id.toString());
+                const jobID = await addCrawlJob(existingConference._id.toString());
 
                 // 3. pg
                 const isExistedPgInstance = conferenceData.listOfConferences.some(item =>
@@ -52,7 +60,11 @@ class FileController {
 
                 if (isExistedPgInstance) {
                     return res.status(status.OK).json({
-                        message: "mode 2.0"
+                        message: "mode 2.0",
+                        newMongoInstance: false,
+                        crawlJob: jobID,
+                        newPgInstance: false,
+                        cfp_id: isExistedPgInstance.cfp_id
                     });
                 }
 
@@ -62,12 +74,19 @@ class FileController {
 
                     // 4. view
                     await insertToList(pgInstance.cfp_id, conferenceData.listOfConferences);
+
+                    return res.status(status.OK).json({
+                        message: "mode 2",
+                        newMongoInstance: false,
+                        crawlJob: jobID,
+                        newPgInstance: true,
+                        cfp_id: pgInstance.cfp_id
+                    });
                 }
 
-                return res.status(status.OK).json({
-                    message: "mode 2"
+                return res.status(status.INTERNAL_ERROR).json({
+                    message: "Error in mode 2."
                 });
-
 
             } else if (existingConferences.length == 0) {
 
@@ -89,7 +108,7 @@ class FileController {
                 });
 
                 // 2. crawl job
-                await addCrawlJob(newConference._id.toString());
+                const jobID = await addCrawlJob(newConference._id.toString());
 
                 // 3. pg
                 const conferenceObj = await dataPineline(newConference);
@@ -98,10 +117,18 @@ class FileController {
 
                     // 4. view
                     await insertToList(pgInstance.cfp_id, conferenceData.listOfConferences);
+
+                    return res.status(status.OK).json({
+                        message: "mode 3",
+                        newMongoInstance: true,
+                        crawlJob: jobID,
+                        newPgInstance: true,
+                        cfp_id: pgInstance.cfp_id
+                    });
                 }
 
-                return res.status(status.OK).json({
-                    message: "mode 3"
+                return res.status(status.INTERNAL_ERROR).json({
+                    message: "Error in mode 3."
                 });
             }
 

@@ -426,7 +426,7 @@ function getSetting(req) {
     try {
         return {
             userID: req.user?._id,
-            name: req.body.name,
+            name: req.body.name || req.params.name,
             value: req.body.value,
             status: req.body.status
         }

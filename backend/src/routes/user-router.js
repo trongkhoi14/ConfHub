@@ -17,6 +17,7 @@ router.get('/refreshToken', userController.refreshAccessToken);
 router.post('/register', userController.register);
 
 router.get('/setting', verifyAccessToken, settingController.getAllSettings);
+router.get('/setting/:name', verifyAccessToken, settingController.getSetting);
 router.put('/setting', verifyAccessToken, settingController.changeSetting);
 
 // admin side
