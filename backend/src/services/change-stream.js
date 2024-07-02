@@ -51,7 +51,7 @@ const monitorChanges = async () => {
                             const error = change.updateDescription?.updatedFields?.error || null;
                             const progress = JSON.stringify(change.updateDescription?.updatedFields?.progress) || null;
 
-                            const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}", "status": "${status}", "progress": "${progress}", "error": "${error}" }`);
+                            const message = JSON.parse(`{ "id": "${cfpID}", "name": "${name}", "status": "${status}", "progress": ${progress}, "error": "${error}" }`);
 
                             for (let i of toInform) {
                                 io.to(i._socketID).emit('notification', message);
