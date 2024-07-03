@@ -33,7 +33,7 @@ const selectUpcomingEvents = async function () {
         const upcomingDates = await model.importantDateModel.findAll({
             where: {
                 status: "new",
-                date_value: { [Op.between]: [moment.utc(currentDate).toDate(), moment.utc(oneWeekLater).toDate()] },
+                date_value: { [Op.between]: [moment.utc(formatDate(currentDate)).toDate(), moment.utc(formatDate(oneWeekLater)).toDate()] },
             }
         })
 
@@ -56,7 +56,7 @@ const selectUpcomingEvents = async function () {
         const upcomingOrgs = await model.organizationModel.findAll({
             where: {
                 status: "new",
-                start_date: { [Op.between]: [moment.utc(currentDate).toDate(), moment.utc(oneWeekLater).toDate()] },
+                start_date: { [Op.between]: [moment.utc(formatDate(currentDate)).toDate(), moment.utc(formatDate(oneWeekLater)).toDate()] },
             }
         })
 

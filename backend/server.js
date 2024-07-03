@@ -8,18 +8,17 @@ const { dataSeeding } = require('./src/seeders/data-seeding');
 const { notFound, errorHandler } = require('./src/middlewares/errorHandling');
 const { rateLimiter } = require('./src/utils/rate-limiter');
 const { infoLogger } = require('./src/utils/logger');
-const NotificationController = require('./src/controllers/notification-controller');
 const http = require('http');
-const { initSocket, users } = require('./src/config/socket');
+const { initSocket, socketListening } = require('./src/config/socket');
 const { loadDataForFilter, loadInactiveConference } = require('./src/temp/index');
-var cron = require('node-cron');
-const { createNewLog, increaseUserLog } = require('./src/utils/dashboard');
+const { createNewLog } = require('./src/utils/dashboard');
 const session = require('express-session');
 const passport = require('./src/services/passport');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 8081;
+process.env.TZ = "Asia/Ho_Chi_Minh"
 
 app.use(cors());
 app.set('trust proxy', true);
@@ -59,49 +58,14 @@ crawlerDBConnect();
 app.use(notFound);
 app.use(errorHandler);
 
-
 // Create HTTP server and integrate with Socket.IO
 const server = http.createServer(app);
 const io = initSocket(server);
+socketListening(io);
 
-io.on('connection', (socket) => {
-	let userID = socket.handshake.query['user-id'];
-
-	if (!userID || userID == 'null') {
-		userID = 'guest' + Math.random();
-	}
-
-	if (userID) {
-		users.set(userID, socket.id);
-		console.log(`User ${userID} registered with socket ID ${socket.id}`);
-		io.emit('currentUser', users.size);
-		increaseUserLog();
-
-	} else {
-		console.log('No user ID found in headers.');
-	}
-
-	socket.on('disconnect', () => {
-		console.log('User disconnected');
-		for (let [userID, socketID] of users) {
-			if (socketID === socket.id) {
-				users.delete(userID);
-				break;
-			}
-		}
-		io.emit('currentUser', users.size);
-	});
-});
-
-// send upcoming notification
-// cron.schedule("*/1 * * * *", async () => {
-cron.schedule("0 0 * * *", async () => {
-	console.log("[" + new Date() + "] Sending upcoming notifications emails.");
-	NotificationController.sendUpcomingNotification();
-	createNewLog();
-}, {
-	timezone: "Asia/Ho_Chi_Minh"
-});
+// Schedule the cron job for sending upcoming notification emails
+const setupCronJobs = require('./src/config/cron-job');
+setupCronJobs();
 
 // create log
 createNewLog();
@@ -109,8 +73,6 @@ createNewLog();
 // read conference list
 loadDataForFilter();
 loadInactiveConference();
-
-process.env.TZ = "Asia/Ho_Chi_Minh"
 
 // change stream
 const { monitorChanges } = require('./src/services/change-stream');
