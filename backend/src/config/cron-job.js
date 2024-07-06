@@ -42,7 +42,7 @@ function createOrUpdateCronJob(cycle) {
         console.log(Date() + `Cron job chạy với chu kỳ: ${cycle}`);
         const events = await selectUpcomingEvents(runningCycle.period);
         const cfp_ids = new Set(events.map(event => event.cfp_id));
-        const nkeys = conferenceData.listOfConferences.filter(obj => cfp_ids.has(obj.id)).map(obj => obj.information.nkey);
+        const nkeys = conferenceData.listOfConferences.filter(obj => cfp_ids.has(obj.id) && obj.information.nkey != null).map(obj => obj.information.nkey);
         for (const nkey of nkeys) {
             await addCrawlJob(nkey, "update now");
         }
