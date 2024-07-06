@@ -8,7 +8,7 @@ require('dotenv').config();
 class NotificationController {
     static sendUpcomingNotification = asyncHandler(async (req, res, next) => {
         try {
-            const events = await selectUpcomingEvents();
+            const events = await selectUpcomingEvents(30);
             await sendNotifications(events);
         } catch (err) {
             throw (err);

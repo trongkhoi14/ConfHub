@@ -23,10 +23,10 @@ const sendNotificationToUser = (userID, message) => {
     }
 };
 
-const selectUpcomingEvents = async function () {
+const selectUpcomingEvents = async function (period) {
     try {
         const currentDate = new Date();
-        const oneWeekLater = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000); // one month
+        const oneWeekLater = new Date(currentDate.getTime() + period * 24 * 60 * 60 * 1000); // one month
 
         let upcomingEvents = [];
 

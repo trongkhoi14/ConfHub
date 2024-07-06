@@ -12,6 +12,7 @@ const feedbackModel = require('./feedback-model');
 const calenderNoteModel = require('./calender-note-model');
 const settingModel = require('./setting-model');
 const notificationModel = require('./notification-model');
+const updateCycleModel = require('./update-cycle-model');
 
 // Assocation
 conferenceModel.hasMany(callForPaperModel, { onDelete: 'CASCADE' });
@@ -80,5 +81,6 @@ module.exports = {
     feedbackModel,
     calenderNoteModel,
     settingModel,
-    notificationModel
+    notificationModel,
+    updateCycleModel
 }

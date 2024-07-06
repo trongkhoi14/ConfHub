@@ -44,6 +44,32 @@ class JobController {
             next(error);
         }
     });
+
+    deleteJobById = asyncHandler(async (req, res, next) => {
+        try {
+
+            const id = req.params?.id
+            await JobModel.findByIdAndDelete(id);
+
+            return res.status(status.OK).json({
+                message: "Job is deleted."
+            });
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    deletePendingJob = asyncHandler(async (req, res, next) => {
+        try {
+            const count = await JobModel.deleteMany({ status: "pending" });
+
+            return res.status(status.OK).json({
+                message: `${count.deletedCount} jobs is deleted.`
+            });
+        } catch (error) {
+            next(error);
+        }
+    });
 }
 
 

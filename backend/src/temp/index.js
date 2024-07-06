@@ -135,5 +135,5 @@ module.exports = {
     selectCallForPaperForFilter,
     insertToList,
     updateToList,
-    removeFromList
+    removeFromList,
 }
