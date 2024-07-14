@@ -309,20 +309,22 @@ class UserController {
                 { refreshToken: newRefreshToken },
                 { where: { id: response.id }, returning: true })
             // save refresh token to cookie
-            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000 });
 
-            res.redirect('https://jjoevv.github.io/demo-conference-search/?page=1&#/login');
+            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000, secure: true, sameSite: 'lax' });
+
+            res.redirect(`http://localhost:5173/demo-conference-search/?page=1&#/login?refreshToken=${newRefreshToken}`);
+
             return res.status(status.OK).json({
-                message: "Login successfully",
-                data: {
-                    name: response.name,
-                    phone: response.phone,
-                    email: response.email,
-                    address: response.address,
-                    nationality: response.nationality,
-                    role: response.role,
-                    accessToken
-                }
+                // message: "Login successfully",
+                // data: {
+                //     name: response.name,
+                //     phone: response.phone,
+                //     email: response.email,
+                //     address: response.address,
+                //     nationality: response.nationality,
+                //     role: response.role,
+                //     accessToken
+                // }
             });
 
 
