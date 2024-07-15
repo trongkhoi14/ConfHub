@@ -312,7 +312,7 @@ class UserController {
 
             res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000, secure: true, sameSite: 'lax' });
 
-            res.redirect(`http://localhost:5173/demo-conference-search/?page=1&#/login?refreshToken=${newRefreshToken}`);
+            res.redirect(`https://jjoevv.github.io/demo-conference-search/#/login?refreshToken=${newRefreshToken}`);
 
             return res.status(status.OK).json({
                 // message: "Login successfully",
