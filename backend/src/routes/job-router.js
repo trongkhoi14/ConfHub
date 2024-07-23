@@ -1,6 +1,5 @@
 const express = require('express');
 const { JobController } = require('../controllers');
-const { verifyAccessToken, checkUserLicense } = require('../middlewares/verifyToken');
 
 const router = express.Router();
 const jobController = new JobController();

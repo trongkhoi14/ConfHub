@@ -23,5 +23,8 @@ router.put('/setting', verifyAccessToken, settingController.changeSetting);
 // admin side
 router.get('/', verifyAccessToken, checkAdminRole, userController.getAll);
 router.post('/login/admin', userController.adminLogin);
+router.delete('/:id', verifyAccessToken, checkAdminRole, userController.deleteUser);
+router.put('/:id/active', verifyAccessToken, checkAdminRole, userController.activateUser);
+router.put('/:id/deactive', verifyAccessToken, checkAdminRole, userController.deactivateUser);
 
 module.exports = router;

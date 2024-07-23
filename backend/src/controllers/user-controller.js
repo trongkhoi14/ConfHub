@@ -7,6 +7,8 @@ const { Op } = require('sequelize');
 const axios = require('axios');
 const sequelize = require('../config/database.js');
 const model = require('../models');
+const { sendingEmail } = require('../services/mail-services');
+require('dotenv').config();
 
 class UserController {
     // [POST] /api/v1/user/register
@@ -60,6 +62,13 @@ class UserController {
                 data: []
             })
         }
+
+        if (response.role == 'banned') {
+            return res.status(status.OK).json({
+                message: `Your account is not activated. Please contact email ${process.env.ADMIN_EMAIL_ADDRESS} for more information`
+            });
+        }
+
         const passwordCorrect = await response.isCorrectPassword(password);
         //console.log(passwordCorrect);
         if (passwordCorrect) {
@@ -303,29 +312,32 @@ class UserController {
 
             const response = await userModel.findOne({ where: { email: user.email } });
 
+            if (response.role == 'banned') {
+                const message = `Your account is not activated. Please contact email ${process.env.ADMIN_EMAIL_ADDRESS} for more information`;
+                return res.redirect(`https://jjoevv.github.io/demo-conference-search/#/login?message=${message}`);
+            }
+
             const accessToken = generateAccessToken(response.id, response.role)
             const newRefreshToken = generateRefreshToken(response.id)
             await userModel.update(
                 { refreshToken: newRefreshToken },
                 { where: { id: response.id }, returning: true })
-            // save refresh token to cookie
 
-            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000, secure: true, sameSite: 'lax' });
-
+            // res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: parseInt(process.env.REFRESH_TOKEN_DAYS) * 24 * 60 * 60 * 1000, secure: true, sameSite: 'lax' });
             res.redirect(`https://jjoevv.github.io/demo-conference-search/#/login?refreshToken=${newRefreshToken}`);
 
-            return res.status(status.OK).json({
-                // message: "Login successfully",
-                // data: {
-                //     name: response.name,
-                //     phone: response.phone,
-                //     email: response.email,
-                //     address: response.address,
-                //     nationality: response.nationality,
-                //     role: response.role,
-                //     accessToken
-                // }
-            });
+            // return res.status(status.OK).json({
+            // message: "Login successfully",
+            // data: {
+            //     name: response.name,
+            //     phone: response.phone,
+            //     email: response.email,
+            //     address: response.address,
+            //     nationality: response.nationality,
+            //     role: response.role,
+            //     accessToken
+            // }
+            // });
 
 
         } catch (error) {
@@ -335,6 +347,75 @@ class UserController {
             });
         }
 
+    });
+
+    activateUser = asyncHandler(async (req, res) => {
+        try {
+            const userID = req.params?.id;
+            const user = await userModel.findByPk(userID);
+            user.role = 'user';
+            await user.save();
+            return res.status(status.OK).json({
+                message: "Activated this user successfully.",
+            })
+
+        } catch (error) {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Activate this user failed.",
+                error: error
+            });
+        }
+    });
+
+    deactivateUser = asyncHandler(async (req, res) => {
+        try {
+            const userID = req.params?.id;
+            const user = await userModel.findByPk(userID);
+            user.role = 'banned';
+            await user.save();
+
+            const payload = {
+                title: process.env.DEACTIVATE_ACCOUNT,
+                uEmail: user.email
+            }
+            sendingEmail(payload);
+
+            return res.status(status.OK).json({
+                message: "You have been banned.",
+            })
+
+        } catch (error) {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Deactivate this user failed.",
+                error: error
+            });
+        }
+    });
+
+    deleteUser = asyncHandler(async (req, res) => {
+        try {
+            const userID = req.params?.id;
+            const user = await userModel.findByPk(userID);
+            const email = user.email;
+            if (user) {
+                await user.destroy();
+                const payload = {
+                    title: process.env.DELETE_ACCOUNT,
+                    uEmail: email
+                }
+                sendingEmail(payload);
+            }
+
+            return res.status(status.OK).json({
+                message: "Deleted this user successfully.",
+            })
+
+        } catch (error) {
+            return res.status(status.BAD_REQUEST).json({
+                message: "Delete this user failed.",
+                error: error
+            });
+        }
     });
 }
 

@@ -2,7 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/user-model');
 const getRndInteger = require('../utils/random');
-const { sendingEmail } = require('../services/mail-services')
+const { sendingEmail } = require('../services/mail-services');
 require('dotenv').config();
 
 passport.use(
