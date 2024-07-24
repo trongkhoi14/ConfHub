@@ -353,10 +353,16 @@ class UserController {
         try {
             const userID = req.params?.id;
             const user = await userModel.findByPk(userID);
-            user.role = 'user';
-            await user.save();
+            if (user) {
+                user.role = 'user';
+                await user.save();
+                return res.status(status.OK).json({
+                    message: "Activated this user successfully.",
+                })
+            }
+
             return res.status(status.OK).json({
-                message: "Activated this user successfully.",
+                message: "User is not existed.",
             })
 
         } catch (error) {
@@ -371,17 +377,24 @@ class UserController {
         try {
             const userID = req.params?.id;
             const user = await userModel.findByPk(userID);
-            user.role = 'banned';
-            await user.save();
 
-            const payload = {
-                title: process.env.DEACTIVATE_ACCOUNT,
-                uEmail: user.email
+            if (user) {
+                user.role = 'banned';
+                await user.save();
+
+                const payload = {
+                    title: process.env.DEACTIVATE_ACCOUNT,
+                    uEmail: user.email
+                }
+                sendingEmail(payload);
+
+                return res.status(status.OK).json({
+                    message: "You have been banned.",
+                })
             }
-            sendingEmail(payload);
 
             return res.status(status.OK).json({
-                message: "You have been banned.",
+                message: "User is not existed.",
             })
 
         } catch (error) {
@@ -396,8 +409,9 @@ class UserController {
         try {
             const userID = req.params?.id;
             const user = await userModel.findByPk(userID);
-            const email = user.email;
+
             if (user) {
+                const email = user.email;
                 await user.destroy();
                 const payload = {
                     title: process.env.DELETE_ACCOUNT,
