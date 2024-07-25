@@ -1,93 +1,115 @@
-const { query } = require('express');
-const connection = require('./../config/database')
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('./../config/database');
+const settingModel = require('./setting-model');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
-module.exports = {
-    // demo
-    getAllUser: async () => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            const result = await connection.request().query(`SELECT * FROM ACCOUNT`)
-            // Đóng kết nối
-            await connection.close();
-            return result.recordset;
-        } catch (error) {
-            console.log(error);
-        }
-    },
-
-    // Lấy người dùng theo Email
-    getUserByEmail: async (email) => {
-        try {
-            await connection.connect();
-            const result = await connection.request()
-            .query(`SELECT * FROM ACCOUNT WHERE ACC_EMAIL = '${email}'`)
-            await connection.close();
-            //console.log(result.recordset)
-            return result.recordset;
-        } catch (error) {
-            console.log(error);
-        }
-    },
-
-    // Tạo người dùng mới
-    createUser: async (acc) => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            queryStr = `INSERT INTO ACCOUNT (ACC_ID, ACC_NAME, ACC_PHONE, ACC_EMAIL, ACC_ADDRESS, ACC_NATIONALITY, ACC_PASSWORD) 
-            VALUES ('${acc.id}', '${acc.name}', '${acc.phone}', '${acc.email}', '${acc.address}', '${acc.nationality}', '${acc.password}')`;
-            const result = await connection.request().query(queryStr);
-            // Đóng kết nối
-            await connection.close();
-            return true;
-        } catch (error) {
-            console.log(error);
-        }
-    },
-
-    // Cập nhật người dùng
-    updateUser: async () => {
-        try {
-            
-        } catch (error) {
-            
-        }
-    },
-
-    // Cập nhật token người dùng theo id
-    updateUserTokenById: async (id, token) => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            queryStr = `UPDATE ACCOUNT SET ACC_TOKEN = '${token}' WHERE ACC_ID = '${id}'`;
-            const result = await connection.request().query(queryStr);
-            // Đóng kết nối
-            await connection.close();
-        } catch (error) {
-            
-        }
-    },
-
-    // Cập nhật token người dùng theo id
-    updateUserTokenByToken: async (old_token, new_token) => {
-        try {
-            // Mở kết nối đến database
-            await connection.connect();
-            // Thực hiện truy vấn
-            queryStr = `UPDATE ACCOUNT SET ACC_TOKEN = '${new_token}' WHERE ACC_TOKEN = '${old_token}'`;
-            const result = await connection.request().query(queryStr);
-            // Đóng kết nối
-            await connection.close();
-        } catch (error) {
-            
-        }
+class User extends Model {
+    static async hashPassword(password) {
+        const salt = bcrypt.genSaltSync(10);
+        return await bcrypt.hash(password, salt);
     }
 
-    // Xóa người dùng
+    async isCorrectPassword(password) {
+        return await bcrypt.compare(password, this.password);
+    }
 
-    
-}
+    static createPasswordChangedToken() {
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+        return resetToken;
+    }
+};
+
+User.init({
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    phone: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        unique: false
+    },
+    email: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        unique: true,
+        validate: {
+            isEmail: true
+        }
+    },
+    address: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    nationality: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    password: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    role: {
+        type: DataTypes.TEXT,
+        // validate: {
+        //     isIn: {
+        //         args: [['user', 'admin']],
+        //         msg: 'Error: Invalid value.'
+        //     }
+        // },
+        defaultValue: 'user'
+    },
+    license: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    refreshToken: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    passwordChangedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    passwordResetToken: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    passwordResetExpires: {
+        type: DataTypes.DATE,
+        allowNull: true
+    }
+}, {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
+    timestamps: false
+});
+
+User.beforeSave(async (user, options) => {
+    if (user.changed('password')) {
+        user.password = await User.hashPassword(user.password);
+    }
+});
+
+User.afterCreate(async (user, options) => {
+    await settingModel.bulkCreate([
+        { name: process.env.DATA_UPDATE_CYCLE, value: 3, status: true, UserId: user.id },
+        { name: process.env.CHANGE_AND_UPDATE, status: true, UserId: user.id },
+        { name: process.env.CANCELLED_EVENT, status: true, UserId: user.id },
+        { name: process.env.YOUR_UPCOMING_EVENT, status: true, UserId: user.id },
+        { name: process.env.AUTO_ADD_EVENT_TO_SCHEDULE, status: true, UserId: user.id }
+    ]);
+});
+
+module.exports = User;
+
+

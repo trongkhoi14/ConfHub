@@ -1,20 +1,57 @@
-const connection = require('../config/database')
+const { DataTypes } = require('sequelize');
+const sequelize = require('./../config/database');
 
-module.exports = {
-    getConferenceCFP: async (id) => {
-        try {
-            await connection.connect();
-            const sql = `SELECT CFP_ID AS cfp_id, `
-                        + `CFP_CONTENT AS content, `
-                        + `CFP_LINK AS link, ` 
-                        + `CFP_NOTE AS note, `
-                        + `CFP_IS_LATEST AS is_latest ` 
-                        + `FROM dbo.CALL_FOR_PAPER `
-                        + `WHERE CONF_ID = ${id}`
-            const result = await connection.request().query(sql)
-            return result.recordset;
-        } catch (error) {
-            console.log(error) 
-        }
+const CallForPaper = sequelize.define('CallForPaper', {
+    cfp_id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
     },
-}
+    content: {
+        type: DataTypes.TEXT
+    },
+    link: {
+        type: DataTypes.TEXT
+    },
+    status: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    rating: {
+        type: DataTypes.DOUBLE
+    },
+    rank: {
+        type: DataTypes.TEXT
+    },
+    owner: {
+        type: DataTypes.TEXT,
+        // isIn: {
+        //     args: [['admin', 'user', 'crawler']],
+        //     msg: 'Error: Invalid value.'
+        // },
+        defaultValue: "crawler"
+    },
+    nkey: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    view: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
+}, {
+    timestamps: false,
+    tableName: 'call_for_papers'
+});
+
+module.exports = CallForPaper;

@@ -1,15 +1,28 @@
-const connection = require('../config/database')
+const { DataTypes } = require('sequelize');
+const sequelize = require('./../config/database');
 
-module.exports = {
-    getImportantDate: async (id) => {
-        try {
-            await connection.connect();
-            const result = await connection.request().query(`SELECT TB1.DATE_ID AS date_id, TB2.DOC_TYPE AS doc_type `
-                                                            + `FROM dbo.IMPORTANT_DATE TB1, dbo.DOCUMENT TB2 `
-                                                            + `WHERE TB1.DOC_ID = TB2.DOC_ID AND TB1.CONF_ID = '${id}'`)
-            return result.recordset;
-        } catch (error) {
-            console.log(error) 
-        }
+const ImportantDate = sequelize.define('ImportantDate', {
+    date_id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
+    date_type: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    date_value: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    status: {
+        type: DataTypes.TEXT,
+        defaultValue: 'new'
     }
-}
+}, {
+    timestamps: false,
+    tableName: 'important_dates'
+});
+
+module.exports = ImportantDate;
